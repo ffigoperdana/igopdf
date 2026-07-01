@@ -75,7 +75,7 @@ export interface MarkdownEditorOptions {
 
 export type { MarkdownItOptions } from '@/types';
 
-const DEFAULT_MARKDOWN = `# Welcome to BentoPDF Markdown Editor
+const DEFAULT_MARKDOWN = `# Welcome to igo Markdown Editor
 
 This is a **live preview** markdown editor with full plugin support.
 
@@ -85,7 +85,7 @@ This is a **live preview** markdown editor with full plugin support.
 
 - **Bold** and *italic* text
 - ~~Strikethrough~~ text
-- [Links](https://bentopdf.com)
+- [Links](https://igo.local)
 - ==Highlighted text== using mark
 - ++Inserted text++ using ins
 - H~2~O for subscript
@@ -145,12 +145,12 @@ graph TD
 \`\`\`mermaid
 sequenceDiagram
     participant User
-    participant BentoPDF
+    participant igo
     participant Server
-    User->>BentoPDF: Upload PDF
-    BentoPDF->>BentoPDF: Process locally
-    BentoPDF-->>User: Download result
-    Note over BentoPDF: No server needed!
+    User->>igo: Upload PDF
+    igo->>igo: Process locally
+    igo-->>User: Download result
+    Note over igo: No server needed!
 \`\`\`
 
 ### Pie Chart
@@ -218,7 +218,7 @@ erDiagram
 
 \`\`\`mermaid
 mindmap
-    root((BentoPDF))
+    root((igo))
         Convert
             Word to PDF
             Excel to PDF

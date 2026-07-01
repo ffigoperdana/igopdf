@@ -2,7 +2,6 @@
 # Build to serve under Subdirectory BASE_URL if provided, eg: "ARG BASE_URL=/pdf/", otherwise leave blank: "ARG BASE_URL="
 ARG BASE_URL=
 
-# Build stage
 FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
@@ -15,11 +14,9 @@ RUN npm config set fetch-retries 5 && \
     npm ci
 COPY . .
 
-# Build without type checking (vite build only)
-# Pass SIMPLE_MODE environment variable if provided
 ARG SIMPLE_MODE=false
 ENV SIMPLE_MODE=$SIMPLE_MODE
-ARG COMPRESSION_MODE=all
+ARG COMPRESSION_MODE=b
 ENV COMPRESSION_MODE=$COMPRESSION_MODE
 
 # global arg to local arg - BASE_URL is read from env by vite.config.ts
@@ -62,10 +59,7 @@ ENV VITE_FOOTER_TEXT=$VITE_FOOTER_TEXT
 ARG DISABLE_TOOLS
 ENV DISABLE_TOOLS=$DISABLE_TOOLS
 
-# Public-facing canonical site URL. Defaults to the official site so self-hosters
-# consolidate SEO signals back to bentopdf.com. Override with --build-arg
-# SITE_URL=https://your-domain.example to claim canonical for your own deployment.
-ARG SITE_URL=https://www.bentopdf.com
+ARG SITE_URL=https://igo.local
 ENV SITE_URL=$SITE_URL
 
 ENV NODE_OPTIONS="--max-old-space-size=3072"
@@ -74,13 +68,12 @@ RUN --mount=type=secret,id=VITE_CORS_PROXY_URL,required=false \
     --mount=type=secret,id=VITE_CORS_PROXY_SECRET,required=false \
     VITE_CORS_PROXY_URL=$(cat /run/secrets/VITE_CORS_PROXY_URL 2>/dev/null || echo "") \
     VITE_CORS_PROXY_SECRET=$(cat /run/secrets/VITE_CORS_PROXY_SECRET 2>/dev/null || echo "") \
-    npm run build:with-docs
+    npm run build
 
-# Production stage
 FROM quay.io/nginx/nginx-unprivileged:alpine-slim
 
-LABEL org.opencontainers.image.source="https://github.com/alam00000/bentopdf"
-LABEL org.opencontainers.image.url="https://github.com/alam00000/bentopdf"
+LABEL org.opencontainers.image.title="IGO Frontend"
+LABEL org.opencontainers.image.description="Internal Government Operation PDF frontend"
 
 # global arg to local arg
 ARG BASE_URL
@@ -95,7 +88,6 @@ USER nginx
 
 COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html${BASE_URL%/}
 COPY --chown=nginx:nginx nginx.conf /etc/nginx/nginx.conf
-COPY --chown=nginx:nginx --from=builder /app/security-headers.conf /etc/nginx/security-headers.conf
 COPY --chown=nginx:nginx --from=builder /app/security-headers-docs.conf /etc/nginx/security-headers-docs.conf
 COPY --chown=nginx:nginx --chmod=755 nginx-ipv6.sh /docker-entrypoint.d/99-disable-ipv6.sh
 COPY --chown=nginx:nginx --chmod=755 nginx-noindex.sh /docker-entrypoint.d/98-noindex.sh

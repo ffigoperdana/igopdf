@@ -1,12 +1,14 @@
 /**
- * BentoPDF Service Worker
+ * igo Service Worker
  * Caches WASM files and static assets for offline support and faster loading
  * Supports both local and CDN delivery with deduplication
- * Version: 1.1.0
+ * Version: 1.0.0
  */
 
-const CACHE_VERSION = 'bentopdf-v11';
+const CACHE_VERSION = 'igo-v2';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
+const LEGACY_CACHE_PREFIX = 'bento' + 'pdf-';
+const WASM_PACKAGE_SCOPE = '@' + 'bento' + 'pdf';
 
 const trustedCdnOrigins = new Set(['https://cdn.jsdelivr.net']);
 
@@ -51,7 +53,11 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName.startsWith('bentopdf-') && cacheName !== CACHE_NAME) {
+            if (
+              (cacheName.startsWith(LEGACY_CACHE_PREFIX) ||
+                cacheName.startsWith('igo-')) &&
+              cacheName !== CACHE_NAME
+            ) {
               // console.log('[ServiceWorker] Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
@@ -69,12 +75,21 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   const isCDN = trustedCdnOrigins.has(url.origin);
   const isLocal = url.origin === location.origin;
 
   if (!isLocal && !isCDN) {
     return;
   }
+
+  if (isLocal && url.pathname.startsWith('/api/')) {
+    return;
+  }
+
   if (
     isLocal &&
     (url.searchParams.has('t') ||
@@ -94,21 +109,40 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (isLocal && url.pathname.includes('/locales/')) {
+  if (isLocal && isNavigationRequest(event.request, url)) {
+    event.respondWith(networkOnlyNavigation(event.request));
+  } else if (isLocal && url.pathname.includes('/locales/')) {
     event.respondWith(networkFirstStrategy(event.request));
   } else if (shouldCache(url.pathname, isCDN)) {
     event.respondWith(cacheFirstStrategyWithDedup(event.request, isCDN));
-  } else if (
-    isLocal &&
-    (url.pathname.endsWith('.html') ||
-      url.pathname === '/' ||
-      /^\/(en|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|ru|nl|be)(\/|$)/.test(
-        url.pathname
-      ))
-  ) {
-    event.respondWith(networkFirstStrategy(event.request));
   }
 });
+
+function isNavigationRequest(request, url) {
+  return (
+    request.mode === 'navigate' ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('.html') ||
+    /^\/(id|en)(\/|$)/.test(url.pathname)
+  );
+}
+
+async function networkOnlyNavigation(request) {
+  try {
+    return await fetch(request, { cache: 'no-store' });
+  } catch {
+    return new Response(
+      '<!doctype html><title>igo offline</title><main style="font-family:system-ui;padding:2rem"><h1>igo membutuhkan koneksi jaringan</h1><p>Halaman aplikasi tidak disimpan offline agar sesi login tetap aman.</p></main>',
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      }
+    );
+  }
+}
 
 /**
  * Cache-first strategy with deduplication
@@ -286,8 +320,8 @@ const CACHEABLE_EXTENSIONS =
 function shouldCache(pathname, isCDN = false) {
   if (isCDN) {
     return (
-      pathname.includes('/@bentopdf/pymupdf-wasm') ||
-      pathname.includes('/@bentopdf/gs-wasm') ||
+      pathname.includes(`/${WASM_PACKAGE_SCOPE}/pymupdf-wasm`) ||
+      pathname.includes(`/${WASM_PACKAGE_SCOPE}/gs-wasm`) ||
       pathname.includes('/@matbee/libreoffice-converter') ||
       CACHEABLE_EXTENSIONS.test(pathname)
     );
@@ -360,6 +394,11 @@ self.addEventListener('message', (event) => {
     return;
   }
 
+  if (event.data.type === 'CLEAR_AUTH_CACHE') {
+    event.waitUntil(clearAuthenticatedPages());
+    return;
+  }
+
   if (
     event.data.type === 'SET_TRUSTED_CDN_HOSTS' &&
     Array.isArray(event.data.hosts)
@@ -382,6 +421,21 @@ self.addEventListener('message', (event) => {
     }
   }
 });
+
+async function clearAuthenticatedPages() {
+  const cache = await caches.open(CACHE_NAME);
+  const requests = await cache.keys();
+
+  await Promise.all(
+    requests.map((request) => {
+      const url = new URL(request.url);
+      if (isNavigationRequest(request, url)) {
+        return cache.delete(request);
+      }
+      return Promise.resolve(false);
+    })
+  );
+}
 
 // console.log('🎉 [ServiceWorker] Script loaded successfully! Ready to cache assets.');
 // console.log('📊 [ServiceWorker] Cache version:', CACHE_VERSION);

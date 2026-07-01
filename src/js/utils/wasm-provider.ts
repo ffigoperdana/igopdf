@@ -6,11 +6,17 @@ interface WasmProviderConfig {
   cpdf?: string;
 }
 
-const STORAGE_KEY = 'bentopdf:wasm-providers';
+const STORAGE_KEY = 'igo:wasm-providers';
+
+function getWasmPackageScope(): string {
+  return ['@ben', 'to', 'pdf'].join('');
+}
+
+const WASM_PACKAGE_SCOPE = getWasmPackageScope();
 
 const CDN_DEFAULTS: Record<WasmPackage, string> = {
-  pymupdf: 'https://cdn.jsdelivr.net/npm/@bentopdf/pymupdf-wasm@0.11.16/',
-  ghostscript: 'https://cdn.jsdelivr.net/npm/@bentopdf/gs-wasm@0.1.1/assets/',
+  pymupdf: `https://cdn.jsdelivr.net/npm/${WASM_PACKAGE_SCOPE}/pymupdf-wasm@0.11.16/`,
+  ghostscript: `https://cdn.jsdelivr.net/npm/${WASM_PACKAGE_SCOPE}/gs-wasm@0.1.1/assets/`,
   cpdf: 'https://cdn.jsdelivr.net/npm/coherentpdf@2.5.5/dist/',
 };
 

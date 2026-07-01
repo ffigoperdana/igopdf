@@ -1,55 +1,15 @@
 import i18next from 'i18next';
 import HttpBackend from 'i18next-http-backend';
 
-// Supported languages
-export const supportedLanguages = [
-  'en',
-  'ar',
-  'be',
-  'ru',
-  'fr',
-  'de',
-  'es',
-  'zh',
-  'zh-TW',
-  'vi',
-  'tr',
-  'id',
-  'it',
-  'pt',
-  'nl',
-  'da',
-  'sv',
-  'ko',
-  'ja',
-  'uk',
-  'sk',
-] as const;
+export const supportedLanguages = ['id', 'en'] as const;
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
 export const languageNames: Record<SupportedLanguage, string> = {
-  en: 'English',
-  ar: 'العربية',
-  be: 'Беларуская',
-  ru: 'Русский',
-  fr: 'Français',
-  de: 'Deutsch',
-  es: 'Español',
-  zh: '中文',
-  'zh-TW': '繁體中文（台灣）',
-  vi: 'Tiếng Việt',
-  tr: 'Türkçe',
   id: 'Bahasa Indonesia',
-  it: 'Italiano',
-  pt: 'Português',
-  nl: 'Nederlands',
-  da: 'Dansk',
-  sv: 'Svenska',
-  ko: '한국어',
-  ja: '日本語',
-  uk: 'Українська',
-  sk: 'Slovenčina',
+  en: 'English',
 };
+
+const LANGUAGE_PREFIX = /^\/(id|en)(?:\/|$)/;
 
 export const getLanguageFromUrl = (): SupportedLanguage => {
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -63,9 +23,7 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
     path = '/' + path;
   }
 
-  const langMatch = path.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk|sk)(?:\/|$)/
-  );
+  const langMatch = path.match(LANGUAGE_PREFIX);
   if (
     langMatch &&
     supportedLanguages.includes(langMatch[1] as SupportedLanguage)
@@ -81,7 +39,6 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
     return storedLang as SupportedLanguage;
   }
 
-  // Check browser language preferences
   if (typeof navigator !== 'undefined' && navigator.languages) {
     for (const lang of navigator.languages) {
       if (supportedLanguages.includes(lang as SupportedLanguage)) {
@@ -100,7 +57,7 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
     return envLang as SupportedLanguage;
   }
 
-  return 'en';
+  return 'id';
 };
 
 let initialized = false;
@@ -114,7 +71,7 @@ export const initI18n = async (): Promise<typeof i18next> => {
 
   await i18next.use(HttpBackend).init({
     lng: currentLang,
-    fallbackLng: 'en',
+    fallbackLng: 'id',
     supportedLngs: supportedLanguages as unknown as string[],
     ns: ['common', 'tools'],
     defaultNS: 'common',
@@ -153,9 +110,7 @@ export const changeLanguage = (lang: SupportedLanguage): void => {
   }
 
   let pagePathWithoutLang = relativePath;
-  const langPrefixMatch = relativePath.match(
-    /^\/(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk|sk)(\/.*)?$/
-  );
+  const langPrefixMatch = relativePath.match(/^\/(id|en)(\/.*)?$/);
   if (langPrefixMatch) {
     pagePathWithoutLang = langPrefixMatch[2] || '/';
   }
@@ -164,27 +119,19 @@ export const changeLanguage = (lang: SupportedLanguage): void => {
     pagePathWithoutLang = '/' + pagePathWithoutLang;
   }
 
-  let newRelativePath: string;
-  if (lang === 'en') {
-    newRelativePath = pagePathWithoutLang;
-  } else {
-    newRelativePath = `/${lang}${pagePathWithoutLang}`;
-  }
+  const newRelativePath =
+    lang === 'id' ? pagePathWithoutLang : `/${lang}${pagePathWithoutLang}`;
 
-  let newPath: string;
-  if (basePath && basePath !== '/') {
-    newPath = basePath + newRelativePath;
-  } else {
-    newPath = newRelativePath;
-  }
+  const newPath =
+    basePath && basePath !== '/'
+      ? `${basePath}${newRelativePath}`
+      : newRelativePath;
 
-  newPath = newPath.replace(/\/+/g, '/');
-
-  const newUrl = newPath + window.location.search + window.location.hash;
+  const newUrl =
+    newPath.replace(/\/+/g, '/') + window.location.search + window.location.hash;
   window.location.href = newUrl;
 };
 
-// Apply translations to all elements with data-i18n attribute
 export const applyTranslations = (): void => {
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     const key = element.getAttribute('data-i18n');
@@ -217,12 +164,12 @@ export const applyTranslations = (): void => {
   });
 
   document.documentElement.lang = i18next.language;
-  document.documentElement.dir = i18next.language === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.dir = 'ltr';
 };
 
 export const rewriteLinks = (): void => {
   const currentLang = getLanguageFromUrl();
-  if (currentLang === 'en') return;
+  if (currentLang === 'id') return;
 
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
   const links = document.querySelectorAll('a[href]');
@@ -248,9 +195,8 @@ export const rewriteLinks = (): void => {
       return;
     }
 
-    const langPrefixRegex = new RegExp(
-      `^(${basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})?/?(en|ar|fr|es|de|zh|zh-TW|vi|tr|id|it|pt|nl|be|da|ko|sv|ru|ja|uk|sk)(/|$)`
-    );
+    const escapedBase = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const langPrefixRegex = new RegExp(`^(${escapedBase})?/?(id|en)(/|$)`);
     if (langPrefixRegex.test(href)) {
       return;
     }
@@ -260,24 +206,20 @@ export const rewriteLinks = (): void => {
       const pathAfterBase = href.slice(basePath.length);
       newHref = `${basePath}/${currentLang}${pathAfterBase}`;
     } else if (href.startsWith('/')) {
-      if (basePath && basePath !== '/') {
-        newHref = `${basePath}/${currentLang}${href}`;
-      } else {
-        newHref = `/${currentLang}${href}`;
-      }
+      newHref =
+        basePath && basePath !== '/'
+          ? `${basePath}/${currentLang}${href}`
+          : `/${currentLang}${href}`;
     } else if (href === '' || href === 'index.html') {
-      if (basePath && basePath !== '/') {
-        newHref = `${basePath}/${currentLang}/`;
-      } else {
-        newHref = `/${currentLang}/`;
-      }
+      newHref =
+        basePath && basePath !== '/'
+          ? `${basePath}/${currentLang}/`
+          : `/${currentLang}/`;
     } else {
       newHref = `/${currentLang}/${href}`;
     }
 
-    newHref = newHref.replace(/([^:])\/+/g, '$1/');
-
-    link.setAttribute('href', newHref);
+    link.setAttribute('href', newHref.replace(/([^:])\/+/g, '$1/'));
   });
 };
 

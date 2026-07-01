@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - igo</title>
+    <meta name="description" content="Manajemen pengguna igo." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
+    <link href="src/css/styles.css" rel="stylesheet" />
+  </head>
+  <body class="antialiased bg-background text-on-background">
+    {{> navbar }}
+
+    <main class="container mx-auto min-h-screen px-4 py-8">
+      <div class="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="text-sm font-semibold uppercase text-vibrant-palm">Admin</p>
+          <h1 class="text-3xl font-bold text-deep-forest">Manajemen Pengguna</h1>
+        </div>
+        <p class="max-w-2xl text-sm text-on-surface-variant">
+          Import CSV dapat memakai satu kolom <code>Email</code>. Jika password kosong atau kolom password tidak ada, default password adalah <strong>SawitItuBaik</strong>.
+        </p>
+      </div>
+
+      <section id="admin-message" class="mb-4 hidden rounded px-4 py-3 text-sm"></section>
+
+      <section class="mb-8 grid gap-4 md:grid-cols-5">
+        <div class="rounded border border-outline-variant bg-white p-4">
+          <p class="text-sm text-on-surface-variant">Total user</p>
+          <p id="stat-total" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+        </div>
+        <div class="rounded border border-outline-variant bg-white p-4">
+          <p class="text-sm text-on-surface-variant">Aktif</p>
+          <p id="stat-active" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+        </div>
+        <div class="rounded border border-outline-variant bg-white p-4">
+          <p class="text-sm text-on-surface-variant">Nonaktif</p>
+          <p id="stat-inactive" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+        </div>
+        <div class="rounded border border-outline-variant bg-white p-4">
+          <p class="text-sm text-on-surface-variant">Admin</p>
+          <p id="stat-admin" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+        </div>
+        <div class="rounded border border-outline-variant bg-white p-4">
+          <p class="text-sm text-on-surface-variant">User</p>
+          <p id="stat-user" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+        </div>
+      </section>
+
+      <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
+        <aside class="space-y-6">
+          <section class="rounded border border-outline-variant bg-white p-5">
+            <h2 class="mb-4 text-lg font-bold text-ink-slate">Tambah user</h2>
+            <form id="create-user-form" class="space-y-4">
+              <div>
+                <label for="new-username" class="mb-1 block text-sm font-medium">Username atau email</label>
+                <input id="new-username" required minlength="3" maxlength="150" class="w-full rounded border border-outline-variant px-3 py-2" />
+              </div>
+              <div>
+                <label for="new-password" class="mb-1 block text-sm font-medium">Password</label>
+                <input id="new-password" type="password" required minlength="8" class="w-full rounded border border-outline-variant px-3 py-2" />
+              </div>
+              <div>
+                <label for="new-role" class="mb-1 block text-sm font-medium">Role</label>
+                <select id="new-role" class="w-full rounded border border-outline-variant px-3 py-2">
+                  <option value="user">user</option>
+                  <option value="admin">admin</option>
+                </select>
+              </div>
+              <button class="w-full rounded bg-deep-forest px-4 py-2 font-semibold text-white hover:bg-green-800" type="submit">Buat user</button>
+            </form>
+          </section>
+
+          <section class="rounded border border-outline-variant bg-white p-5">
+            <h2 class="mb-4 text-lg font-bold text-ink-slate">Bulk import</h2>
+            <div class="space-y-4">
+              <input id="import-file" type="file" accept=".csv,.txt,text/csv,text/plain" class="w-full text-sm" />
+              <textarea id="import-content" rows="8" class="w-full rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Email&#10;nama@bpdp.or.id"></textarea>
+              <div class="flex gap-2">
+                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest hover:bg-green-50" type="button">Preview</button>
+                <button id="run-import-btn" class="rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white hover:bg-orange-600" type="button">Import</button>
+              </div>
+              <pre id="import-preview" class="max-h-56 overflow-auto rounded bg-surface-gray p-3 text-xs text-on-surface"></pre>
+            </div>
+          </section>
+        </aside>
+
+        <section class="rounded border border-outline-variant bg-white">
+          <div class="flex flex-col gap-3 border-b border-outline-variant p-4 md:flex-row md:items-center md:justify-between">
+            <h2 class="text-lg font-bold text-ink-slate">Daftar user</h2>
+            <div class="flex flex-wrap gap-2">
+              <input id="user-search" class="rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Cari username" />
+              <select id="role-filter" class="rounded border border-outline-variant px-3 py-2 text-sm">
+                <option value="">Semua role</option>
+                <option value="admin">admin</option>
+                <option value="user">user</option>
+              </select>
+              <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest hover:bg-green-50" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-outline-variant text-sm">
+              <thead class="bg-surface-gray text-left text-on-surface-variant">
+                <tr>
+                  <th class="px-4 py-3 font-semibold">Username</th>
+                  <th class="px-4 py-3 font-semibold">Role</th>
+                  <th class="px-4 py-3 font-semibold">Status</th>
+                  <th class="px-4 py-3 font-semibold">Last login</th>
+                  <th class="px-4 py-3 font-semibold">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="users-body" class="divide-y divide-outline-variant"></tbody>
+            </table>
+          </div>
+          <div class="flex items-center justify-between border-t border-outline-variant p-4 text-sm">
+            <button id="prev-page-btn" class="rounded border border-outline-variant px-3 py-2 disabled:opacity-40" type="button">Sebelumnya</button>
+            <span id="page-label">Halaman 1</span>
+            <button id="next-page-btn" class="rounded border border-outline-variant px-3 py-2 disabled:opacity-40" type="button">Berikutnya</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    {{> footer }}
+
+    <script type="module" src="src/js/utils/lucide-init.ts"></script>
+    <script type="module" src="src/js/mobileMenu.ts"></script>
+    <script type="module" src="src/js/main.ts"></script>
+    <script type="module" src="src/js/sw-register.ts"></script>
+    <script type="module">
+      import { getCurrentUser } from './src/js/auth/session.js';
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser || currentUser.role !== 'admin') {
+        window.location.href = '/index.html';
+      }
+
+      const state = { page: 1, totalPages: 1, search: '', role: '' };
+      const usersBody = document.getElementById('users-body');
+      const message = document.getElementById('admin-message');
+
+      async function api(path, options = {}) {
+        const response = await fetch(`/api${path}`, {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+          ...options,
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Request failed');
+        }
+        return data;
+      }
+
+      function showMessage(text, ok = true) {
+        message.textContent = text;
+        message.className = `mb-4 rounded px-4 py-3 text-sm ${ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`;
+      }
+
+      function formatDate(value) {
+        return value ? new Date(value).toLocaleString('id-ID') : '-';
+      }
+
+      async function loadStats() {
+        const result = await api('/admin/dashboard');
+        const stats = result.data;
+        document.getElementById('stat-total').textContent = stats.totalUsers;
+        document.getElementById('stat-active').textContent = stats.activeUsers;
+        document.getElementById('stat-inactive').textContent = stats.inactiveUsers;
+        document.getElementById('stat-admin').textContent = stats.adminCount;
+        document.getElementById('stat-user').textContent = stats.userCount;
+      }
+
+      async function loadUsers() {
+        const params = new URLSearchParams({
+          page: String(state.page),
+          limit: '20',
+        });
+        if (state.search) params.set('search', state.search);
+        if (state.role) params.set('role', state.role);
+        const result = await api(`/admin/users?${params.toString()}`);
+        state.totalPages = result.totalPages || 1;
+        document.getElementById('page-label').textContent = `Halaman ${state.page} dari ${state.totalPages}`;
+        document.getElementById('prev-page-btn').disabled = state.page <= 1;
+        document.getElementById('next-page-btn').disabled = state.page >= state.totalPages;
+        usersBody.innerHTML = '';
+
+        for (const user of result.data) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-4 py-3 font-medium text-ink-slate"></td>
+            <td class="px-4 py-3"></td>
+            <td class="px-4 py-3"></td>
+            <td class="px-4 py-3"></td>
+            <td class="px-4 py-3">
+              <div class="flex flex-wrap gap-2">
+                <button data-action="role" class="rounded border border-outline-variant px-2 py-1 text-xs">Toggle role</button>
+                <button data-action="status" class="rounded border border-outline-variant px-2 py-1 text-xs">Aktif/nonaktif</button>
+                <button data-action="reset" class="rounded border border-outline-variant px-2 py-1 text-xs">Reset password</button>
+                <button data-action="delete" class="rounded border border-red-300 px-2 py-1 text-xs text-red-700">Hapus</button>
+              </div>
+            </td>
+          `;
+          row.children[0].textContent = user.username;
+          row.children[1].textContent = user.role;
+          row.children[2].textContent = user.isActive ? 'Aktif' : 'Nonaktif';
+          row.children[3].textContent = formatDate(user.lastLogin);
+          row.querySelector('[data-action="role"]').addEventListener('click', () => updateUser(user.id, { role: user.role === 'admin' ? 'user' : 'admin' }));
+          row.querySelector('[data-action="status"]').addEventListener('click', () => updateUser(user.id, { isActive: !user.isActive }));
+          row.querySelector('[data-action="reset"]').addEventListener('click', () => resetPassword(user.id));
+          row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteUser(user.id, user.username));
+          usersBody.appendChild(row);
+        }
+      }
+
+      async function refreshAll() {
+        await Promise.all([loadStats(), loadUsers()]);
+      }
+
+      async function updateUser(id, payload) {
+        try {
+          await api(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+          showMessage('User berhasil diperbarui.');
+          await refreshAll();
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      }
+
+      async function resetPassword(id) {
+        const newPassword = prompt('Password baru (kosongkan untuk generate otomatis):');
+        try {
+          const body = newPassword ? { newPassword } : {};
+          const result = await api(`/admin/users/${id}/reset-password`, { method: 'POST', body: JSON.stringify(body) });
+          showMessage(result.data?.newPassword ? `Password baru: ${result.data.newPassword}` : 'Password berhasil direset.');
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      }
+
+      async function deleteUser(id, username) {
+        if (!confirm(`Hapus user ${username}?`)) return;
+        try {
+          await api(`/admin/users/${id}`, { method: 'DELETE' });
+          showMessage('User berhasil dihapus.');
+          await refreshAll();
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      }
+
+      document.getElementById('create-user-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+          await api('/admin/users', {
+            method: 'POST',
+            body: JSON.stringify({
+              username: document.getElementById('new-username').value.trim(),
+              password: document.getElementById('new-password').value,
+              role: document.getElementById('new-role').value,
+            }),
+          });
+          event.target.reset();
+          showMessage('User berhasil dibuat.');
+          await refreshAll();
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      });
+
+      document.getElementById('import-file').addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        document.getElementById('import-content').value = await file.text();
+      });
+
+      async function importRequest(path) {
+        const content = document.getElementById('import-content').value;
+        const fileName = document.getElementById('import-file').files?.[0]?.name || '';
+        const format = fileName.toLowerCase().endsWith('.txt') ? 'txt' : 'csv';
+        return api(path, { method: 'POST', body: JSON.stringify({ content, format }) });
+      }
+
+      document.getElementById('preview-import-btn').addEventListener('click', async () => {
+        try {
+          const result = await importRequest('/admin/users/import-preview');
+          document.getElementById('import-preview').textContent = JSON.stringify(result.data, null, 2);
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      });
+
+      document.getElementById('run-import-btn').addEventListener('click', async () => {
+        try {
+          const result = await importRequest('/admin/users/bulk-import');
+          document.getElementById('import-preview').textContent = JSON.stringify(result.data, null, 2);
+          showMessage(result.message || 'Import selesai.');
+          await refreshAll();
+        } catch (error) {
+          showMessage(error.message, false);
+        }
+      });
+
+      document.getElementById('refresh-users-btn').addEventListener('click', refreshAll);
+      document.getElementById('user-search').addEventListener('input', (event) => {
+        state.search = event.target.value.trim();
+        state.page = 1;
+        loadUsers().catch((error) => showMessage(error.message, false));
+      });
+      document.getElementById('role-filter').addEventListener('change', (event) => {
+        state.role = event.target.value;
+        state.page = 1;
+        loadUsers().catch((error) => showMessage(error.message, false));
+      });
+      document.getElementById('prev-page-btn').addEventListener('click', () => {
+        if (state.page > 1) {
+          state.page -= 1;
+          loadUsers().catch((error) => showMessage(error.message, false));
+        }
+      });
+      document.getElementById('next-page-btn').addEventListener('click', () => {
+        if (state.page < state.totalPages) {
+          state.page += 1;
+          loadUsers().catch((error) => showMessage(error.message, false));
+        }
+      });
+
+      refreshAll().catch((error) => showMessage(error.message, false));
+    </script>
+  </body>
+</html>

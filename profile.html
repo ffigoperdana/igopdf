@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil - igo</title>
+    <meta name="description" content="Kelola profil pengguna igo." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
+    <link href="src/css/styles.css" rel="stylesheet" />
+  </head>
+  <body class="antialiased bg-background text-on-background">
+    {{> navbar }}
+
+    <main class="container mx-auto min-h-screen px-4 py-10">
+      <section class="mx-auto max-w-3xl">
+        <div class="mb-8">
+          <p class="text-sm font-semibold uppercase text-vibrant-palm">Akun</p>
+          <h1 class="text-3xl font-bold text-deep-forest">Profil Pengguna</h1>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-[1fr_1.2fr]">
+          <section class="rounded border border-outline-variant bg-white p-6">
+            <h2 class="mb-4 text-lg font-bold text-ink-slate">Informasi sesi</h2>
+            <dl class="space-y-3 text-sm">
+              <div>
+                <dt class="text-on-surface-variant">Username</dt>
+                <dd id="profile-username" class="font-semibold text-on-surface">-</dd>
+              </div>
+              <div>
+                <dt class="text-on-surface-variant">Role</dt>
+                <dd id="profile-role" class="font-semibold text-on-surface">-</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="rounded border border-outline-variant bg-white p-6">
+            <h2 class="mb-4 text-lg font-bold text-ink-slate">Ubah password</h2>
+            <form id="change-password-form" class="space-y-4">
+              <div>
+                <label for="current-password" class="mb-1 block text-sm font-medium">Password saat ini</label>
+                <input id="current-password" type="password" required class="w-full rounded border border-outline-variant px-3 py-2" />
+              </div>
+              <div>
+                <label for="new-password" class="mb-1 block text-sm font-medium">Password baru</label>
+                <input id="new-password" type="password" required minlength="8" class="w-full rounded border border-outline-variant px-3 py-2" />
+              </div>
+              <p class="text-xs text-on-surface-variant">Minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka.</p>
+              <div id="profile-message" class="hidden rounded px-3 py-2 text-sm"></div>
+              <button class="rounded bg-deep-forest px-4 py-2 font-semibold text-white hover:bg-green-800" type="submit">
+                Simpan password
+              </button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    {{> footer }}
+
+    <script type="module" src="src/js/utils/lucide-init.ts"></script>
+    <script type="module" src="src/js/mobileMenu.ts"></script>
+    <script type="module" src="src/js/main.ts"></script>
+    <script type="module" src="src/js/sw-register.ts"></script>
+    <script type="module">
+      import { getCurrentUser, changePassword } from './src/js/auth/session.js';
+
+      const user = await getCurrentUser();
+      if (user) {
+        document.getElementById('profile-username').textContent = user.username;
+        document.getElementById('profile-role').textContent = user.role;
+      }
+
+      const form = document.getElementById('change-password-form');
+      const message = document.getElementById('profile-message');
+
+      function showMessage(text, ok) {
+        message.textContent = text;
+        message.className = `rounded px-3 py-2 text-sm ${ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`;
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const result = await changePassword(currentPassword, newPassword);
+        showMessage(result.success ? 'Password berhasil diperbarui. Silakan login kembali.' : result.error || 'Gagal mengubah password.', result.success);
+        if (result.success) {
+          form.reset();
+        }
+      });
+    </script>
+  </body>
+</html>

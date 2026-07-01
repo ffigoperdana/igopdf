@@ -1,14 +1,15 @@
 services:
-  bentopdf:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SIMPLE_MODE: false # false for default mode, true for simple mode
-    container_name: bentopdf
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: igopdf
+      POSTGRES_USER: igopdf
+      POSTGRES_PASSWORD: igopdf_password
     ports:
-      - '8080:8080'
+      - '5432:5432'
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
     restart: unless-stopped
-    # For IPv4-only environments
-    #environment:
-    #  - DISABLE_IPV6=true
+
+volumes:
+  postgres_dev_data:

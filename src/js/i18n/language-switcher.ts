@@ -164,6 +164,22 @@ export const createLanguageSwitcher = (): HTMLElement => {
 };
 
 export const injectLanguageSwitcher = (): void => {
+  const preferredContainer = document.getElementById(
+    'language-switcher-container'
+  );
+  if (preferredContainer) {
+    preferredContainer.innerHTML = '';
+    preferredContainer.appendChild(createLanguageSwitcher());
+    const mobileContainer = document.getElementById(
+      'mobile-language-switcher-container'
+    );
+    if (mobileContainer) {
+      mobileContainer.innerHTML = '';
+      mobileContainer.appendChild(createLanguageSwitcher());
+    }
+    return;
+  }
+
   const simpleModeContainer = document.getElementById(
     'simple-mode-language-switcher'
   );

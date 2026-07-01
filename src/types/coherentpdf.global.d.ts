@@ -1,11 +1,9 @@
 /*
- * coherentpdf.global.d.ts — TypeScript type definitions for BentoPDF / CoherentPDF integration
+ * coherentpdf.global.d.ts - TypeScript type definitions for CoherentPDF integration.
  *
- * These type definitions were written by Alam for use in the BentoPDF project.
- * They describe APIs provided by the CoherentPDF library (cpdf.js) but are original
- * work created for type safety and integration.
+ * These declarations describe APIs provided by the CoherentPDF library (cpdf.js)
+ * for use in the igo PDF workspace.
  *
- * Copyright © 2026 BentoPDF
  * Licensed under the GNU Affero General Public License v3.0 or later (AGPLv3+).
  */
 declare global {

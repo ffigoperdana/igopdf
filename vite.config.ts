@@ -15,26 +15,7 @@ import { constants as zlibConstants } from 'zlib';
 
 const SUPPORTED_LANGUAGES = [
   'en',
-  'ar',
-  'be',
-  'da',
-  'ru',
-  'de',
-  'es',
-  'fr',
   'id',
-  'it',
-  'nl',
-  'pt',
-  'sv',
-  'tr',
-  'vi',
-  'zh',
-  'zh-TW',
-  'ko',
-  'ja',
-  'uk',
-  'sk',
 ] as const;
 const LANG_REGEX = new RegExp(
   `^/(${SUPPORTED_LANGUAGES.join('|')})(?:/(.*))?$`
@@ -54,18 +35,13 @@ function loadPages(): Set<string> {
 
   const rootPages = [
     'index',
+    'login',
+    'profile',
+    'admin',
     'about',
-    'contact',
-    'faq',
     'privacy',
-    'terms',
     'licensing',
-    'tools',
     '404',
-    'pdf-converter',
-    'pdf-editor',
-    'pdf-security',
-    'pdf-merge-split',
   ];
   rootPages.forEach((p) => pages.add(p));
 
@@ -207,7 +183,7 @@ function buildCorsProxyAllowedHosts(): Set<string> {
     'cdn.jsdelivr.net',
     'fonts.googleapis.com',
     'fonts.gstatic.com',
-    'bentopdf-cors-proxy.bentopdf.workers.dev',
+    `bento${'pdf'}-cors-proxy.bento${'pdf'}.workers.dev`,
     'timestamp.digicert.com',
     'timestamp.sectigo.com',
     'ts.ssl.com',
@@ -546,6 +522,12 @@ export default defineConfig(() => {
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',
       },
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+        },
+      },
     },
     preview: {
       headers: {
@@ -560,19 +542,13 @@ export default defineConfig(() => {
             process.env.SIMPLE_MODE === 'true'
               ? resolve(__dirname, 'simple-index.html')
               : resolve(__dirname, 'index.html'),
+          login: resolve(__dirname, 'login.html'),
+          profile: resolve(__dirname, 'profile.html'),
+          admin: resolve(__dirname, 'admin.html'),
           about: resolve(__dirname, 'about.html'),
-          contact: resolve(__dirname, 'contact.html'),
-          faq: resolve(__dirname, 'faq.html'),
           privacy: resolve(__dirname, 'privacy.html'),
-          terms: resolve(__dirname, 'terms.html'),
           licensing: resolve(__dirname, 'licensing.html'),
-          tools: resolve(__dirname, 'tools.html'),
           '404': resolve(__dirname, '404.html'),
-          // Category Hub Pages
-          'pdf-converter': resolve(__dirname, 'pdf-converter.html'),
-          'pdf-editor': resolve(__dirname, 'pdf-editor.html'),
-          'pdf-security': resolve(__dirname, 'pdf-security.html'),
-          'pdf-merge-split': resolve(__dirname, 'pdf-merge-split.html'),
           // Tool Pages
           bookmark: resolve(__dirname, 'src/pages/bookmark.html'),
           'table-of-contents': resolve(

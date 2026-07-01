@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - igo</title>
+    <meta name="description" content="Login igo - Internal PDF Tools Workspace" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
+    <link href="src/css/styles.css" rel="stylesheet" />
+  </head>
+  <body class="bg-background min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md px-6">
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="text-center mb-8">
+          <img src="images/logo-igo.png" alt="igo Logo" class="h-16 mx-auto mb-4" />
+          <h1 class="text-2xl font-bold text-ink-slate">igo</h1>
+          <p class="text-on-surface-variant mt-1">Internal PDF Workspace</p>
+        </div>
+
+        <form id="login-form" class="space-y-6">
+          <div>
+            <label for="username" class="block text-sm font-medium text-on-surface mb-2">Username atau email</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              minlength="3"
+              maxlength="150"
+              autocomplete="username"
+              class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
+              placeholder="Enter your username"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-on-surface mb-2">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="8"
+              autocomplete="current-password"
+              class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-on-surface mb-2">CAPTCHA</label>
+            <div class="flex items-center gap-4">
+              <div id="captcha-image" class="h-12 border border-outline-variant rounded bg-gray-100 flex items-center justify-center px-2"></div>
+              <button type="button" id="refresh-captcha" class="text-deep-forest hover:text-vibrant-palm text-sm font-medium">Refresh</button>
+            </div>
+            <input
+              type="text"
+              id="captcha-answer"
+              name="captcha-answer"
+              required
+              class="w-full px-4 py-3 mt-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
+              placeholder="Masukkan jawaban CAPTCHA"
+            />
+            <input type="hidden" id="captcha-token" name="captcha-token" />
+          </div>
+
+          <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+
+          <button
+            type="submit"
+            id="login-button"
+            class="w-full bg-deep-forest hover:bg-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+          >
+            Masuk
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-on-surface-variant">
+          <p>Hubungi administrator untuk akses akun.</p>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center text-xs text-on-surface-variant">
+        <p>igo Internal Workspace | Licensed under AGPL-3.0</p>
+      </div>
+    </div>
+
+    <script type="module">
+      import { login, getCaptcha } from './src/js/auth/session.js';
+
+      let captchaToken = '';
+
+      async function loadCaptcha() {
+        const result = await getCaptcha();
+        if (result.success && result.data) {
+          document.getElementById('captcha-image').innerHTML = result.data.svg;
+          captchaToken = result.data.token;
+          document.getElementById('captcha-token').value = result.data.token;
+        }
+      }
+
+      document.getElementById('refresh-captcha').addEventListener('click', loadCaptcha);
+
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const captchaAnswer = document.getElementById('captcha-answer').value;
+        const errorDiv = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-button');
+
+        errorDiv.classList.add('hidden');
+        loginBtn.disabled = true;
+          loginBtn.textContent = 'Memproses...';
+
+        const result = await login(username, password, captchaToken, captchaAnswer);
+
+        if (result.success) {
+          window.location.href = '/index.html';
+        } else {
+          errorDiv.textContent = result.error || 'Login failed';
+          errorDiv.classList.remove('hidden');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Masuk';
+          loadCaptcha();
+        }
+      });
+
+      loadCaptcha();
+    </script>
+  </body>
+</html>

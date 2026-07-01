@@ -1,16 +1,59 @@
 services:
-  bentopdf:
-    # GitHub Container Registry (Recommended)
-    # Self-Hosted build - ghcr.io/alam00000/bentopdf-simple:latest
-    # Commercial build  - ghcr.io/alam00000/bentopdf:latest
-    # Docker Hub (Alternative)
-    # Self-Hosted build - bentopdfteam/bentopdf-simple:latest
-    # Commercial build  - bentopdfteam/bentopdf:latest
-    image: ghcr.io/alam00000/bentopdf-simple:latest
-    container_name: bentopdf
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-igopdf}
+      POSTGRES_USER: ${DB_USER:-igopdf}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-igopdf_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-igopdf} -d ${DB_NAME:-igopdf}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-igopdf}
+      DB_USER: ${DB_USER:-igopdf}
+      DB_PASSWORD: ${DB_PASSWORD:-igopdf_password}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      SESSION_TIMEOUT_HOURS: ${SESSION_TIMEOUT_HOURS:-3}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
+      MAX_LOGIN_ATTEMPTS: ${MAX_LOGIN_ATTEMPTS:-5}
+      LOCKOUT_MINUTES: ${LOCKOUT_MINUTES:-15}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
     ports:
-      - '8080:8080'
-    # For IPv4-only environments
-    #environment:
-    #  - DISABLE_IPV6=true
+      - '${HTTP_PORT:-8081}:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

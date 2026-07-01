@@ -8,7 +8,6 @@ import '../css/styles.css';
 import {
   escapeHtml,
   formatShortcutDisplay,
-  formatStars,
 } from './utils/helpers.js';
 import {
   initI18n,
@@ -22,10 +21,13 @@ import {
   isToolDisabled,
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
+import { initAuth, requireAuth } from './auth/guard.js';
 declare const __BRAND_NAME__: string;
 
 const init = async () => {
   await initI18n();
+  await initAuth();
+  requireAuth();
   await loadRuntimeConfig();
   injectLanguageSwitcher();
   applyTranslations();
@@ -58,13 +60,6 @@ const init = async () => {
       const heroSection = document.getElementById('hero-section');
       if (heroSection) {
         heroSection.style.display = 'none';
-      }
-
-      const githubLink = document.querySelector(
-        'a[href*="github.com/alam00000/bentopdf"]'
-      );
-      if (githubLink) {
-        (githubLink as HTMLElement).style.display = 'none';
       }
 
       const featuresSection = document.getElementById('features-section');
@@ -109,7 +104,7 @@ const init = async () => {
         (divider as HTMLElement).style.display = 'none';
       });
 
-      const brandName = __BRAND_NAME__ || 'BentoPDF';
+      const brandName = __BRAND_NAME__ || 'igo';
       document.title = `${brandName} - ${t('simpleMode.title')}`;
 
       const toolsHeader = document.getElementById('tools-header');
@@ -325,7 +320,7 @@ const init = async () => {
       const chevron = document.createElement('i');
       chevron.setAttribute('data-lucide', 'chevron-down');
       chevron.className =
-        'category-chevron w-5 h-5 text-gray-400 transition-transform duration-300';
+        'category-chevron w-5 h-5 text-on-surface-variant transition-transform duration-300';
 
       header.append(title, chevron);
 
@@ -375,25 +370,25 @@ const init = async () => {
           toolCard = document.createElement('a');
           toolCard.href = tool.href;
           toolCard.className =
-            'tool-card block bg-gray-800 rounded-xl p-4 cursor-pointer flex flex-col items-center justify-center text-center no-underline hover:shadow-lg transition duration-200';
+            'tool-card block cursor-pointer no-underline transition duration-200';
         } else {
           toolCard = document.createElement('div');
           toolCard.className =
-            'tool-card bg-gray-800 rounded-xl p-4 cursor-pointer flex flex-col items-center justify-center text-center hover:shadow-lg transition duration-200';
+            'tool-card cursor-pointer transition duration-200';
           toolCard.dataset.toolId = getToolId(tool);
         }
 
         const icon = document.createElement('i');
-        icon.className = 'w-10 h-10 mb-3 text-indigo-400';
+        icon.className = 'w-10 h-10 mb-3 text-deep-forest';
 
         if (tool.icon.startsWith('ph-')) {
-          icon.className = `ph ${tool.icon} text-4xl mb-3 text-indigo-400`;
+          icon.className = `ph ${tool.icon} text-4xl mb-3 text-deep-forest`;
         } else {
           icon.setAttribute('data-lucide', tool.icon);
         }
 
         const toolName = document.createElement('h3');
-        toolName.className = 'font-semibold text-white';
+        toolName.className = 'font-semibold text-ink-slate';
         const toolKey = toolTranslationKeys[tool.name];
         toolName.textContent = toolKey ? t(`${toolKey}.name`) : tool.name;
 
@@ -401,7 +396,7 @@ const init = async () => {
 
         if (tool.subtitle) {
           const toolSubtitle = document.createElement('p');
-          toolSubtitle.className = 'text-xs text-gray-400 mt-1 px-2';
+          toolSubtitle.className = 'text-xs text-on-surface-variant mt-1 px-2';
           toolSubtitle.textContent = toolKey
             ? t(`${toolKey}.subtitle`)
             : tool.subtitle;
@@ -539,29 +534,6 @@ const init = async () => {
 
   createIcons({ icons });
   console.log('Please share our tool and share the love!');
-
-  const githubStarsElements = [
-    document.getElementById('github-stars-desktop'),
-    document.getElementById('github-stars-mobile'),
-  ];
-
-  if (githubStarsElements.some((el) => el) && !__SIMPLE_MODE__) {
-    fetch('https://api.github.com/repos/alam00000/bentopdf')
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.stargazers_count !== undefined) {
-          const formattedStars = formatStars(data.stargazers_count);
-          githubStarsElements.forEach((el) => {
-            if (el) el.textContent = formattedStars;
-          });
-        }
-      })
-      .catch(() => {
-        githubStarsElements.forEach((el) => {
-          if (el) el.textContent = '-';
-        });
-      });
-  }
 
   // Initialize Shortcuts System
   ShortcutsManager.init();

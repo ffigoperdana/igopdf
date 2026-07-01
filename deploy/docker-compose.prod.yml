@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    image: ${IGO_BACKEND_IMAGE}
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      SESSION_TIMEOUT_HOURS: ${SESSION_TIMEOUT_HOURS:-3}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
+      MAX_LOGIN_ATTEMPTS: ${MAX_LOGIN_ATTEMPTS:-5}
+      LOCKOUT_MINUTES: ${LOCKOUT_MINUTES:-15}
+      CAPTCHA_EXPIRY_MINUTES: ${CAPTCHA_EXPIRY_MINUTES:-5}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    image: ${IGO_FRONTEND_IMAGE}
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - '${HTTP_PORT:-8081}:80'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

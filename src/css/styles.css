@@ -1,30 +1,23 @@
-@import '@fontsource/dm-sans/400.css';
-@import '@fontsource/dm-sans/500.css';
-@import '@fontsource/dm-sans/600.css';
-@import '@fontsource/dm-sans/700.css';
-@import '@fontsource/dancing-script/400.css';
-@import '@fontsource/great-vibes/400.css';
-@import '@fontsource/kalam/300.css';
-@import '@fontsource/kalam/400.css';
-@import '@fontsource/kalam/700.css';
-@import '@fontsource/lato/400.css';
-@import '@fontsource/lato/700.css';
-@import '@fontsource/lato/400-italic.css';
-@import '@fontsource/merriweather/400.css';
-@import '@fontsource/merriweather/700.css';
-@import '@fontsource/merriweather/400-italic.css';
-@import '@fontsource/cedarville-cursive/400.css';
+@import '@fontsource/public-sans/400.css';
+@import '@fontsource/public-sans/500.css';
+@import '@fontsource/public-sans/700.css';
+@import '@fontsource/public-sans/800.css';
 @import 'cropperjs/dist/cropper.css';
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-dancing: 'Dancing Script', cursive;
-  --font-vibes: 'Great Vibes', cursive;
-  --font-kalam: 'Kalam', cursive;
-  --font-lato: 'Lato', sans-serif;
-  --font-merriweather: 'Merriweather', serif;
-  --font-cedarville: 'Cedarville Cursive', cursive;
+  --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+  --color-deep-forest: #1F5630;
+  --color-vibrant-palm: #E67E22;
+  --color-ink-slate: #111827;
+  --color-paper-white: #FFFFFF;
+  --color-surface-gray: #F9FAFB;
+  --color-background: #f8faf4;
+  --color-on-background: #191c19;
+  --color-on-surface: #191c19;
+  --color-on-surface-variant: #414941;
+  --color-outline-variant: #c0c9be;
+  --color-outline: #717970;
 }
 
 @layer base {
@@ -34,34 +27,24 @@
   }
 }
 
-@theme {
-  --font-sans: 'DM Sans', ui-sans-serif, system-ui;
-  --font-dancing: 'Dancing Script', cursive;
-  --font-vibes: 'Great Vibes', cursive;
-  --font-kalam: 'Kalam', cursive;
-  --font-lato: 'Lato', sans-serif;
-  --font-merriweather: 'Merriweather', serif;
-  --font-cedarville: 'Cedarville Cursive', cursive;
-}
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background-color: #111827;
-  color: #d1d5db;
+  font-family: 'Public Sans', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
 }
 
 .tool-card {
   transition:
     transform 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
-  border: 1px solid #374151;
-  background-color: #1f2937;
+  border: 1px solid #c0c9be;
+  background-color: #ffffff;
   padding: 1.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -71,9 +54,9 @@ body {
 .tool-card:hover {
   transform: translateY(-5px);
   box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.2),
-    0 4px 6px -2px rgba(0, 0, 0, 0.1);
-  border-color: #4f46e5;
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: #E67E22;
 }
 
 .category-header {
@@ -89,7 +72,7 @@ body {
   cursor: pointer;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #191c19;
   text-align: left;
 }
 
@@ -98,11 +81,11 @@ body {
 }
 
 .category-header:hover {
-  color: #818cf8;
+  color: #E67E22;
 }
 
 .category-header:hover .category-chevron {
-  color: #818cf8;
+  color: #E67E22;
 }
 
 .category-tools {
@@ -197,23 +180,22 @@ input[type='file']::file-selector-button {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1f2937;
+  background: #f2f4ee;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4f46e5;
+  background: #1F5630;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4338ca;
-  /* indigo-700 */
+  background: #336941;
 }
 
 /* Style for drag-and-drop placeholder */
 .sortable-ghost {
   opacity: 0.4;
-  border: 2px dashed #4f46e5;
+  border: 2px dashed #1F5630;
 }
 
 #embed-pdf-container > div {
@@ -222,7 +204,7 @@ input[type='file']::file-selector-button {
 }
 
 #tool-interface {
-  color: #39a0ed;
+  color: #1F5630;
 }
 
 #page-organizer .page-thumbnail,
@@ -251,9 +233,9 @@ input[type='file']::file-selector-button {
   min-width: 0;
   overflow: auto;
   height: 75vh;
-  border: 2px solid #374151;
-  border-radius: 0.5rem;
-  background-color: #1f2937;
+  border: 2px solid #c0c9be;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
 }
 
 /* This rule ensures canvases in side-by-side panels display at their natural rendered size. */
@@ -328,11 +310,11 @@ footer a {
 }
 
 .nav-link {
-  @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors;
+  @apply text-white hover:text-vibrant-palm px-3 py-2 rounded-md text-sm font-medium transition-colors;
 }
 
 .mobile-nav-link {
-  @apply text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors;
+  @apply text-white hover:text-vibrant-palm block px-3 py-2 rounded-md text-base font-medium transition-colors;
 }
 
 .marker-slanted {
@@ -549,7 +531,7 @@ footer a {
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 700;
-  color: white;
+  color: #191c19;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
@@ -558,7 +540,7 @@ footer a {
   font-size: 1.25rem;
   line-height: 1.75rem;
   font-weight: 600;
-  color: rgb(129 140 248);
+  color: #1F5630;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
 }
@@ -566,7 +548,7 @@ footer a {
 .legal-content p {
   margin-bottom: 1rem;
   line-height: 1.625;
-  color: rgb(156 163 175);
+  color: #414941;
 }
 
 .legal-content ul {
@@ -574,16 +556,16 @@ footer a {
   list-style-position: inside;
   margin-bottom: 1rem;
   padding-left: 1rem;
-  color: rgb(156 163 175);
+  color: #414941;
 }
 
 .legal-content a {
-  color: rgb(129 140 248);
+  color: #1F5630;
   text-decoration: underline;
 }
 
 .legal-content a:hover {
-  color: rgb(165 180 252);
+  color: #E67E22;
 }
 
 details > summary {
@@ -626,11 +608,11 @@ button:disabled,
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     'Courier New', monospace;
   line-height: 1;
-  color: #e5e7eb;
-  background-color: #374151;
-  border: 1px solid #4b5563;
+  color: #191c19;
+  background-color: #e1e3dd;
+  border: 1px solid #c0c9be;
   border-radius: 0.25rem;
-  box-shadow: 0 1px 0 0 #1f2937;
+  box-shadow: 0 1px 0 0 #d9dbd5;
 }
 
 .shortcut-input {
@@ -642,8 +624,8 @@ button:disabled,
 
 .shortcut-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-color: #1F5630;
+  box-shadow: 0 0 0 2px rgba(31, 86, 48, 0.2);
 }
 
 /* Custom Scrollbar for Modal Content */
@@ -652,16 +634,16 @@ button:disabled,
 }
 
 #shortcuts-list::-webkit-scrollbar-track {
-  background: #1f2937;
+  background: #f2f4ee;
 }
 
 #shortcuts-list::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: #717970;
   border-radius: 3px;
 }
 
 #shortcuts-list::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: #414941;
 }
 
 /* Scroll to Top Button Visibility */
@@ -677,8 +659,8 @@ button:disabled,
   z-index: -1;
   background-size: 60px 60px;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(31, 86, 48, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 86, 48, 0.05) 1px, transparent 1px);
   mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
   -webkit-mask-image: radial-gradient(
     ellipse at center,
@@ -693,7 +675,7 @@ input[type='color'] {
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  border: 2px solid #4b5563;
+  border: 2px solid #c0c9be;
   border-radius: 9999px;
   background: transparent;
   cursor: pointer;

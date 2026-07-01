@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BentoPDF - The PDF Toolkit Built for Privacy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#003e1b",
+                        "primary-container": "#1f5630",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#90ca99",
+                        "secondary-fixed-dim": "#ffb783",
+                        "surface-container-high": "#e7e9e3",
+                        "on-tertiary-container": "#f9a5b3",
+                        "on-surface-variant": "#414941",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#713700",
+                        "on-secondary-fixed": "#301400",
+                        "surface-bright": "#f8faf4",
+                        "inverse-surface": "#2e312d",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#19512b",
+                        "vibrant-palm": "#E67E22",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c19",
+                        "outline-variant": "#c0c9be",
+                        "background": "#f8faf4",
+                        "on-primary-fixed": "#00210b",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#944a00",
+                        "on-tertiary-fixed-variant": "#713340",
+                        "tertiary-fixed-dim": "#ffb2be",
+                        "deep-forest": "#1F5630",
+                        "tertiary": "#5b222f",
+                        "secondary-fixed": "#ffdcc5",
+                        "tertiary-container": "#773845",
+                        "surface-gray": "#F9FAFB",
+                        "surface-variant": "#e1e3dd",
+                        "paper-white": "#FFFFFF",
+                        "surface-container-low": "#f2f4ee",
+                        "on-secondary-container": "#663100",
+                        "on-background": "#191c19",
+                        "primary-fixed": "#b5f1be",
+                        "surface-container-highest": "#e1e3dd",
+                        "surface-dim": "#d9dbd5",
+                        "secondary-container": "#fc8f34",
+                        "inverse-primary": "#9ad4a3",
+                        "surface-container": "#edefe9",
+                        "inverse-on-surface": "#eff1eb",
+                        "primary-fixed-dim": "#9ad4a3",
+                        "surface": "#f8faf4",
+                        "outline": "#717970",
+                        "tertiary-fixed": "#ffd9de",
+                        "surface-tint": "#336941",
+                        "ink-slate": "#111827",
+                        "on-tertiary-fixed": "#3a0816",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "1rem",
+                        "stack-lg": "4rem",
+                        "stack-md": "1.5rem",
+                        "container-max": "1280px",
+                        "stack-sm": "0.5rem",
+                        "gutter": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Public Sans"],
+                        "label-sm": ["Public Sans"],
+                        "body-lg": ["Public Sans"],
+                        "headline-lg": ["Public Sans"],
+                        "headline-xl": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "headline-md": ["Public Sans"],
+                        "headline-lg-mobile": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- Header / TopAppBar -->
+<header class="sticky top-0 z-50 w-full bg-deep-forest dark:bg-deep-forest text-on-primary dark:text-on-primary docked full-width flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-8 max-w-container-max mx-auto h-20">
+<!-- Leading Icon -->
+<button class="scale-95 duration-150 ease-in-out hover:text-vibrant-palm transition-colors duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">grid_view</span>
+</button>
+<!-- Headline / Brand -->
+<div class="text-headline-md font-headline-md font-extrabold text-paper-white dark:text-paper-white tracking-tight flex items-center gap-2">
+<img alt="BentoPDF Logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF2oyBrRMhmaepc7UWFOqJ5-Z3-fKjdYlJeSQgnT6aBUWUJcdCqaNo45A3XmpZYSEQ7XRnUS_uh-pRxgQ2DRplFrpp1JhCLIgiXkeMHgIyax-t0BfQ5BHcIc0y_QKtC1gU9oQo3kk6pTsNxS9AoaF9B495kRahP9n-VQNsbeqbXcWIDAKoQGVY0LncF5B26S-vUeg34yk2O_qbqfgvfWw7wxSN2Zxj7e8CUOsWvg1TwANM-BeMfSrfo1QlYjXq2zsCD0h0IF5KBH8"/>
+</div>
+<!-- Trailing Icon -->
+<button class="md:hidden scale-95 duration-150 ease-in-out hover:text-vibrant-palm transition-colors duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<!-- Desktop Nav (Hidden on Mobile as requested) -->
+<nav class="hidden md:flex gap-6">
+<a class="text-paper-white font-label-bold hover:text-vibrant-palm transition-colors duration-200 text-label-bold" href="#">Home</a>
+<a class="text-paper-white font-label-bold hover:text-vibrant-palm transition-colors duration-200 text-label-bold" href="#">About</a>
+<a class="text-paper-white font-label-bold hover:text-vibrant-palm transition-colors duration-200 text-label-bold" href="#">Contact</a>
+</nav>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="bg-deep-forest text-paper-white py-stack-lg px-margin-mobile md:px-8 relative overflow-hidden">
+<div class="max-w-container-max mx-auto relative z-10 grid md:grid-cols-2 gap-gutter items-center">
+<div>
+<h1 class="text-headline-lg-mobile md:text-headline-xl font-headline-lg-mobile md:font-headline-xl mb-6">
+                        The PDF Toolkit <span class="text-vibrant-palm">built for privacy.</span>
+</h1>
+<ul class="space-y-4 mb-8 text-body-lg font-body-lg">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-vibrant-palm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            No Signups
+                        </li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-vibrant-palm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Unlimited Use
+                        </li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-vibrant-palm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Works Offline
+                        </li>
+</ul>
+<a class="inline-block bg-vibrant-palm text-paper-white text-label-bold font-label-bold px-8 py-4 rounded-lg hover:bg-opacity-90 transition-all shadow-[0px_4px_20px_rgba(230,126,34,0.3)]" href="#">
+                        Start Using Now
+                    </a>
+</div>
+<div class="hidden md:block relative h-96 rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.2)]">
+<div class="w-full h-full bg-cover bg-center" data-alt="A clean, modern 3D illustration of a floating, secure document folder glowing with vibrant orange energy on a deep forest green background, conveying digital privacy and high-tech security." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvSNtOEDCi9tyQrpbvCUnO8gPRiYu2QH_SWL-I_JqD3skPnx7jknNnZxuRE59VLwBU7ZS_zWMbpeM99YxZnfI2F_yw11L6ZwWasmY-AkWlxjiMqZ5ztfcfLqMvrRW8IBZZf-mqQf9Gs03DPd94QNNz7XpbCYwAtOfLNFqg1efqNN2gylNnz2rNG6Pkk5iBIHtxIlk8LGFZeM5lxHKgwEvbmYK83qs5kp6kohHAVfL3aEF2NSAN1BW1dKC-KrzDCqKULB9K10JoEwI')"></div>
+</div>
+</div>
+<!-- Abstract Graphic -->
+<div class="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+<svg class="w-full h-full fill-current text-vibrant-palm" preserveaspectratio="none" viewbox="0 0 100 100">
+<polygon points="0,100 100,0 100,100"></polygon>
+</svg>
+</div>
+</section>
+<!-- Feature Highlights -->
+<section class="py-stack-lg px-margin-mobile md:px-8 bg-surface-gray">
+<div class="max-w-container-max mx-auto">
+<h2 class="text-headline-md font-headline-md text-deep-forest mb-12 text-center">Why choose BentoPDF?</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">no_accounts</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">No Signup</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Start instantly, no accounts or emails.</p>
+</div>
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">cloud_off</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">No Uploads</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">100% client-side, your files never leave your device.</p>
+</div>
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">money_off</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">Forever Free</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">All tools, no trials, no paywalls.</p>
+</div>
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">all_inclusive</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">No Limits</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Use as much as you want, no hidden caps.</p>
+</div>
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">dynamic_feed</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">Batch Processing</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Handle unlimited PDFs in one go.</p>
+</div>
+<div class="bg-paper-white p-6 rounded-xl border border-surface-variant hover:shadow-[0px_4px_20px_rgba(0,0,0,0.05)] transition-shadow">
+<span class="material-symbols-outlined text-vibrant-palm text-4xl mb-4" style="font-variation-settings: 'FILL' 0;">bolt</span>
+<h3 class="text-body-lg font-body-lg font-bold mb-2">Lightning Fast</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Process PDFs instantly, without waiting or delays.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Privacy Section -->
+<section class="py-stack-lg px-margin-mobile md:px-8 bg-paper-white border-t border-surface-variant">
+<div class="max-w-container-max mx-auto text-center">
+<h2 class="text-headline-md font-headline-md text-deep-forest mb-4">Your data never leaves your device</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">
+                    We keep your information safe by following global security standards. All the processing happens locally on your device.
+                </p>
+<div class="flex flex-col md:flex-row justify-center items-center gap-6">
+<div class="bg-surface-gray px-6 py-4 rounded-full border border-surface-variant text-label-bold font-label-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-deep-forest">verified_user</span> GDPR compliance
+                    </div>
+<div class="bg-surface-gray px-6 py-4 rounded-full border border-surface-variant text-label-bold font-label-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-deep-forest">verified_user</span> CCPA compliance
+                    </div>
+<div class="bg-surface-gray px-6 py-4 rounded-full border border-surface-variant text-label-bold font-label-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-deep-forest">verified_user</span> HIPAA compliance
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg px-margin-mobile md:px-8 max-w-container-max mx-auto border-t border-primary-container bg-deep-forest dark:bg-deep-forest text-paper-white dark:text-paper-white full-width flat no shadows">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div>
+<div class="text-headline-md font-headline-md font-extrabold text-vibrant-palm mb-4">BentoPDF</div>
+<p class="text-body-md font-body-md text-surface-variant opacity-80">© 2026 BentoPDF Privacy-First Tools</p>
+</div>
+<nav class="flex flex-wrap gap-4 md:gap-8">
+<a class="text-label-bold font-label-bold text-surface-variant hover:text-vibrant-palm underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-label-bold font-label-bold text-surface-variant hover:text-vibrant-palm underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-label-bold font-label-bold text-surface-variant hover:text-vibrant-palm underline transition-all opacity-80 hover:opacity-100" href="#">API Documentation</a>
+<a class="text-label-bold font-label-bold text-surface-variant hover:text-vibrant-palm underline transition-all opacity-80 hover:opacity-100" href="#">Contact Us</a>
+</nav>
+</div>
+</footer>
+</body></html>

@@ -84,7 +84,7 @@ if (isDevelopment) {
 
                 if (
                   confirm(
-                    'A new version of BentoPDF is available. Reload to update?'
+                    'A new version of igo is available. Reload to update?'
                   )
                 ) {
                   newWorker.postMessage({ type: 'SKIP_WAITING' });
