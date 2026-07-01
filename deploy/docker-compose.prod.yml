@@ -33,6 +33,9 @@ services:
       LOCKOUT_MINUTES: ${LOCKOUT_MINUTES:-15}
       CAPTCHA_EXPIRY_MINUTES: ${CAPTCHA_EXPIRY_MINUTES:-5}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
     depends_on:
       postgres:
         condition: service_healthy

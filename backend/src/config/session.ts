@@ -6,7 +6,7 @@ export const sessionConfig = {
   cookieName: config.session.cookieName,
   cookieOptions: {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
+    secure: config.session.cookieSecure,
     sameSite: 'strict' as const,
     path: '/',
     maxAge: config.session.timeoutHours * 60 * 60 * 1000,

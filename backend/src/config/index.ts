@@ -35,6 +35,12 @@ export const config = {
     secret: sessionSecret,
     timeoutHours: parseInt(process.env.SESSION_TIMEOUT_HOURS || '3', 10),
     cookieName: 'igo_session',
+    // Defaults to secure cookies in production, but can be explicitly
+    // overridden (e.g. for internal HTTP-only deployments without TLS).
+    cookieSecure:
+      process.env.SESSION_COOKIE_SECURE !== undefined
+        ? process.env.SESSION_COOKIE_SECURE === 'true'
+        : nodeEnv === 'production',
   },
   
   cors: {
