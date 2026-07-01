@@ -64,6 +64,11 @@ ENV SITE_URL=$SITE_URL
 
 ENV NODE_OPTIONS="--max-old-space-size=3072"
 
+# Regenerate CSP/security headers from the VITE_* build args above.
+# security-headers.conf is gitignored (build-time generated), so it must be
+# produced here rather than copied from the build context.
+RUN node scripts/generate-security-headers.mjs
+
 RUN --mount=type=secret,id=VITE_CORS_PROXY_URL,required=false \
     --mount=type=secret,id=VITE_CORS_PROXY_SECRET,required=false \
     VITE_CORS_PROXY_URL=$(cat /run/secrets/VITE_CORS_PROXY_URL 2>/dev/null || echo "") \
@@ -88,7 +93,7 @@ USER nginx
 
 COPY --chown=nginx:nginx --from=builder /app/dist /usr/share/nginx/html${BASE_URL%/}
 COPY --chown=nginx:nginx nginx.conf /etc/nginx/nginx.conf
-COPY --chown=nginx:nginx security-headers.conf /etc/nginx/security-headers.conf
+COPY --chown=nginx:nginx --from=builder /app/security-headers.conf /etc/nginx/security-headers.conf
 COPY --chown=nginx:nginx --from=builder /app/security-headers-docs.conf /etc/nginx/security-headers-docs.conf
 COPY --chown=nginx:nginx --chmod=755 nginx-ipv6.sh /docker-entrypoint.d/99-disable-ipv6.sh
 COPY --chown=nginx:nginx --chmod=755 nginx-noindex.sh /docker-entrypoint.d/98-noindex.sh
