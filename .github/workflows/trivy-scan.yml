@@ -19,10 +19,12 @@ jobs:
     strategy:
       matrix:
         image:
-          - name: bentopdf
+          - name: igov2-frontend
+            context: .
             file: Dockerfile
-          - name: bentopdf-nonroot
-            file: Dockerfile.nonroot
+          - name: igov2-backend
+            context: backend
+            file: backend/Dockerfile
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,7 +35,7 @@ jobs:
       - name: Build image for scanning
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.image.context }}
           file: ${{ matrix.image.file }}
           push: false
           load: true

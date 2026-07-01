@@ -1,5 +1,5 @@
-name: ❓ Question
-description: Ask a question about BentoPDF
+name: Question
+description: Ask a question about Internal Government Operation
 title: "(Question) "
 labels: ["question"]
 body:
@@ -8,18 +8,9 @@ body:
     attributes:
       label: Question
       description: What would you like to know?
-      placeholder: Your question here...
+      placeholder: Your question here.
     validations:
       required: true
-
-  - type: textarea
-    id: tried
-    attributes:
-      label: What have you tried?
-      description: What solutions have you already attempted?
-      placeholder: Describe what you've tried so far...
-    validations:
-      required: false
 
   - type: textarea
     id: context

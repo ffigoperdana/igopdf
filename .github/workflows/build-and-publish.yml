@@ -6,6 +6,9 @@ on:
       - main
     tags:
       - 'v*'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
@@ -45,9 +48,60 @@ jobs:
         working-directory: backend
         run: npm run build
 
+  docker-build-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate local compose config
+        env:
+          SESSION_SECRET: 12345678901234567890123456789012
+          CORS_ORIGIN: http://localhost:8081
+        run: docker compose config --quiet
+
+      - name: Validate production compose config
+        env:
+          IGO_FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE }}:branch-main
+          IGO_BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ env.BACKEND_IMAGE }}:branch-main
+          DB_NAME: igopdf
+          DB_USER: igopdf
+          DB_PASSWORD: ci-database-password
+          SESSION_SECRET: 12345678901234567890123456789012
+          CORS_ORIGIN: https://igo.example.go.id
+        run: docker compose -f deploy/docker-compose.prod.yml config --quiet
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          platforms: linux/amd64
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE }}:ci
+          cache-from: type=gha,scope=igov2-frontend
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          push: false
+          platforms: linux/amd64
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.BACKEND_IMAGE }}:ci
+          cache-from: type=gha,scope=igov2-backend
+
   publish:
     runs-on: ubuntu-latest
-    needs: build-test
+    needs:
+      - build-test
+      - docker-build-check
+    if: github.event_name != 'pull_request'
     permissions:
       contents: read
       packages: write
