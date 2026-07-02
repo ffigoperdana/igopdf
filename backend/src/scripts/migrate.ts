@@ -80,6 +80,28 @@ const migrations = [
       ALTER TABLE login_attempts ALTER COLUMN username TYPE VARCHAR(150);
     `,
   },
+  {
+    name: '003_add_ldap_auth_source',
+    sql: `
+      ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_source VARCHAR(20) NOT NULL DEFAULT 'local' CHECK (auth_source IN ('local', 'ldap'));
+      ALTER TABLE users ADD CONSTRAINT chk_local_users_have_password
+        CHECK (auth_source != 'local' OR password_hash IS NOT NULL);
+    `,
+  },
+  {
+    name: '004_case_insensitive_username_unique',
+    // login() resolves users case-insensitively (LOWER(username)), but the base
+    // UNIQUE(username) is case-SENSITIVE — so a local 'Admin' and an
+    // LDAP-provisioned 'admin' could coexist and be conflated, making the
+    // "prefer local" invariant query-time-only. A functional unique index
+    // enforces it at the schema level. IF NOT EXISTS keeps it idempotent; it
+    // will fail if case-duplicate usernames already exist — dedupe those first.
+    sql: `
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_lower
+        ON users (LOWER(username));
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {

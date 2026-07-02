@@ -30,14 +30,14 @@ const updateUI = () => {
     files.forEach((file, index) => {
       const fileDiv = document.createElement('div');
       fileDiv.className =
-        'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+        'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
       const infoSpan = document.createElement('span');
-      infoSpan.className = 'truncate font-medium text-gray-200';
+      infoSpan.className = 'truncate font-medium text-content';
       infoSpan.textContent = file.name;
 
       const sizeSpan = document.createElement('span');
-      sizeSpan.className = 'text-gray-400 text-xs ml-2';
+      sizeSpan.className = 'text-content-muted text-xs ml-2';
       sizeSpan.textContent = `(${formatBytes(file.size)})`;
 
       const removeBtn = document.createElement('button');
@@ -187,20 +187,20 @@ document.addEventListener('DOMContentLoaded', () => {
   if (uploadModeBtn && textModeBtn && uploadPanel && textPanel) {
     uploadModeBtn.addEventListener('click', () => {
       currentMode = 'upload';
-      uploadModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-      uploadModeBtn.classList.add('bg-indigo-600', 'text-white');
-      textModeBtn.classList.remove('bg-indigo-600', 'text-white');
-      textModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+      uploadModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+      uploadModeBtn.classList.add('bg-palm-600', 'text-white');
+      textModeBtn.classList.remove('bg-palm-600', 'text-white');
+      textModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
       uploadPanel.classList.remove('hidden');
       textPanel.classList.add('hidden');
     });
 
     textModeBtn.addEventListener('click', () => {
       currentMode = 'text';
-      textModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-      textModeBtn.classList.add('bg-indigo-600', 'text-white');
-      uploadModeBtn.classList.remove('bg-indigo-600', 'text-white');
-      uploadModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+      textModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+      textModeBtn.classList.add('bg-palm-600', 'text-white');
+      uploadModeBtn.classList.remove('bg-palm-600', 'text-white');
+      uploadModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
       textPanel.classList.remove('hidden');
       uploadPanel.classList.add('hidden');
     });
@@ -241,17 +241,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       handleFileSelect(e.dataTransfer?.files ?? null);
     });
 

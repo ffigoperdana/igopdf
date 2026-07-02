@@ -4,13 +4,6 @@ const baseCategories = [
     name: 'Popular Tools',
     tools: [
       {
-        href: import.meta.env.BASE_URL + 'pdf-workflow.html',
-        name: 'PDF Workflow Builder',
-        icon: 'ph-tree-structure',
-        subtitle:
-          'Build custom PDF processing pipelines with a visual node editor.',
-      },
-      {
         href: import.meta.env.BASE_URL + 'pdf-multi-tool.html',
         name: 'PDF Multi Tool',
         icon: 'ph-pencil-ruler',
@@ -47,12 +40,6 @@ const baseCategories = [
         name: 'JPG to PDF',
         icon: 'ph-file-jpg',
         subtitle: 'Create a PDF from one or more JPG images.',
-      },
-      {
-        href: import.meta.env.BASE_URL + 'sign-pdf.html',
-        name: 'Sign PDF',
-        icon: 'ph-pen-nib',
-        subtitle: 'Draw, type, or upload your signature.',
       },
       {
         href: import.meta.env.BASE_URL + 'crop-pdf.html',

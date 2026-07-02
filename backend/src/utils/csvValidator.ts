@@ -1,7 +1,13 @@
 import { parse } from 'csv-parse/sync';
 import type { BulkImportUser } from '../types/index.js';
 
-export const DEFAULT_IMPORT_PASSWORD = 'SawitItuBaik';
+// Default password for imported rows that have no password of their own.
+// There is deliberately NO hardcoded fallback — a shared secret committed to
+// source is a security hole (anyone reading the repo could log in as every
+// bulk-imported user). Opt in explicitly via BULK_IMPORT_DEFAULT_PASSWORD;
+// otherwise every row must carry its own password column.
+export const DEFAULT_IMPORT_PASSWORD =
+  process.env.BULK_IMPORT_DEFAULT_PASSWORD ?? '';
 
 export interface ValidationResult {
   valid: boolean;
@@ -93,8 +99,16 @@ export function validateCsvContent(content: string): ValidationResult {
   }
 
   if (!hasPasswordColumn) {
+    if (!DEFAULT_IMPORT_PASSWORD) {
+      errors.push(
+        'No password column found and BULK_IMPORT_DEFAULT_PASSWORD is not set. ' +
+          'Add a password column, or configure that environment variable.'
+      );
+      return { valid: false, errors, warnings, records: [] };
+    }
     warnings.push(
-      `No password column found. Default password "${DEFAULT_IMPORT_PASSWORD}" will be used.`
+      'No password column found. The configured BULK_IMPORT_DEFAULT_PASSWORD ' +
+        'will be used for rows without a password.'
     );
   }
 

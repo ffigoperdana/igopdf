@@ -75,27 +75,27 @@ function updateFileDisplay(): void {
   selectedFiles.forEach((file, index) => {
     const row = document.createElement('div');
     row.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
 
     const info = document.createElement('div');
     info.className = 'flex items-center gap-3';
 
     const fileIcon = document.createElement('i');
     fileIcon.setAttribute('data-lucide', 'file-text');
-    fileIcon.className = 'w-5 h-5 text-indigo-400';
+    fileIcon.className = 'w-5 h-5 text-palm-400';
 
     const nameSpan = document.createElement('span');
-    nameSpan.className = 'text-gray-200 truncate max-w-xs';
+    nameSpan.className = 'text-content truncate max-w-xs';
     nameSpan.textContent = file.name;
 
     const sizeSpan = document.createElement('span');
-    sizeSpan.className = 'text-gray-500 text-sm';
+    sizeSpan.className = 'text-content-muted text-sm';
     sizeSpan.textContent = `(${(file.size / 1024).toFixed(1)} KB)`;
 
     info.append(fileIcon, nameSpan, sizeSpan);
 
     const removeBtn = document.createElement('button');
-    removeBtn.className = 'remove-file text-gray-400 hover:text-red-400';
+    removeBtn.className = 'remove-file text-content-muted hover:text-red-400';
     removeBtn.dataset.index = String(index);
 
     const removeIcon = document.createElement('i');
@@ -136,12 +136,12 @@ function displayResults(result: DeskewResult): void {
   anglesList.innerHTML = result.angles
     .map((angle, idx) => {
       const wasCorrected = result.corrected[idx];
-      const color = wasCorrected ? 'text-green-400' : 'text-gray-400';
+      const color = wasCorrected ? 'text-green-400' : 'text-content-muted';
       const icon = wasCorrected ? 'check' : 'minus';
       return `
         <div class="flex items-center gap-2 text-sm py-1">
           <i data-lucide="${icon}" class="w-4 h-4 ${color}"></i>
-          <span class="text-gray-300">Page ${idx + 1}:</span>
+          <span class="text-content-muted">Page ${idx + 1}:</span>
           <span class="${color}">${angle.toFixed(2)}°</span>
           ${wasCorrected ? '<span class="text-green-400 text-xs">(corrected)</span>' : ''}
         </div>
@@ -230,16 +230,16 @@ function initPage(): void {
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       if (e.dataTransfer?.files) {
         const pdfFiles = Array.from(e.dataTransfer.files).filter(
           (f) => f.type === 'application/pdf'

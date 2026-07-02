@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -97,20 +98,20 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <div
       id="uploader"
-      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-gray-900"
+      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-surface"
     >
       <div
         id="tool-uploader"
-        class="bg-gray-800 rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools">
@@ -119,28 +120,28 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:ocrPdf.name"
         >
           OCR PDF
         </h1>
-        <p class="text-gray-400 mb-6" data-i18n="tools:ocrPdf.subtitle">
+        <p class="text-content-muted mb-6" data-i18n="tools:ocrPdf.subtitle">
           Make a PDF searchable and copyable.
         </p>
 
         <!-- How it works info box -->
-        <div class="p-3 bg-gray-900 rounded-lg border border-gray-700 mb-6">
-          <p class="text-sm text-gray-300">
-            <strong class="text-white" data-i18n="tools:ocrPdf.howItWorksTitle"
+        <div class="p-3 bg-surface rounded-lg border border-line mb-6">
+          <p class="text-sm text-content-muted">
+            <strong class="text-content" data-i18n="tools:ocrPdf.howItWorksTitle"
               >How it works:</strong
             >
           </p>
           <ul
-            class="list-disc list-inside text-xs text-gray-400 mt-1 space-y-1"
+            class="list-disc list-inside text-xs text-content-muted mt-1 space-y-1"
           >
             <li>
               <strong
-                class="text-white"
+                class="text-content"
                 data-i18n="tools:ocrPdf.extractTextLabel"
                 >Extract Text:</strong
               >
@@ -151,7 +152,7 @@
             </li>
             <li>
               <strong
-                class="text-white"
+                class="text-content"
                 data-i18n="tools:ocrPdf.searchableOutputLabel"
                 >Searchable Output:</strong
               >
@@ -163,7 +164,7 @@
             </li>
             <li>
               <strong
-                class="text-white"
+                class="text-content"
                 data-i18n="tools:ocrPdf.characterFilteringLabel"
                 >Character Filtering:</strong
               >
@@ -175,7 +176,7 @@
             </li>
             <li>
               <strong
-                class="text-white"
+                class="text-content"
                 data-i18n="tools:ocrPdf.multiLanguageSupportLabel"
                 >Multi-language Support:</strong
               >
@@ -189,20 +190,20 @@
 
         <div
           id="drop-zone"
-          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface hover:bg-surface-muted transition-colors duration-300"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="upload-cloud"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-400">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select PDF</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -220,7 +221,7 @@
         <div id="tool-options" class="hidden mt-6 space-y-4">
           <div>
             <label
-              class="block mb-2 text-sm font-medium text-gray-300"
+              class="block mb-2 text-sm font-medium text-content-muted"
               data-i18n="tools:ocrPdf.languagesInDocument"
               >Languages in Document</label
             >
@@ -228,18 +229,18 @@
               <input
                 type="text"
                 id="lang-search"
-                class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg p-2.5 mb-2"
+                class="w-full bg-surface border border-line text-content rounded-lg p-2.5 mb-2"
                 placeholder="Search for languages..."
                 data-i18n-placeholder="tools:ocrPdf.searchLanguagesPlaceholder"
               />
               <div
                 id="lang-list"
-                class="max-h-48 overflow-y-auto border border-gray-600 rounded-lg p-2 bg-gray-900"
+                class="max-h-48 overflow-y-auto border border-line rounded-lg p-2 bg-surface"
               >
                 <!-- Language checkboxes will be populated by JS -->
               </div>
             </div>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-content-muted mt-1">
               <span data-i18n="tools:ocrPdf.selectedLabel">Selected:</span>
               <span
                 id="selected-langs-display"
@@ -255,9 +256,9 @@
           </div>
 
           <!-- Advanced settings -->
-          <details class="bg-gray-900 border border-gray-700 rounded-lg p-3">
+          <details class="bg-surface border border-line rounded-lg p-3">
             <summary
-              class="text-sm font-medium text-gray-300 cursor-pointer flex items-center justify-between"
+              class="text-sm font-medium text-content-muted cursor-pointer flex items-center justify-between"
             >
               <span data-i18n="tools:ocrPdf.advancedSettingsSummary"
                 >Advanced Settings (Recommended to improve accuracy)</span
@@ -272,13 +273,13 @@
               <div>
                 <label
                   for="ocr-resolution"
-                  class="block mb-1 text-xs font-medium text-gray-400"
+                  class="block mb-1 text-xs font-medium text-content-muted"
                   data-i18n="tools:ocrPdf.resolutionLabel"
                   >Resolution</label
                 >
                 <select
                   id="ocr-resolution"
-                  class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 text-sm"
+                  class="w-full bg-surface-muted border border-line text-content rounded-lg p-2 text-sm"
                 >
                   <option
                     value="2.0"
@@ -300,24 +301,24 @@
               </div>
               <!-- Binarization -->
               <label
-                class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
+                class="flex items-center gap-2 text-sm text-content-muted cursor-pointer"
               >
                 <input
                   type="checkbox"
                   id="ocr-binarize"
-                  class="w-4 h-4 rounded text-indigo-600 bg-gray-700 border-gray-600"
+                  class="w-4 h-4 rounded text-palm-600 bg-surface-muted border-line"
                 />
                 <span data-i18n="tools:ocrPdf.binarizeLabel"
                   >Binarize Image (Enhance Contrast for Clean Scans)</span
                 >
               </label>
               <label
-                class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
+                class="flex items-center gap-2 text-sm text-content-muted cursor-pointer"
               >
                 <input
                   type="checkbox"
                   id="ocr-embed-full-fonts"
-                  class="w-4 h-4 rounded text-indigo-600 bg-gray-700 border-gray-600"
+                  class="w-4 h-4 rounded text-palm-600 bg-surface-muted border-line"
                 />
                 <span data-i18n="tools:ocrPdf.embedFullFontsLabel"
                   >Embed Full Fonts (Larger file, better compatibility)</span
@@ -327,13 +328,13 @@
               <div>
                 <label
                   for="whitelist-preset"
-                  class="block mb-1 text-xs font-medium text-gray-400"
+                  class="block mb-1 text-xs font-medium text-content-muted"
                   data-i18n="tools:ocrPdf.whitelistPresetLabel"
                   >Character Whitelist Preset</label
                 >
                 <select
                   id="whitelist-preset"
-                  class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 text-sm mb-2"
+                  class="w-full bg-surface-muted border border-line text-content rounded-lg p-2 text-sm mb-2"
                 >
                   <option value="" data-i18n="tools:ocrPdf.whitelistNone">
                     None (All characters)
@@ -379,7 +380,7 @@
                   </option>
                 </select>
                 <p
-                  class="text-xs text-gray-500 mt-1"
+                  class="text-xs text-content-muted mt-1"
                   data-i18n="tools:ocrPdf.whitelistHelp"
                 >
                   Only these characters will be recognized. Leave empty for all
@@ -390,19 +391,19 @@
               <div>
                 <label
                   for="ocr-whitelist"
-                  class="block mb-1 text-xs font-medium text-gray-400"
+                  class="block mb-1 text-xs font-medium text-content-muted"
                   data-i18n="tools:ocrPdf.whitelistInputLabel"
                   >Character Whitelist (Optional)</label
                 >
                 <input
                   type="text"
                   id="ocr-whitelist"
-                  class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 text-sm"
+                  class="w-full bg-surface-muted border border-line text-content rounded-lg p-2 text-sm"
                   placeholder="e.g., abcdefghijklmnopqrstuvwxyz0123456789$.,"
                   data-i18n-placeholder="tools:ocrPdf.whitelistInputPlaceholder"
                 />
                 <p
-                  class="text-xs text-gray-500 mt-1"
+                  class="text-xs text-content-muted mt-1"
                   data-i18n="tools:ocrPdf.whitelistHelp"
                 >
                   Only these characters will be recognized. Leave empty for all
@@ -425,38 +426,38 @@
         <!-- Progress Section -->
         <div
           id="ocr-progress"
-          class="hidden mt-6 p-4 bg-gray-900 border border-gray-700 rounded-lg"
+          class="hidden mt-6 p-4 bg-surface border border-line rounded-lg"
         >
           <p
             id="progress-status"
-            class="text-white mb-2"
+            class="text-content mb-2"
             data-i18n="tools:ocrPdf.progressInitializing"
           >
             Initializing...
           </p>
-          <div class="w-full bg-gray-700 rounded-full h-4">
+          <div class="w-full bg-surface-muted rounded-full h-4">
             <div
               id="progress-bar"
-              class="bg-indigo-600 h-4 rounded-full transition-all duration-300"
+              class="bg-palm-600 h-4 rounded-full transition-all duration-300"
               style="width: 0%"
             ></div>
           </div>
           <pre
             id="progress-log"
-            class="mt-4 text-xs text-gray-400 max-h-32 overflow-y-auto bg-black p-2 rounded-md"
+            class="mt-4 text-xs text-content-muted max-h-32 overflow-y-auto bg-black p-2 rounded-md"
           ></pre>
         </div>
 
         <!-- Results Section -->
         <div id="ocr-results" class="hidden mt-6">
           <h3
-            class="text-xl font-bold text-white mb-2"
+            class="text-xl font-bold text-content mb-2"
             data-i18n="tools:ocrPdf.resultsTitle"
           >
             OCR Complete
           </h3>
           <p
-            class="mb-4 text-gray-400"
+            class="mb-4 text-content-muted"
             data-i18n="tools:ocrPdf.resultsDescription"
           >
             Your searchable PDF is ready. You can also copy or download the
@@ -466,22 +467,22 @@
             <textarea
               id="ocr-text-output"
               rows="10"
-              class="w-full bg-gray-900 border border-gray-600 text-gray-300 rounded-lg p-2.5 font-sans"
+              class="w-full bg-surface border border-line text-content-muted rounded-lg p-2.5 font-sans"
               readonly
             ></textarea>
             <button
               id="copy-text-btn"
-              class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-md"
+              class="absolute top-2 right-2 bg-surface-muted hover:bg-surface-muted p-2 rounded-md"
               title="Copy to Clipboard"
               data-i18n-title="tools:ocrPdf.copyToClipboard"
             >
-              <i data-lucide="clipboard-copy" class="w-4 h-4 text-gray-300"></i>
+              <i data-lucide="clipboard-copy" class="w-4 h-4 text-content-muted"></i>
             </button>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <button
               id="download-txt-btn"
-              class="w-full bg-gray-700 text-white font-semibold py-3 rounded-lg hover:bg-gray-600"
+              class="w-full bg-surface-muted text-content font-semibold py-3 rounded-lg hover:bg-surface-muted"
               data-i18n="tools:ocrPdf.downloadTxt"
             >
               Download as .txt
@@ -504,12 +505,12 @@
       class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
     >
       <div
-        class="bg-gray-800 p-8 rounded-lg flex flex-col items-center gap-4 border border-gray-700 shadow-xl"
+        class="bg-surface-raised p-8 rounded-lg flex flex-col items-center gap-4 border border-line shadow-xl"
       >
         <div class="solid-spinner"></div>
         <p
           id="loader-text"
-          class="text-white text-lg font-medium"
+          class="text-content text-lg font-medium"
           data-i18n="loader.processing"
           data-i18n="loader.processing"
         >
@@ -521,23 +522,23 @@
     <!-- Alert Modal -->
     <div
       id="alert-modal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden"
+      class="fixed inset-0 bg-surface bg-opacity-90 flex items-center justify-center z-50 hidden"
     >
       <div
-        class="bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full border border-gray-700"
+        class="bg-surface-raised rounded-lg shadow-xl p-6 max-w-sm w-full border border-line"
       >
         <h3
           id="alert-title"
-          class="text-xl font-bold text-white mb-2"
+          class="text-xl font-bold text-content mb-2"
           data-i18n="alert.title"
           data-i18n="alert.title"
         >
           Alert
         </h3>
-        <p id="alert-message" class="text-gray-300 mb-6"></p>
+        <p id="alert-message" class="text-content-muted mb-6"></p>
         <button
           id="alert-ok"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          class="w-full bg-palm-600 hover:bg-palm-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           OK
         </button>
@@ -545,9 +546,9 @@
     </div>
 
     <!-- How It Works Section -->
-    <section class="max-w-4xl mx-auto px-4 py-12">
+    <section class="max-w-2xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -555,39 +556,39 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Upload File</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:ocrPdf.howItWorks.step1Title">Upload File</h3>
+            <p class="text-content-muted" data-i18n="tools:ocrPdf.howItWorks.step1Desc">
               Click or drag and drop your file to begin
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Process</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step2">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:ocrPdf.howItWorks.step2Title">Process</h3>
+            <p class="text-content-muted" data-i18n="tools:ocrPdf.howItWorks.step2Desc">
               Click the process button to start
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Download</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step3">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:ocrPdf.howItWorks.step3Title">Download</h3>
+            <p class="text-content-muted" data-i18n="tools:ocrPdf.howItWorks.step3Desc">
               Save your processed file instantly
             </p>
           </div>
@@ -598,46 +599,46 @@
     <!-- Related Tools Section -->
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="merge-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Merge Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online merge pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:ocrPdf.relatedTools.card1Name">Merge Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:ocrPdf.relatedTools.card1Desc">Free online merge pdf tool</p>
         </a>
         <a
           href="compress-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Compress Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online compress pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:ocrPdf.relatedTools.card2Name">Compress Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:ocrPdf.relatedTools.card2Desc">Free online compress pdf tool</p>
         </a>
         <a
           href="split-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Split Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online split pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:ocrPdf.relatedTools.card3Name">Split Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:ocrPdf.relatedTools.card3Desc">Free online split pdf tool</p>
         </a>
         <a
           href="edit-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Edit Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online edit pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:ocrPdf.relatedTools.card4Name">Edit Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:ocrPdf.relatedTools.card4Desc">Free online edit pdf tool</p>
         </a>
         <a
           href="rotate-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Rotate Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online rotate pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:ocrPdf.relatedTools.card5Name">Rotate Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:ocrPdf.relatedTools.card5Desc">Free online rotate pdf tool</p>
         </a>
       </div>
     </section>
@@ -645,44 +646,44 @@
     <!-- FAQ Section -->
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is ocr pdf really free?
+            <span data-i18n="tools:ocrPdf.faq.q1">Is ocr pdf really free?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:ocrPdf.faq.a1">
             Yes! igo is 100% free with no hidden fees, no signup required,
             and unlimited file processing.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Are my files private and secure?
+            <span data-i18n="tools:ocrPdf.faq.q2">Are my files private and secure?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:ocrPdf.faq.a2">
             Absolutely! All processing happens in your browser. Your files never
             leave your device, ensuring complete privacy.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is there a file size limit?
+            <span data-i18n="tools:ocrPdf.faq.q3">Is there a file size limit?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:ocrPdf.faq.a3">
             No! Process files of any size, as many times as you want, completely
             free.
           </p>

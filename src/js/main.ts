@@ -1,14 +1,16 @@
 import { categories } from './config/tools.js';
 import { dom, switchView, hideAlert } from './ui.js';
 import { ShortcutsManager } from './logic/shortcuts.js';
-import { createIcons, icons } from 'lucide';
 import '@phosphor-icons/web/regular';
-import * as pdfjsLib from 'pdfjs-dist';
+// Worker asset URL only (statically emitted by Vite). The heavy pdf.js library
+// itself is NOT imported here — it's loaded lazily below, and never on the
+// homepage, so it stays out of the main bundle.
+const PDF_WORKER_URL = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 import '../css/styles.css';
-import {
-  escapeHtml,
-  formatShortcutDisplay,
-} from './utils/helpers.js';
+import { escapeHtml, formatShortcutDisplay } from './utils/helpers-light.js';
 import {
   initI18n,
   applyTranslations,
@@ -21,16 +23,92 @@ import {
   isToolDisabled,
   isCurrentPageDisabled,
 } from './utils/disabled-tools.js';
-import { initAuth, requireAuth } from './auth/guard.js';
+import { initAuth, requireAuth, getUser } from './auth/guard.js';
+import { initTheme, createThemeToggle } from './theme.js';
+import { initPwaInstallPrompt } from './pwa-install.js';
 declare const __BRAND_NAME__: string;
+
+// Lucide is loaded lazily (its own chunk) so its full icon set stays out of the
+// main bundle — this keeps the homepage's main-thread JS small. Fire-and-forget:
+// createIcons() converts every [data-lucide] placeholder in place.
+function renderLucideIcons(): void {
+  void import('lucide').then(({ createIcons, icons }) => createIcons({ icons }));
+}
+
+function injectThemeToggle(): void {
+  const cls = 'text-white hover:bg-white/10';
+  ['theme-toggle-container', 'theme-toggle-container-mobile'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = '';
+      el.appendChild(createThemeToggle(cls));
+    }
+  });
+}
+
+// Render the navbar controls (theme toggle + ID|EN pill) as early as possible —
+// before the `load` event that runs init() — so they don't pop in after first
+// paint (a source of flicker when navigating between pages).
+initTheme();
+function setActiveNavItem(): void {
+  const norm = (s: string) =>
+    (s.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+  const current = norm(location.pathname);
+  document
+    .querySelectorAll<HTMLAnchorElement>('.nav-item')
+    .forEach((a) =>
+      a.classList.toggle('is-active', norm(a.getAttribute('href') || '') === current)
+    );
+}
+
+function renderNavControls(): void {
+  injectLanguageSwitcher();
+  injectThemeToggle();
+  setActiveNavItem();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', renderNavControls);
+} else {
+  renderNavControls();
+}
+// In-place language switch (no reload) — refresh the pill's active state.
+document.addEventListener('igo:languagechange', () => injectLanguageSwitcher());
+
+// Auth gate — resolve login state as early as possible and reveal the page (or
+// redirect to /login) so guarded content never flashes before the redirect.
+// The `.auth-guard` class is baked into every navbar page's <html> at build
+// time (vite.config.ts) and hides <body> via CSS until we remove it here. Login
+// and other unguarded pages don't carry the class, so this is a no-op there.
+async function guardAndReveal(): Promise<void> {
+  const root = document.documentElement;
+  if (!root.classList.contains('auth-guard')) return;
+  try {
+    await Promise.all([initI18n(), initAuth()]);
+    if (!getUser()) {
+      requireAuth(); // redirect to /login.html; stay hidden → no flash
+      return;
+    }
+    applyTranslations(); // translate before revealing (no id→en flash)
+    root.classList.remove('auth-guard');
+  } catch {
+    requireAuth(); // on any failure treat as unauthenticated → login
+  }
+}
+void guardAndReveal();
 
 const init = async () => {
   await initI18n();
   await initAuth();
-  requireAuth();
+  if (!getUser()) {
+    requireAuth(); // not logged in → redirect; keep the page hidden (no flash)
+    return;
+  }
   await loadRuntimeConfig();
-  injectLanguageSwitcher();
   applyTranslations();
+  document.documentElement.classList.remove('auth-guard'); // authed → reveal
+
+  // Logged in → offer the one-time "install as app" prompt (shows once, ever).
+  initPwaInstallPrompt();
 
   if (isCurrentPageDisabled()) {
     document.title = t('disabledTool.title') || 'Tool Unavailable';
@@ -42,19 +120,24 @@ const init = async () => {
     const backHome = t('disabledTool.backHome') || 'Back to Home';
     main.innerHTML = `
       <div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <i class="ph ph-prohibit text-6xl text-gray-500 mb-4"></i>
+        <i class="ph ph-prohibit text-6xl text-content-muted mb-4"></i>
         <h1 class="text-2xl font-bold text-white mb-2">${heading}</h1>
-        <p class="text-gray-400 mb-6">${message}</p>
-        <a href="${import.meta.env.BASE_URL}" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition">${backHome}</a>
+        <p class="text-content-muted mb-6">${message}</p>
+        <a href="${import.meta.env.BASE_URL}" class="px-6 py-2 bg-palm-600 hover:bg-palm-700 text-white rounded-lg transition">${backHome}</a>
       </div>
     `;
     return;
   }
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url
-  ).toString();
+  // pdf.js is only needed on pages that actually render PDFs — never on the
+  // homepage grid. Load it lazily (its own chunk) and skip it entirely on the
+  // homepage so it isn't downloaded or parsed there. PDF tool pages also set the
+  // worker via render-utils.ts, so this global setup is safe and redundant.
+  if (!document.getElementById('tool-grid')) {
+    void import('pdfjs-dist').then((pdfjs) => {
+      pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
+    });
+  }
   if (__SIMPLE_MODE__) {
     const hideBrandingSections = () => {
       const heroSection = document.getElementById('hero-section');
@@ -117,7 +200,7 @@ const init = async () => {
         }
         if (subtitle) {
           subtitle.textContent = t('simpleMode.subtitle');
-          subtitle.className = 'text-lg text-gray-400';
+          subtitle.className = 'text-lg text-content-muted';
         }
       }
 
@@ -316,6 +399,7 @@ const init = async () => {
       const title = document.createElement('span');
       const categoryKey = categoryTranslationKeys[category.name];
       title.textContent = categoryKey ? t(categoryKey) : category.name;
+      if (categoryKey) title.setAttribute('data-i18n', categoryKey);
 
       const chevron = document.createElement('i');
       chevron.setAttribute('data-lucide', 'chevron-down');
@@ -379,18 +463,19 @@ const init = async () => {
         }
 
         const icon = document.createElement('i');
-        icon.className = 'w-10 h-10 mb-3 text-deep-forest';
+        icon.className = 'w-10 h-10 mb-3 text-vibrant-palm';
 
         if (tool.icon.startsWith('ph-')) {
-          icon.className = `ph ${tool.icon} text-4xl mb-3 text-deep-forest`;
+          icon.className = `ph ${tool.icon} text-4xl mb-3 text-vibrant-palm`;
         } else {
           icon.setAttribute('data-lucide', tool.icon);
         }
 
         const toolName = document.createElement('h3');
-        toolName.className = 'font-semibold text-ink-slate';
+        toolName.className = 'font-semibold text-on-surface-variant';
         const toolKey = toolTranslationKeys[tool.name];
         toolName.textContent = toolKey ? t(`${toolKey}.name`) : tool.name;
+        if (toolKey) toolName.setAttribute('data-i18n', `${toolKey}.name`);
 
         toolCard.append(icon, toolName);
 
@@ -400,6 +485,8 @@ const init = async () => {
           toolSubtitle.textContent = toolKey
             ? t(`${toolKey}.subtitle`)
             : tool.subtitle;
+          if (toolKey)
+            toolSubtitle.setAttribute('data-i18n', `${toolKey}.subtitle`);
           toolCard.appendChild(toolSubtitle);
         }
 
@@ -484,7 +571,7 @@ const init = async () => {
         searchResultsContainer.appendChild(tool);
       });
 
-      createIcons({ icons });
+      renderLucideIcons();
     });
 
     window.addEventListener('keydown', function (e) {
@@ -532,7 +619,7 @@ const init = async () => {
     });
   }
 
-  createIcons({ icons });
+  renderLucideIcons();
   console.log('Please share our tool and share the love!');
 
   // Initialize Shortcuts System
@@ -553,10 +640,10 @@ const init = async () => {
 
   if (shortcutsTabBtn && preferencesTabBtn) {
     shortcutsTabBtn.addEventListener('click', () => {
-      shortcutsTabBtn.classList.add('bg-indigo-600', 'text-white');
-      shortcutsTabBtn.classList.remove('text-gray-300');
-      preferencesTabBtn.classList.remove('bg-indigo-600', 'text-white');
-      preferencesTabBtn.classList.add('text-gray-300');
+      shortcutsTabBtn.classList.add('bg-palm-600', 'text-white');
+      shortcutsTabBtn.classList.remove('text-content-muted');
+      preferencesTabBtn.classList.remove('bg-palm-600', 'text-white');
+      preferencesTabBtn.classList.add('text-content-muted');
       shortcutsTabContent?.classList.remove('hidden');
       preferencesTabContent?.classList.add('hidden');
       shortcutsTabFooter?.classList.remove('hidden');
@@ -565,10 +652,10 @@ const init = async () => {
     });
 
     preferencesTabBtn.addEventListener('click', () => {
-      preferencesTabBtn.classList.add('bg-indigo-600', 'text-white');
-      preferencesTabBtn.classList.remove('text-gray-300');
-      shortcutsTabBtn.classList.remove('bg-indigo-600', 'text-white');
-      shortcutsTabBtn.classList.add('text-gray-300');
+      preferencesTabBtn.classList.add('bg-palm-600', 'text-white');
+      preferencesTabBtn.classList.remove('text-content-muted');
+      shortcutsTabBtn.classList.remove('bg-palm-600', 'text-white');
+      shortcutsTabBtn.classList.add('text-content-muted');
       preferencesTabContent?.classList.remove('hidden');
       shortcutsTabContent?.classList.add('hidden');
       preferencesTabFooter?.classList.remove('hidden');
@@ -895,7 +982,7 @@ const init = async () => {
 
       const header = document.createElement('h3');
       header.className =
-        'text-gray-400 text-xs font-bold uppercase tracking-wider mb-3 pl-1';
+        'text-content-muted text-xs font-bold uppercase tracking-wider mb-3 pl-1';
       const categoryKey = categoryTranslationKeys[category.name];
       header.textContent = categoryKey ? t(categoryKey) : category.name;
       section.appendChild(header);
@@ -913,21 +1000,21 @@ const init = async () => {
 
         const item = document.createElement('div');
         item.className =
-          'shortcut-item flex items-center justify-between p-3 bg-gray-900 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors';
+          'shortcut-item flex items-center justify-between p-3 bg-surface rounded-lg border border-line hover:border-line transition-colors';
 
         const left = document.createElement('div');
         left.className = 'flex items-center gap-3';
 
         const icon = document.createElement('i');
         if (tool.icon.startsWith('ph-')) {
-          icon.className = `ph ${tool.icon} w-5 h-5 text-indigo-400`;
+          icon.className = `ph ${tool.icon} w-5 h-5 text-palm-400`;
         } else {
-          icon.className = 'w-5 h-5 text-indigo-400';
+          icon.className = 'w-5 h-5 text-palm-400';
           icon.setAttribute('data-lucide', tool.icon);
         }
 
         const name = document.createElement('span');
-        name.className = 'text-gray-200 font-medium';
+        name.className = 'text-content font-medium';
         const toolKey = toolTranslationKeys[tool.name];
         name.textContent = toolKey ? t(`${toolKey}.name`) : tool.name;
 
@@ -939,14 +1026,14 @@ const init = async () => {
         const input = document.createElement('input');
         input.type = 'text';
         input.className =
-          'shortcut-input w-32 bg-gray-800 border border-gray-600 text-white text-center text-sm rounded px-2 py-1 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all';
+          'shortcut-input w-32 bg-surface-raised border border-line text-white text-center text-sm rounded px-2 py-1 focus:ring-2 focus:ring-palm-500 focus:border-transparent outline-none transition-all';
         input.placeholder = t('settings.clickToSet');
         input.value = formatShortcutDisplay(currentShortcut, isMac);
         input.readOnly = true;
 
         const clearBtn = document.createElement('button');
         clearBtn.className =
-          'absolute -right-2 -top-2 bg-gray-700 hover:bg-red-600 text-white rounded-full p-0.5 hidden group-hover:block shadow-sm';
+          'absolute -right-2 -top-2 bg-surface-muted hover:bg-red-600 text-white rounded-full p-0.5 hidden group-hover:block shadow-sm';
         clearBtn.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>';
         if (currentShortcut) {
           right.classList.add('group');
@@ -1039,7 +1126,7 @@ const init = async () => {
                 ShortcutsManager.getShortcut(toolId) || '',
                 isMac
               );
-              input.classList.remove('border-indigo-500', 'text-indigo-400');
+              input.classList.remove('border-palm-500', 'text-palm-400');
               input.blur();
               return;
             }
@@ -1061,7 +1148,7 @@ const init = async () => {
                   ShortcutsManager.getShortcut(toolId) || '',
                   isMac
                 );
-                input.classList.remove('border-indigo-500', 'text-indigo-400');
+                input.classList.remove('border-palm-500', 'text-palm-400');
                 input.blur();
                 return;
               }
@@ -1083,7 +1170,7 @@ const init = async () => {
 
         input.onfocus = () => {
           input.value = t('settings.pressKeys');
-          input.classList.add('border-indigo-500', 'text-indigo-400');
+          input.classList.add('border-palm-500', 'text-palm-400');
         };
 
         input.onblur = () => {
@@ -1091,7 +1178,7 @@ const init = async () => {
             ShortcutsManager.getShortcut(toolId) || '',
             isMac
           );
-          input.classList.remove('border-indigo-500', 'text-indigo-400');
+          input.classList.remove('border-palm-500', 'text-palm-400');
         };
 
         right.append(input);
@@ -1106,7 +1193,7 @@ const init = async () => {
       }
     });
 
-    createIcons({ icons });
+    renderLucideIcons();
   }
 
   const scrollToTopBtn = document.getElementById('scroll-to-top-btn');

@@ -84,7 +84,7 @@ function updateFileList() {
 
   const wrapper = document.createElement('div');
   wrapper.className =
-    'bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-indigo-500 transition-colors';
+    'bg-surface-muted p-3 rounded-lg border border-line hover:border-palm-500 transition-colors';
 
   const innerDiv = document.createElement('div');
   innerDiv.className = 'flex items-center justify-between';
@@ -97,7 +97,7 @@ function updateFileList() {
   nameSpan.textContent = selectedFile.name;
 
   const sizeSpan = document.createElement('p');
-  sizeSpan.className = 'text-gray-400 text-sm';
+  sizeSpan.className = 'text-content-muted text-sm';
   sizeSpan.textContent = formatBytes(selectedFile.size);
 
   infoDiv.append(nameSpan, sizeSpan);
@@ -282,14 +282,14 @@ const dropZone = document.getElementById('drop-zone');
 if (dropZone) {
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-indigo-500');
+    dropZone.classList.add('border-palm-500');
   });
   dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
   });
   dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
     const file = e.dataTransfer?.files[0];
     if (file && file.type === 'application/pdf') {
       await onPdfSelected(file);

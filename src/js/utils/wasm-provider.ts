@@ -8,16 +8,21 @@ interface WasmProviderConfig {
 
 const STORAGE_KEY = 'igo:wasm-providers';
 
-function getWasmPackageScope(): string {
-  return ['@ben', 'to', 'pdf'].join('');
+// Self-hosted (same-origin) defaults. The WASM modules are bundled into the
+// build (see vite.config.ts staticCopyTargets + public/coherentpdf.browser.min.js),
+// so the app works fully offline with no external CDN. Respect the deploy BASE_URL
+// (e.g. '/' or '/pdf/') so subdirectory deployments resolve correctly.
+function siteBase(): string {
+  const b = (import.meta.env.BASE_URL as string) || '/';
+  return b.endsWith('/') ? b : `${b}/`;
 }
 
-const WASM_PACKAGE_SCOPE = getWasmPackageScope();
+const LOCAL_BASE = siteBase();
 
 const CDN_DEFAULTS: Record<WasmPackage, string> = {
-  pymupdf: `https://cdn.jsdelivr.net/npm/${WASM_PACKAGE_SCOPE}/pymupdf-wasm@0.11.16/`,
-  ghostscript: `https://cdn.jsdelivr.net/npm/${WASM_PACKAGE_SCOPE}/gs-wasm@0.1.1/assets/`,
-  cpdf: 'https://cdn.jsdelivr.net/npm/coherentpdf@2.5.5/dist/',
+  pymupdf: `${LOCAL_BASE}wasm/pymupdf/`,
+  ghostscript: `${LOCAL_BASE}wasm/gs/`,
+  cpdf: LOCAL_BASE,
 };
 
 function envOrDefault(envVar: string | undefined, fallback: string): string {
@@ -365,7 +370,7 @@ export function showWasmRequiredDialog(
 
   const modal = document.createElement('div');
   modal.className =
-    'bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl border border-gray-700';
+    'bg-surface-raised rounded-2xl max-w-md w-full shadow-2xl border border-line';
 
   modal.innerHTML = `
     <div class="p-6">
@@ -377,17 +382,17 @@ export function showWasmRequiredDialog(
         </div>
         <div>
           <h3 class="text-lg font-semibold text-white">Advanced Feature Required</h3>
-          <p class="text-sm text-gray-400">External processing module needed</p>
+          <p class="text-sm text-content-muted">External processing module needed</p>
         </div>
       </div>
 
-      <p class="text-gray-300 mb-4">
+      <p class="text-content-muted mb-4">
         This feature requires <strong class="text-white">${displayName}</strong> to be configured.
       </p>
 
-      <div class="bg-gray-700/50 rounded-lg p-4 mb-4">
-        <p class="text-sm text-gray-400 mb-2">Features enabled by this module:</p>
-        <ul class="text-sm text-gray-300 space-y-1">
+      <div class="bg-surface-muted/50 rounded-lg p-4 mb-4">
+        <p class="text-sm text-content-muted mb-2">Features enabled by this module:</p>
+        <ul class="text-sm text-content-muted space-y-1">
           ${features
             .slice(0, 4)
             .map(
@@ -395,17 +400,17 @@ export function showWasmRequiredDialog(
                 `<li class="flex items-center gap-2"><span class="text-green-400">✓</span> ${f}</li>`
             )
             .join('')}
-          ${features.length > 4 ? `<li class="text-gray-500">+ ${features.length - 4} more...</li>` : ''}
+          ${features.length > 4 ? `<li class="text-content-muted">+ ${features.length - 4} more...</li>` : ''}
         </ul>
       </div>
 
-      <p class="text-xs text-gray-500 mb-4">
+      <p class="text-xs text-content-muted mb-4">
         This module is licensed under AGPL-3.0. By configuring it, you agree to its license terms.
       </p>
     </div>
 
-    <div class="border-t border-gray-700 p-4 flex gap-3">
-      <button id="wasm-modal-cancel" class="flex-1 px-4 py-2.5 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors font-medium">
+    <div class="border-t border-line p-4 flex gap-3">
+      <button id="wasm-modal-cancel" class="flex-1 px-4 py-2.5 rounded-lg bg-surface-muted text-content-muted hover:bg-surface-muted transition-colors font-medium">
         Cancel
       </button>
       <button id="wasm-modal-configure" class="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 transition-all font-medium">
@@ -434,7 +439,9 @@ export function showWasmRequiredDialog(
     if (onConfigure) {
       onConfigure();
     } else {
-      window.location.href = `${import.meta.env.BASE_URL}wasm-settings.html`;
+      // WASM modules are self-hosted and always configured, so this dialog is
+      // effectively unreachable; the dedicated wasm-settings page was removed.
+      window.location.href = import.meta.env.BASE_URL;
     }
   });
 }

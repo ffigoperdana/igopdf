@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="id">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profil - igo</title>
@@ -17,12 +18,12 @@
       <section class="mx-auto max-w-3xl">
         <div class="mb-8">
           <p class="text-sm font-semibold uppercase text-vibrant-palm">Akun</p>
-          <h1 class="text-3xl font-bold text-deep-forest">Profil Pengguna</h1>
+          <h1 class="text-3xl font-bold text-deep-forest dark:text-content">Profil Pengguna</h1>
         </div>
 
         <div class="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <section class="rounded border border-outline-variant bg-white p-6">
-            <h2 class="mb-4 text-lg font-bold text-ink-slate">Informasi sesi</h2>
+            <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Informasi sesi</h2>
             <dl class="space-y-3 text-sm">
               <div>
                 <dt class="text-on-surface-variant">Username</dt>
@@ -36,7 +37,7 @@
           </section>
 
           <section class="rounded border border-outline-variant bg-white p-6">
-            <h2 class="mb-4 text-lg font-bold text-ink-slate">Ubah password</h2>
+            <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Ubah password</h2>
             <form id="change-password-form" class="space-y-4">
               <div>
                 <label for="current-password" class="mb-1 block text-sm font-medium">Password saat ini</label>

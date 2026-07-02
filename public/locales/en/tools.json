@@ -19,11 +19,71 @@
     "name": "Merge PDF",
     "subtitle": "Combine multiple PDFs into one file. Preserves Bookmarks.",
     "retainPageLabels": "Keep original page labels from each file",
-    "retainPageLabelsHint": "Off (default): the merged PDF uses natural page numbering 1–N. On: each file's original page labels are preserved (may produce duplicate labels)."
+    "retainPageLabelsHint": "Off (default): the merged PDF uses natural page numbering 1–N. On: each file's original page labels are preserved (may produce duplicate labels).",
+    "howItWorks": {
+      "step1Title": "Upload PDFs",
+      "step1Desc": "Select or drag and drop multiple PDF files you want to merge",
+      "step2Title": "Arrange Order",
+      "step2Desc": "Drag files up or down to reorder them in your preferred sequence",
+      "step3Title": "Merge Files",
+      "step3Desc": "Click the merge button to combine all PDFs into a single document",
+      "step4Title": "Download",
+      "step4Desc": "Save your merged PDF - all pages combined in the order you chose"
+    },
+    "relatedTools": {
+      "card1Name": "Split Pdf",
+      "card1Desc": "Free online split pdf tool",
+      "card2Name": "Organize Pdf",
+      "card2Desc": "Free online organize pdf tool",
+      "card3Name": "Compress Pdf",
+      "card3Desc": "Free online compress pdf tool",
+      "card4Name": "Rotate Pdf",
+      "card4Desc": "Free online rotate pdf tool",
+      "card5Name": "Delete Pages",
+      "card5Desc": "Free online delete pages tool"
+    },
+    "faq": {
+      "q1": "How many PDFs can I merge at once?",
+      "a1": "Unlimited! Merge as many PDF files as you need in a single operation. No restrictions on file count or total size.",
+      "q2": "Will merging reduce PDF quality?",
+      "a2": "No! igo preserves the original quality of all PDFs when merging. Your documents remain crisp and clear with no quality loss.",
+      "q3": "Can I reorder pages after selecting files?",
+      "a3": "Yes! Simply drag and drop files to arrange them in any order before clicking the merge button."
+    }
   },
   "splitPdf": {
     "name": "Split PDF",
-    "subtitle": "Extract a range of pages into a new PDF."
+    "subtitle": "Extract a range of pages into a new PDF.",
+    "howItWorks": {
+      "step1Title": "Upload PDF",
+      "step1Desc": "Select the PDF file you want to split or extract pages from",
+      "step2Title": "Choose Split Method",
+      "step2Desc": "Select specific pages, page ranges, or split into individual pages",
+      "step3Title": "Preview & Select",
+      "step3Desc": "View page thumbnails and select exactly which pages you want",
+      "step4Title": "Split & Download",
+      "step4Desc": "Download extracted pages as separate PDFs or as a ZIP file"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Extract Pages",
+      "card2Desc": "Free online extract pages tool",
+      "card3Name": "Organize Pdf",
+      "card3Desc": "Free online organize pdf tool",
+      "card4Name": "Compress Pdf",
+      "card4Desc": "Free online compress pdf tool",
+      "card5Name": "Delete Pages",
+      "card5Desc": "Free online delete pages tool"
+    },
+    "faq": {
+      "q1": "Can I extract specific page ranges?",
+      "a1": "Yes! You can extract any specific pages or page ranges from your PDF. Select exactly which pages you need or split into individual files.",
+      "q2": "Will split PDFs lose quality?",
+      "a2": "No! Split PDFs maintain the exact same quality as the original document. No compression or quality loss occurs.",
+      "q3": "Can I split multiple PDFs at once?",
+      "a3": "Yes, process multiple PDFs in batches for efficient document management."
+    }
   },
   "compressPdf": {
     "name": "Compress PDF",
@@ -49,36 +109,260 @@
     "removeMetadata": "Remove metadata",
     "subsetFonts": "Subset fonts (remove unused glyphs)",
     "removeThumbnails": "Remove embedded thumbnails",
-    "compressButton": "Compress PDF"
+    "compressButton": "Compress PDF",
+    "howItWorks": {
+      "step1Title": "Upload PDFs",
+      "step1Desc": "Click or drag and drop one or more PDF files",
+      "step2Title": "Choose Algorithm",
+      "step2Desc": "Select Condense (recommended) or Photon (for photo-heavy PDFs)",
+      "step3Title": "Select Compression Level",
+      "step3Desc": "Pick Light, Balanced, Aggressive, or Extreme compression",
+      "step4Title": "Customize & Compress",
+      "step4Desc": "Optionally enable grayscale or custom settings, then compress",
+      "step5Title": "Download",
+      "step5Desc": "Save your compressed PDFs - up to 90% smaller"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Split Pdf",
+      "card2Desc": "Free online split pdf tool",
+      "card3Name": "Pdf To Jpg",
+      "card3Desc": "Free online pdf to jpg tool"
+    },
+    "faq": {
+      "q1": "What's the difference between Condense and Photon?",
+      "a1": "Condense removes dead-weight, optimizes images, and subsets fonts - best for most PDFs. Photon converts pages to images - ideal for photo-heavy/scanned PDFs but makes text non-selectable.",
+      "q2": "Which compression level should I use?",
+      "a2": "Balanced (recommended) offers great size reduction with minimal quality loss. Use Light to preserve maximum quality, Aggressive for smaller files, or Extreme for maximum compression.",
+      "q3": "Are there file size limits?",
+      "a3": "No limits! Compress as many PDFs as you need, of any size, completely free."
+    }
   },
   "pdfEditor": {
     "name": "PDF Editor",
-    "subtitle": "Annotate, highlight, redact, comment, add shapes/images, search, and view PDFs."
+    "subtitle": "Annotate, highlight, redact, comment, add shapes/images, search, and view PDFs.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Compress Pdf",
+      "card1Desc": "Free online compress pdf tool",
+      "card2Name": "Merge Pdf",
+      "card2Desc": "Free online merge pdf tool",
+      "card3Name": "Rotate Pdf",
+      "card3Desc": "Free online rotate pdf tool",
+      "card4Name": "Delete Pages",
+      "card4Desc": "Free online delete pages tool",
+      "card5Name": "Add Watermark",
+      "card5Desc": "Free online add watermark tool"
+    },
+    "faq": {
+      "q1": "Is edit pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "jpgToPdf": {
     "name": "JPG to PDF",
-    "subtitle": "Create a PDF from JPG, JPEG, and JPEG2000 (JP2/JPX) images."
+    "subtitle": "Create a PDF from JPG, JPEG, and JPEG2000 (JP2/JPX) images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is jpg to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "signPdf": {
     "name": "Sign PDF",
-    "subtitle": "Draw, type, or upload your signature."
+    "subtitle": "Draw, type, or upload your signature.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is sign pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "cropPdf": {
     "name": "Crop PDF",
-    "subtitle": "Trim the margins of every page in your PDF."
+    "subtitle": "Trim the margins of every page in your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is crop pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "extractPages": {
     "name": "Extract Pages",
-    "subtitle": "Save a selection of pages as new files."
+    "subtitle": "Save a selection of pages as new files.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is extract pages really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "duplicateOrganize": {
     "name": "Duplicate & Organize",
     "subtitle": "Duplicate, reorder, and delete pages.",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Split Pdf",
+      "card2Desc": "Free online split pdf tool",
+      "card3Name": "Rotate Pdf",
+      "card3Desc": "Free online rotate pdf tool",
+      "card4Name": "Delete Pages",
+      "card4Desc": "Free online delete pages tool",
+      "card5Name": "Extract Pages",
+      "card5Desc": "Free online extract pages tool"
+    },
+    "faq": {
+      "q1": "Is organize pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "deletePages": {
     "name": "Delete Pages",
-    "subtitle": "Remove specific pages from your document."
+    "subtitle": "Remove specific pages from your document.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is delete pages really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "editBookmarks": {
     "name": "Edit Bookmarks",
@@ -89,7 +373,35 @@
     "jsonFormat": "JSON format",
     "uploadCsvAction": "Click to upload CSV",
     "uploadJsonAction": "Click to upload JSON",
-    "orDragHere": "or drag here"
+    "orDragHere": "or drag here",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is bookmark really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "tableOfContents": {
     "name": "Table of Contents",
@@ -105,11 +417,67 @@
     "errorReadingFileWithMessage": "Error reading file: {{message}}",
     "successGeneratedDownloadStarted": "Table of contents generated successfully! Download started.",
     "workerErrorWithMessage": "Error: {{message}}",
-    "workerErrorOccurred": "Worker error occurred. Check console for details."
+    "workerErrorOccurred": "Worker error occurred. Check console for details.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is table of contents really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pageNumbers": {
     "name": "Page Numbers",
-    "subtitle": "Insert page numbers into your document."
+    "subtitle": "Insert page numbers into your document.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is page numbers really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "addPageLabels": {
     "name": "Add Page Labels",
@@ -177,15 +545,99 @@
   "addWatermark": {
     "name": "Add Watermark",
     "subtitle": "Stamp text or an image over your PDF pages.",
-    "applyToAllPages": "Apply to all pages"
+    "applyToAllPages": "Apply to all pages",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is add watermark really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "headerFooter": {
     "name": "Header & Footer",
-    "subtitle": "Add text to the top and bottom of pages."
+    "subtitle": "Add text to the top and bottom of pages.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is header footer really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "invertColors": {
     "name": "Invert Colors",
-    "subtitle": "Create a \"dark mode\" version of your PDF."
+    "subtitle": "Create a \"dark mode\" version of your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is invert colors really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "scannerEffect": {
     "name": "Scanner Effect",
@@ -220,11 +672,67 @@
   },
   "backgroundColor": {
     "name": "Background Color",
-    "subtitle": "Change the background color of your PDF."
+    "subtitle": "Change the background color of your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is background color really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "changeTextColor": {
     "name": "Change Text Color",
-    "subtitle": "Change the color of text in your PDF."
+    "subtitle": "Change the color of text in your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is text color really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "addStamps": {
     "name": "Add Stamps",
@@ -232,57 +740,390 @@
     "usernameLabel": "Stamp Username",
     "usernamePlaceholder": "Enter your name (for stamps)",
     "usernameHint": "This name will appear on stamps you create.",
-    "saveButton": "Save Stamped PDF"
+    "saveButton": "Save Stamped PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is add stamps really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "removeAnnotations": {
     "name": "Remove Annotations",
-    "subtitle": "Strip comments, highlights, and links."
+    "subtitle": "Strip comments, highlights, and links.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is remove annotations really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfFormFiller": {
     "name": "PDF Form Filler",
     "subtitle": "Fill in forms directly in the browser. Also supports XFA forms.",
     "uploadHint": "Upload a PDF with form fields. Fill them directly in the viewer below, then click the button to save and download the filled form. Also supports XFA forms.",
     "xfaNoteTitle": "Note on XFA Forms:",
-    "xfaNoteDescription": "XFA (XML Forms Architecture) is a legacy format that's only supported by certain PDF viewers like igo and Firefox. If you open an XFA PDF in other software and see blank pages or no form fields, it means that viewer doesn't support XFA. To view and fill XFA forms properly, use Firefox or igo's Form Filler."
+    "xfaNoteDescription": "XFA (XML Forms Architecture) is a legacy format that's only supported by certain PDF viewers like igo and Firefox. If you open an XFA PDF in other software and see blank pages or no form fields, it means that viewer doesn't support XFA. To view and fill XFA forms properly, use Firefox or igo's Form Filler.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is form filler really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "createPdfForm": {
     "name": "Create PDF Form",
     "subtitle": "Create fillable PDF forms with drag-and-drop text fields.",
     "orSeparator": "OR",
-    "createBlankPdf": "Create Blank PDF"
+    "createBlankPdf": "Create Blank PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is form creator really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "removeBlankPages": {
     "name": "Remove Blank Pages",
     "subtitle": "Automatically detect and delete blank pages.",
-    "sensitivityHint": "Higher = stricter, only purely blank pages. Lower = allows pages with some content."
+    "sensitivityHint": "Higher = stricter, only purely blank pages. Lower = allows pages with some content.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is remove blank pages really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "imageToPdf": {
     "name": "Images to PDF",
-    "subtitle": "Convert JPG, PNG, BMP, GIF, TIFF, PNM, PGM, PBM, PPM, PAM, JXR, JPX, JP2, PSD, SVG, HEIC, WebP to PDF."
+    "subtitle": "Convert JPG, PNG, BMP, GIF, TIFF, PNM, PGM, PBM, PPM, PAM, JXR, JPX, JP2, PSD, SVG, HEIC, WebP to PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is image to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pngToPdf": {
     "name": "PNG to PDF",
-    "subtitle": "Create a PDF from one or more PNG images."
+    "subtitle": "Create a PDF from one or more PNG images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is png to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "webpToPdf": {
     "name": "WebP to PDF",
-    "subtitle": "Create a PDF from one or more WebP images."
+    "subtitle": "Create a PDF from one or more WebP images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is webp to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "svgToPdf": {
     "name": "SVG to PDF",
-    "subtitle": "Create a PDF from one or more SVG images."
+    "subtitle": "Create a PDF from one or more SVG images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step2Title": "Process",
+      "step3Title": "Download"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is svg to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "bmpToPdf": {
     "name": "BMP to PDF",
-    "subtitle": "Create a PDF from one or more BMP images."
+    "subtitle": "Create a PDF from one or more BMP images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is bmp to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "heicToPdf": {
     "name": "HEIC to PDF",
-    "subtitle": "Create a PDF from one or more HEIC images."
+    "subtitle": "Create a PDF from one or more HEIC images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is heic to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "tiffToPdf": {
     "name": "TIFF to PDF",
-    "subtitle": "Create a PDF from one or more TIFF images."
+    "subtitle": "Create a PDF from one or more TIFF images.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is tiff to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "textToPdf": {
     "name": "Text to PDF",
@@ -295,7 +1136,35 @@
     "textColor": "Text Color",
     "pageSize": "Page Size",
     "rtlAutoDetectNote": "RTL languages (Arabic, Urdu, Persian, etc.) are automatically detected and text direction is adjusted.",
-    "createButton": "Create PDF"
+    "createButton": "Create PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is txt to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "jsonToPdf": {
     "name": "JSON to PDF",
@@ -314,6 +1183,34 @@
       "zipError": "Error creating ZIP: {{message}}",
       "workerError": "Worker Error: {{message}}",
       "getStarted": "Select JSON files to get started"
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is json to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "pdfToJpg": {
@@ -331,6 +1228,36 @@
     },
     "loader": {
       "converting": "Converting to JPG..."
+    },
+    "howItWorks": {
+      "step1Title": "Upload PDF",
+      "step1Desc": "Select the PDF file you want to convert to images",
+      "step2Title": "Choose Quality",
+      "step2Desc": "Select image quality (Low, Medium, High, Maximum)",
+      "step3Title": "Select Pages",
+      "step3Desc": "Convert all pages or choose specific pages to extract",
+      "step4Title": "Download Images",
+      "step4Desc": "Save JPG images individually or as a ZIP archive"
+    },
+    "relatedTools": {
+      "card1Name": "Pdf To Png",
+      "card1Desc": "Free online pdf to png tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Pdf To Webp",
+      "card4Desc": "Free online pdf to webp tool",
+      "card5Name": "Extract Images",
+      "card5Desc": "Free online extract images tool"
+    },
+    "faq": {
+      "q1": "What quality should I choose?",
+      "a1": "Use High or Maximum for print-quality images, Medium for web use, or Low to save disk space. Higher quality produces larger file sizes.",
+      "q2": "Can I convert specific pages only?",
+      "a2": "Yes! You can choose to convert all pages or select specific pages you want as JPG images.",
+      "q3": "Are the JPG files compressed?",
+      "a3": "Yes, JPG is a compressed format. You control the quality level - higher quality means less compression and larger files."
     }
   },
   "pdfToPng": {
@@ -348,6 +1275,34 @@
     },
     "loader": {
       "converting": "Converting to PNG..."
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to png really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "pdfToWebp": {
@@ -365,6 +1320,34 @@
     },
     "loader": {
       "converting": "Converting to WebP..."
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to webp really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "pdfToBmp": {
@@ -380,6 +1363,34 @@
     },
     "loader": {
       "converting": "Converting to BMP..."
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to bmp really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "pdfToTiff": {
@@ -400,6 +1411,34 @@
       "noFileExplanation": "Please upload a PDF file first.",
       "conversionSuccess": "PDF converted to TIFFs successfully!",
       "conversionError": "Failed to convert PDF to TIFF. The file might be corrupted."
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to tiff really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "pdfToCbz": {
@@ -434,7 +1473,35 @@
   },
   "pdfToGreyscale": {
     "name": "PDF to Greyscale",
-    "subtitle": "Convert all colors to black and white."
+    "subtitle": "Convert all colors to black and white.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to greyscale really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToJson": {
     "name": "PDF to JSON",
@@ -452,6 +1519,34 @@
       "zipError": "Error creating ZIP: {{message}}",
       "workerError": "Worker Error: {{message}}",
       "getStarted": "Select PDF files to get started"
+    },
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to json really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
     }
   },
   "ocrPdf": {
@@ -506,65 +1601,483 @@
     "characterFilteringLabel": "Character Filtering:",
     "characterFilteringDescription": "Use whitelists to filter out unwanted characters and improve accuracy for specific document types (invoices, forms, etc.).",
     "multiLanguageSupportLabel": "Multi-language Support:",
-    "multiLanguageSupportDescription": "Select multiple languages for documents containing mixed language content."
+    "multiLanguageSupportDescription": "Select multiple languages for documents containing mixed language content.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is ocr pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "alternateMerge": {
     "name": "Alternate & Mix Pages",
     "subtitle": "Merge PDFs by alternating pages from each PDF. Preserves Bookmarks.",
     "retainPageLabels": "Keep original page labels from each file",
-    "retainPageLabelsHint": "Off (default): the merged PDF uses natural page numbering 1–N. On: each file's original page labels are preserved (may produce duplicate labels)."
+    "retainPageLabelsHint": "Off (default): the merged PDF uses natural page numbering 1–N. On: each file's original page labels are preserved (may produce duplicate labels).",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is alternate merge really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "addAttachments": {
     "name": "Add Attachments",
-    "subtitle": "Embed one or more files into your PDF."
+    "subtitle": "Embed one or more files into your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is add attachments really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "extractAttachments": {
     "name": "Extract Attachments",
-    "subtitle": "Extract all embedded files from PDF(s) as a ZIP."
+    "subtitle": "Extract all embedded files from PDF(s) as a ZIP.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is extract attachments really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "editAttachments": {
     "name": "Edit Attachments",
-    "subtitle": "View or remove attachments in your PDF."
+    "subtitle": "View or remove attachments in your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is edit attachments really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "dividePages": {
     "name": "Divide Pages",
-    "subtitle": "Divide pages horizontally or vertically."
+    "subtitle": "Divide pages horizontally or vertically.",
+    "howItWorks": {
+      "step2Title": "Process",
+      "step3Title": "Download",
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is divide pages really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "addBlankPage": {
     "name": "Add Blank Page",
-    "subtitle": "Insert an empty page anywhere in your PDF."
+    "subtitle": "Insert an empty page anywhere in your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is add blank page really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "reversePages": {
     "name": "Reverse Pages",
-    "subtitle": "Flip the order of all pages in your document."
+    "subtitle": "Flip the order of all pages in your document.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is reverse pages really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "rotatePdf": {
     "name": "Rotate PDF",
-    "subtitle": "Turn pages in 90-degree increments."
+    "subtitle": "Turn pages in 90-degree increments.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Split Pdf",
+      "card2Desc": "Free online split pdf tool",
+      "card3Name": "Organize Pdf",
+      "card3Desc": "Free online organize pdf tool",
+      "card4Name": "Compress Pdf",
+      "card4Desc": "Free online compress pdf tool",
+      "card5Name": "Delete Pages",
+      "card5Desc": "Free online delete pages tool"
+    },
+    "faq": {
+      "q1": "Is rotate pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "rotateCustom": {
     "name": "Rotate by Custom Degrees",
-    "subtitle": "Rotate pages by any custom angle."
+    "subtitle": "Rotate pages by any custom angle.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is rotate custom really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "nUpPdf": {
     "name": "N-Up PDF",
-    "subtitle": "Arrange multiple pages onto a single sheet."
+    "subtitle": "Arrange multiple pages onto a single sheet.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is n up pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "combineToSinglePage": {
     "name": "Combine to Single Page",
-    "subtitle": "Stitch all pages into one continuous scroll."
+    "subtitle": "Stitch all pages into one continuous scroll.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is combine single page really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "viewMetadata": {
     "name": "View Metadata",
-    "subtitle": "Inspect the hidden properties of your PDF."
+    "subtitle": "Inspect the hidden properties of your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is view metadata really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "editMetadata": {
     "name": "Edit Metadata",
-    "subtitle": "Change the author, title, and other properties."
+    "subtitle": "Change the author, title, and other properties.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is edit metadata really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfsToZip": {
     "name": "PDFs to ZIP",
-    "subtitle": "Package multiple PDF files into a ZIP archive."
+    "subtitle": "Package multiple PDF files into a ZIP archive.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to zip really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "comparePdfs": {
     "name": "Compare PDFs",
@@ -608,91 +2121,620 @@
     "loadingFile": "Loading {{name}}...",
     "invalidFile": "Invalid File",
     "invalidFileMsg": "Please select a valid PDF file.",
-    "loadError": "Could not load PDF. It may be corrupt or password-protected."
+    "loadError": "Could not load PDF. It may be corrupt or password-protected.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is compare pdfs really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "posterizePdf": {
     "name": "Posterize PDF",
-    "subtitle": "Split a large page into multiple smaller pages."
+    "subtitle": "Split a large page into multiple smaller pages.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step2Title": "Process",
+      "step3Title": "Download"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is posterize pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "fixPageSize": {
     "name": "Fix Page Size",
-    "subtitle": "Standardize all pages to a uniform size."
+    "subtitle": "Standardize all pages to a uniform size.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is fix page size really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "linearizePdf": {
     "name": "Linearize PDF",
-    "subtitle": "Optimize PDF for fast web viewing."
+    "subtitle": "Optimize PDF for fast web viewing.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is linearize pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pageDimensions": {
     "name": "Page Dimensions",
-    "subtitle": "Analyze page size, orientation, and units."
+    "subtitle": "Analyze page size, orientation, and units.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is page dimensions really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "removeRestrictions": {
     "name": "Remove Restrictions",
-    "subtitle": "Remove password protection and security restrictions associated with digitally signed PDF files."
+    "subtitle": "Remove password protection and security restrictions associated with digitally signed PDF files.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is remove restrictions really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "repairPdf": {
     "name": "Repair PDF",
-    "subtitle": "Recover data from corrupted or damaged PDF files."
+    "subtitle": "Recover data from corrupted or damaged PDF files.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is repair pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "encryptPdf": {
     "name": "Encrypt PDF",
-    "subtitle": "Lock your PDF by adding a password."
+    "subtitle": "Lock your PDF by adding a password.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is encrypt pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "sanitizePdf": {
     "name": "Sanitize PDF",
-    "subtitle": "Remove metadata, annotations, scripts, and more."
+    "subtitle": "Remove metadata, annotations, scripts, and more.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is sanitize pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "decryptPdf": {
     "name": "Decrypt PDF",
-    "subtitle": "Unlock PDF by removing password protection."
+    "subtitle": "Unlock PDF by removing password protection.",
+    "howItWorks": {
+      "step2Title": "Process",
+      "step3Title": "Download",
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is decrypt pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "flattenPdf": {
     "name": "Flatten PDF",
-    "subtitle": "Make form fields and annotations non-editable."
+    "subtitle": "Make form fields and annotations non-editable.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is flatten pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "removeMetadata": {
     "name": "Remove Metadata",
-    "subtitle": "Strip hidden data from your PDF."
+    "subtitle": "Strip hidden data from your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is remove metadata really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "changePermissions": {
     "name": "Change Permissions",
-    "subtitle": "Set or change user permissions on a PDF."
+    "subtitle": "Set or change user permissions on a PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is change permissions really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "odtToPdf": {
     "name": "ODT to PDF",
     "subtitle": "Convert OpenDocument Text files to PDF format. Supports multiple files.",
     "acceptedFormats": "ODT files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is odt to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "csvToPdf": {
     "name": "CSV to PDF",
     "subtitle": "Convert CSV spreadsheet files to PDF format. Supports multiple files.",
     "acceptedFormats": "CSV files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is csv to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "rtfToPdf": {
     "name": "RTF to PDF",
     "subtitle": "Convert Rich Text Format documents to PDF. Supports multiple files.",
     "acceptedFormats": "RTF files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is rtf to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "wordToPdf": {
     "name": "Word to PDF",
     "subtitle": "Convert Word documents (DOCX, DOC, ODT, RTF) to PDF format. Supports multiple files.",
     "acceptedFormats": "DOCX, DOC, ODT, RTF files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload Word Files",
+      "step1Desc": "Select or drag DOCX or DOC files you want to convert",
+      "step2Title": "Auto Convert",
+      "step2Desc": "Conversion starts automatically, processing in your browser",
+      "step3Title": "Preview Results",
+      "step3Desc": "See your converted PDF with preserved formatting",
+      "step4Title": "Download PDFs",
+      "step4Desc": "Save your PDF files - formatting perfectly preserved"
+    },
+    "relatedTools": {
+      "card1Name": "Pdf To Docx",
+      "card1Desc": "Free online pdf to docx tool",
+      "card2Name": "Excel To Pdf",
+      "card2Desc": "Free online excel to pdf tool",
+      "card3Name": "Powerpoint To Pdf",
+      "card3Desc": "Free online powerpoint to pdf tool",
+      "card4Name": "Txt To Pdf",
+      "card4Desc": "Free online txt to pdf tool",
+      "card5Name": "Merge Pdf",
+      "card5Desc": "Free online merge pdf tool"
+    },
+    "faq": {
+      "q1": "Does it work with both .doc and .docx files?",
+      "a1": "Yes! igo supports both older .doc and newer .docx Microsoft Word formats.",
+      "q2": "Will formatting be preserved?",
+      "a2": "Yes! Fonts, images, tables, headers, footers, and all formatting are preserved exactly as they appear in Word.",
+      "q3": "Can I convert password-protected Word files?",
+      "a3": "You'll need to unlock password-protected files first before converting them to PDF."
+    }
   },
   "excelToPdf": {
     "name": "Excel to PDF",
     "subtitle": "Convert Excel spreadsheets (XLSX, XLS, ODS, CSV) to PDF format. Supports multiple files.",
     "acceptedFormats": "XLSX, XLS, ODS, CSV files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Pdf To Excel",
+      "card1Desc": "Free online pdf to excel tool",
+      "card2Name": "Word To Pdf",
+      "card2Desc": "Free online word to pdf tool",
+      "card3Name": "Csv To Pdf",
+      "card3Desc": "Free online csv to pdf tool",
+      "card4Name": "Merge Pdf",
+      "card4Desc": "Free online merge pdf tool",
+      "card5Name": "Compress Pdf",
+      "card5Desc": "Free online compress pdf tool"
+    },
+    "faq": {
+      "q1": "Is excel to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "powerpointToPdf": {
     "name": "PowerPoint to PDF",
     "subtitle": "Convert PowerPoint presentations (PPTX, PPT, ODP) to PDF format. Supports multiple files.",
     "acceptedFormats": "PPTX, PPT, ODP files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is powerpoint to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "markdownToPdf": {
     "name": "Markdown to PDF",
@@ -712,12 +2754,47 @@
     "optAllowHtml": "Allow HTML tags",
     "optBreaks": "Convert newlines to <br>",
     "optLinkify": "Auto-convert URLs to links",
-    "optTypographer": "Typographer (smart quotes, etc.)"
+    "optTypographer": "Typographer (smart quotes, etc.)",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is markdown to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfBooklet": {
     "name": "PDF Booklet",
     "subtitle": "Rearrange pages for double-sided booklet printing. Fold and staple to create a booklet.",
-    "howItWorks": "How it works:",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
     "step1": "Upload a PDF file.",
     "step2": "Pages will be rearranged in booklet order.",
     "step3": "Print double-sided, flip on short edge, fold and staple.",
@@ -728,120 +2805,700 @@
     "pagesPerSheet": "Pages per Sheet",
     "createBooklet": "Create Booklet",
     "processing": "Processing...",
-    "pageCount": "Page count will be padded to multiple of 4 if needed."
+    "pageCount": "Page count will be padded to multiple of 4 if needed.",
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf booklet really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "xpsToPdf": {
     "name": "XPS to PDF",
     "subtitle": "Convert XPS/OXPS documents to PDF format. Supports multiple files.",
     "acceptedFormats": "XPS, OXPS files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is xps to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "mobiToPdf": {
     "name": "MOBI to PDF",
     "subtitle": "Convert MOBI e-books to PDF format. Supports multiple files.",
     "acceptedFormats": "MOBI files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is mobi to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "epubToPdf": {
     "name": "EPUB to PDF",
     "subtitle": "Convert EPUB e-books to PDF format. Supports multiple files.",
     "acceptedFormats": "EPUB files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is EPUB to PDF really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "fb2ToPdf": {
     "name": "FB2 to PDF",
     "subtitle": "Convert FictionBook (FB2) e-books to PDF format. Supports multiple files.",
     "acceptedFormats": "FB2 files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is fb2 to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "cbzToPdf": {
     "name": "CBZ to PDF",
     "subtitle": "Convert comic book archives (CBZ/CBR) to PDF format. Supports multiple files.",
     "acceptedFormats": "CBZ, CBR files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is cbz to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "wpdToPdf": {
     "name": "WPD to PDF",
     "subtitle": "Convert WordPerfect documents (WPD) to PDF format. Supports multiple files.",
     "acceptedFormats": "WPD files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is wpd to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "wpsToPdf": {
     "name": "WPS to PDF",
     "subtitle": "Convert WPS Office documents to PDF format. Supports multiple files.",
     "acceptedFormats": "WPS files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is wps to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "xmlToPdf": {
     "name": "XML to PDF",
     "subtitle": "Convert XML documents to PDF format. Supports multiple files.",
     "acceptedFormats": "XML files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is xml to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pagesToPdf": {
     "name": "Pages to PDF",
     "subtitle": "Convert Apple Pages documents to PDF format. Supports multiple files.",
     "acceptedFormats": "Pages files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pages to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "odgToPdf": {
     "name": "ODG to PDF",
     "subtitle": "Convert OpenDocument Graphics (ODG) files to PDF format. Supports multiple files.",
     "acceptedFormats": "ODG files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is odg to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "odsToPdf": {
     "name": "ODS to PDF",
     "subtitle": "Convert OpenDocument Spreadsheet (ODS) files to PDF format. Supports multiple files.",
     "acceptedFormats": "ODS files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is ods to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "odpToPdf": {
     "name": "ODP to PDF",
     "subtitle": "Convert OpenDocument Presentation (ODP) files to PDF format. Supports multiple files.",
     "acceptedFormats": "ODP files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is odp to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pubToPdf": {
     "name": "PUB to PDF",
     "subtitle": "Convert Microsoft Publisher (PUB) files to PDF format. Supports multiple files.",
     "acceptedFormats": "PUB files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pub to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "vsdToPdf": {
     "name": "VSD to PDF",
     "subtitle": "Convert Microsoft Visio (VSD, VSDX) files to PDF format. Supports multiple files.",
     "acceptedFormats": "VSD, VSDX files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is vsd to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "psdToPdf": {
     "name": "PSD to PDF",
     "subtitle": "Convert Adobe Photoshop (PSD) files to PDF format. Supports multiple files.",
     "acceptedFormats": "PSD files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is psd to pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToSvg": {
     "name": "PDF to SVG",
-    "subtitle": "Convert each page of a PDF file into a scalable vector graphic (SVG) for perfect quality at any size."
+    "subtitle": "Convert each page of a PDF file into a scalable vector graphic (SVG) for perfect quality at any size.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to svg really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "extractTables": {
     "name": "Extract PDF Tables",
-    "subtitle": "Extract tables from PDF files and export as CSV, JSON, or Markdown."
+    "subtitle": "Extract tables from PDF files and export as CSV, JSON, or Markdown.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is extract tables really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToCsv": {
     "name": "PDF to CSV",
-    "subtitle": "Extract tables from PDF and convert to CSV format."
+    "subtitle": "Extract tables from PDF and convert to CSV format.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to csv really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToExcel": {
     "name": "PDF to Excel",
-    "subtitle": "Extract tables from PDF and convert to Excel (XLSX) format."
+    "subtitle": "Extract tables from PDF and convert to Excel (XLSX) format.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to excel really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToText": {
     "name": "PDF to Text",
     "subtitle": "Extract text from PDF files and save as plain text (.txt). Supports multiple files.",
     "noteLabel": "Note:",
     "noteText": "This tool works ONLY with digitally created PDFs. For scanned documents or image-based PDFs, use our OCR PDF tool instead.",
-    "convertButton": "Extract Text"
+    "convertButton": "Extract Text",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to text really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "digitalSignPdf": {
     "name": "Digital Signature PDF",
@@ -932,7 +3589,31 @@
   "validateSignaturePdf": {
     "name": "Validate PDF Signature",
     "pageTitle": "Validate PDF Signature - Verify Digital Signatures | igo",
-    "subtitle": "Verify digital signatures in your PDF files. Check certificate validity, view signer details, and confirm document integrity. All processing happens in your browser."
+    "subtitle": "Verify digital signatures in your PDF files. Check certificate validity, view signer details, and confirm document integrity. All processing happens in your browser.",
+    "howItWorks": {
+      "step1Title": "Upload Your PDF",
+      "step1Desc": "Select a digitally signed PDF file from your device",
+      "step2Title": "Automatic Analysis",
+      "step2Desc": "The tool extracts and parses all digital signatures in the document",
+      "step3Title": "View Results",
+      "step3Desc": "See signer information, certificate validity, and signature status"
+    },
+    "relatedTools": {
+      "card1Name": "Digital Signature",
+      "card1Desc": "Add cryptographic signature",
+      "card2Name": "Encrypt PDF",
+      "card2Desc": "Password protect PDF",
+      "card3Name": "View Metadata",
+      "card3Desc": "Inspect PDF properties"
+    },
+    "faq": {
+      "q1": "What types of signatures can be validated?",
+      "a1": "This tool validates PKCS#7 digital signatures created with X.509 certificates, the standard format used by most PDF signing tools and certificate authorities.",
+      "q2": "What does \"Self-Signed Certificate\" mean?",
+      "a2": "A self-signed certificate is one where the issuer and subject are the same. While the signature is technically valid, it means the certificate wasn't issued by a trusted Certificate Authority (CA).",
+      "q3": "Is my PDF uploaded to a server?",
+      "a3": "No, all processing happens entirely in your browser. Your PDF files never leave your device, ensuring complete privacy and security."
+    }
   },
   "timestampPdf": {
     "name": "Timestamp PDF",
@@ -947,7 +3628,37 @@
     "name": "Email to PDF",
     "subtitle": "Convert email files (EML, MSG) to PDF format. Supports Outlook exports and standard email formats.",
     "acceptedFormats": "EML, MSG files",
-    "convertButton": "Convert to PDF"
+    "convertButton": "Convert to PDF",
+    "howItWorks": {
+      "step2Title": "Process",
+      "step2Desc": "Click the convert button to generate your PDF",
+      "step3Title": "Download",
+      "step3Desc": "Save your converted PDF file instantly",
+      "step1Title": "Upload Email File",
+      "step1Desc": "Click or drag and drop your .eml or .msg file to begin"
+    },
+    "relatedTools": {
+      "card1Name": "Merge PDF",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Word to PDF",
+      "card2Desc": "Convert Word documents to PDF",
+      "card3Name": "Compress PDF",
+      "card3Desc": "Free online compress pdf tool",
+      "card4Name": "Text to PDF",
+      "card4Desc": "Convert text files to PDF",
+      "card5Name": "Edit PDF",
+      "card5Desc": "Free online edit pdf tool"
+    },
+    "faq": {
+      "q1": "What email formats are supported?",
+      "a1": "igo supports both .eml (standard email format) and .msg (Microsoft Outlook) files. These are the most common formats for exported or saved emails.",
+      "q2": "Is email to PDF conversion really free?",
+      "a2": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q3": "Are my emails kept private?",
+      "a3": "Absolutely! All processing happens in your browser. Your email files never leave your device, ensuring complete privacy for sensitive communications.",
+      "q4": "What about email attachments?",
+      "a4": "The PDF displays a list of attachments at the bottom and also embeds the actual files into the PDF. You can access them via the Attachments panel in PDF readers like Adobe Reader or Foxit."
+    }
   },
   "fontToOutline": {
     "name": "Font to Outline",
@@ -959,31 +3670,224 @@
   },
   "pdfToWord": {
     "name": "PDF to Word",
-    "subtitle": "Convert PDF files to editable Word documents."
+    "subtitle": "Convert PDF files to editable Word documents.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Word To Pdf",
+      "card1Desc": "Free online word to pdf tool",
+      "card2Name": "Pdf To Text",
+      "card2Desc": "Free online pdf to text tool",
+      "card3Name": "Pdf To Excel",
+      "card3Desc": "Free online pdf to excel tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Extract Pages",
+      "card5Desc": "Free online extract pages tool"
+    },
+    "faq": {
+      "q1": "Is pdf to docx really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "extractImages": {
     "name": "Extract Images",
-    "subtitle": "Extract all embedded images from your PDF files."
+    "subtitle": "Extract all embedded images from your PDF files.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is extract images really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToMarkdown": {
     "name": "PDF to Markdown",
-    "subtitle": "Convert PDF text and tables to Markdown format."
+    "subtitle": "Convert PDF text and tables to Markdown format.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to markdown really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "preparePdfForAi": {
     "name": "Prepare PDF for AI",
-    "subtitle": "Extract PDF content as LlamaIndex JSON for RAG/LLM pipelines."
+    "subtitle": "Extract PDF content as LlamaIndex JSON for RAG/LLM pipelines.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is prepare pdf for ai really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfOcg": {
     "name": "PDF OCG",
-    "subtitle": "View, toggle, add, and delete OCG layers in your PDF."
+    "subtitle": "View, toggle, add, and delete OCG layers in your PDF.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf layers really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfToPdfa": {
     "name": "PDF to PDF/A",
-    "subtitle": "Convert PDF to PDF/A for long-term archiving."
+    "subtitle": "Convert PDF to PDF/A for long-term archiving.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step1Desc": "Click or drag and drop your file to begin",
+      "step2Title": "Process",
+      "step2Desc": "Click the process button to start",
+      "step3Title": "Download",
+      "step3Desc": "Save your processed file instantly"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is pdf to pdfa really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "rasterizePdf": {
     "name": "Rasterize PDF",
-    "subtitle": "Convert PDF to image-based PDF. Flatten layers and remove selectable text."
+    "subtitle": "Convert PDF to image-based PDF. Flatten layers and remove selectable text.",
+    "howItWorks": {
+      "step1Title": "Upload File",
+      "step2Title": "Process",
+      "step3Title": "Download"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Free online merge pdf tool",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Free online compress pdf tool",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Free online split pdf tool",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Free online edit pdf tool",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Free online rotate pdf tool"
+    },
+    "faq": {
+      "q1": "Is rasterize pdf really free?",
+      "a1": "Yes! igo is 100% free with no hidden fees, no signup required, and unlimited file processing.",
+      "q2": "Are my files private and secure?",
+      "a2": "Absolutely! All processing happens in your browser. Your files never leave your device, ensuring complete privacy.",
+      "q3": "Is there a file size limit?",
+      "a3": "No! Process files of any size, as many times as you want, completely free."
+    }
   },
   "pdfWorkflow": {
     "name": "PDF Workflow Builder",

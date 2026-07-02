@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -89,7 +90,7 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <input
@@ -99,15 +100,15 @@
       class="hidden"
     />
 
-    <div class="min-h-screen flex items-center justify-center p-4 bg-gray-900">
+    <div class="min-h-screen flex items-center justify-center p-4 bg-surface">
       <!-- Upload Area (shown initially) -->
       <div
         id="upload-area"
-        class="bg-gray-800 rounded-xl shadow-xl p-6 max-w-5xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl p-6 max-w-5xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools-upload"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools"
@@ -116,37 +117,37 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:createPdfForm.name"
         >
           Create PDF Form
         </h1>
-        <p class="text-gray-400 mb-6" data-i18n="tools:createPdfForm.subtitle">
+        <p class="text-content-muted mb-6" data-i18n="tools:createPdfForm.subtitle">
           Create fillable PDF forms with drag-and-drop text fields.
         </p>
 
         <div
-          class="relative flex flex-col items-center justify-center w-full h-44 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-44 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface-muted hover:bg-surface-muted transition-colors duration-300"
           id="dropZone"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="upload-cloud"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-300">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select a PDF</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
             <p
-              class="text-xs text-gray-500"
+              class="text-xs text-content-muted"
               data-i18n="upload.hints.singlePdfFile"
             >
               Single PDF file
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -158,16 +159,16 @@
           />
         </div>
 
-        <div id="fileList" class="mt-4 hidden text-sm text-gray-200"></div>
+        <div id="fileList" class="mt-4 hidden text-sm text-content"></div>
 
         <!-- OR Separator -->
         <div class="relative my-6">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-600"></div>
+            <div class="w-full border-t border-line"></div>
           </div>
           <div class="relative flex justify-center text-sm">
             <span
-              class="px-4 bg-gray-800 text-gray-400 font-medium"
+              class="px-4 bg-surface-raised text-content-muted font-medium"
               data-i18n="tools:createPdfForm.orSeparator"
               >OR</span
             >
@@ -177,7 +178,7 @@
         <div>
           <button
             id="blankPdfBtn"
-            class="w-full bg-gray-700 hover:bg-gray-600 text-white p-4 rounded-lg flex items-center justify-center gap-3 transition-colors"
+            class="w-full bg-surface-muted hover:bg-surface-muted text-content p-4 rounded-lg flex items-center justify-center gap-3 transition-colors"
           >
             <i data-lucide="file-plus" class="w-5 h-5"></i>
             <span
@@ -188,12 +189,12 @@
           </button>
 
           <div id="pageSizeSelector" class="mt-4 hidden">
-            <label class="block text-sm font-semibold text-gray-300 mb-2"
+            <label class="block text-sm font-semibold text-content-muted mb-2"
               >Page Size:</label
             >
             <select
               id="pageSizeSelect"
-              class="w-full bg-gray-600 border border-gray-500 text-white rounded px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full bg-surface-muted border border-line text-content rounded px-3 py-2 text-sm focus:ring-palm-500 focus:border-palm-500"
             >
               <option value="letter">Letter (8.5" × 11")</option>
               <option value="a4">A4 (210mm × 297mm)</option>
@@ -207,7 +208,7 @@
             <div id="customDimensionsInput" class="mt-3 hidden space-y-2">
               <div class="flex gap-2">
                 <div class="flex-1">
-                  <label class="block text-xs text-gray-400 mb-1"
+                  <label class="block text-xs text-content-muted mb-1"
                     >Width (pts)</label
                   >
                   <input
@@ -216,11 +217,11 @@
                     placeholder="612"
                     min="72"
                     max="14400"
-                    class="w-full bg-gray-600 border border-gray-500 text-white rounded px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="w-full bg-surface-muted border border-line text-content rounded px-2 py-1 text-sm focus:ring-palm-500 focus:border-palm-500"
                   />
                 </div>
                 <div class="flex-1">
-                  <label class="block text-xs text-gray-400 mb-1"
+                  <label class="block text-xs text-content-muted mb-1"
                     >Height (pts)</label
                   >
                   <input
@@ -229,16 +230,16 @@
                     placeholder="792"
                     min="72"
                     max="14400"
-                    class="w-full bg-gray-600 border border-gray-500 text-white rounded px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="w-full bg-surface-muted border border-line text-content rounded px-2 py-1 text-sm focus:ring-palm-500 focus:border-palm-500"
                   />
                 </div>
               </div>
-              <p class="text-xs text-gray-500 italic">1 inch = 72 points</p>
+              <p class="text-xs text-content-muted italic">1 inch = 72 points</p>
             </div>
 
             <button
               id="confirmBlankBtn"
-              class="w-full mt-3 bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded transition-colors"
+              class="w-full mt-3 bg-palm-600 hover:bg-palm-500 text-white p-2 rounded transition-colors"
             >
               Start Creating
             </button>
@@ -249,11 +250,11 @@
       <!-- Tool Container (hidden initially) -->
       <div
         id="tool-container"
-        class="bg-gray-800 rounded-xl shadow-xl p-6 w-full text-gray-200 border border-gray-700 hidden"
+        class="bg-surface-raised rounded-xl shadow-xl p-6 w-full text-content border border-line hidden"
       >
         <button
           id="back-to-tools-creator"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools"
@@ -262,12 +263,12 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:createPdfForm.name"
         >
           Create PDF Form
         </h1>
-        <p class="text-gray-400 mb-6" data-i18n="tools:createPdfForm.subtitle">
+        <p class="text-content-muted mb-6" data-i18n="tools:createPdfForm.subtitle">
           Create fillable PDF forms with drag-and-drop text fields.
         </p>
 
@@ -278,29 +279,29 @@
             class="lg:w-64 flex-shrink-0 order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start"
           >
             <!-- Properties Section -->
-            <div class="bg-gray-700 rounded-lg p-4">
+            <div class="bg-surface-muted rounded-lg p-4">
               <h2
-                class="font-semibold text-gray-200 mb-3 flex items-center gap-2"
+                class="font-semibold text-content mb-3 flex items-center gap-2"
               >
                 <i data-lucide="settings" class="w-4 h-4"></i>
                 Properties
               </h2>
               <div id="propertiesPanel" class="space-y-3">
-                <p class="text-gray-500 text-sm">
+                <p class="text-content-muted text-sm">
                   Select a field to edit properties
                 </p>
               </div>
             </div>
 
             <!-- Field Count -->
-            <div class="mt-4 bg-gray-700 rounded-lg p-3 text-center">
-              <p class="text-sm text-gray-400">
-                <span id="fieldCount" class="text-indigo-400 font-bold text-lg"
+            <div class="mt-4 bg-surface-muted rounded-lg p-3 text-center">
+              <p class="text-sm text-content-muted">
+                <span id="fieldCount" class="text-palm-400 font-bold text-lg"
                   >0</span
                 >
                 field(s)
               </p>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-xs text-content-muted mt-1">
                 Press Delete to remove selected field
               </p>
             </div>
@@ -310,47 +311,47 @@
           <main class="flex-1 order-1 lg:order-2 min-w-0">
             <!-- Page Management Toolbar -->
             <div
-              class="bg-gray-700 rounded-lg p-3 mb-4 flex flex-wrap gap-2 justify-center md:justify-between items-center overflow-hidden sticky top-16 z-20"
+              class="bg-surface-muted rounded-lg p-3 mb-4 flex flex-wrap gap-2 justify-center md:justify-between items-center overflow-hidden sticky top-16 z-20"
             >
               <div
                 class="flex flex-wrap items-center justify-center gap-2 min-w-0"
               >
                 <button
                   id="prevPageBtn"
-                  class="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="bg-surface-muted hover:bg-surface-muted text-content p-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled
                 >
                   <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 </button>
-                <span id="pageIndicator" class="text-sm text-gray-300 px-2"
+                <span id="pageIndicator" class="text-sm text-content-muted px-2"
                   >Page 1 of 1</span
                 >
                 <button
                   id="nextPageBtn"
-                  class="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="bg-surface-muted hover:bg-surface-muted text-content p-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled
                 >
                   <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
                 <div
-                  class="flex items-center gap-2 md:ml-2 md:border-l border-gray-600 md:pl-2"
+                  class="flex items-center gap-2 md:ml-2 md:border-l border-line md:pl-2"
                 >
-                  <span class="text-sm text-gray-400">Go to:</span>
+                  <span class="text-sm text-content-muted">Go to:</span>
                   <input
                     type="number"
                     id="gotoPageInput"
                     min="1"
-                    class="w-16 bg-gray-600 border border-gray-500 text-white rounded px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="w-16 bg-surface-muted border border-line text-content rounded px-2 py-1 text-sm focus:ring-palm-500 focus:border-palm-500"
                   />
                   <button
                     id="gotoPageBtn"
-                    class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded text-sm transition-colors"
+                    class="bg-palm-600 hover:bg-palm-500 text-white px-2 py-1 rounded text-sm transition-colors"
                   >
                     Go
                   </button>
                 </div>
                 <div
-                  class="hidden md:flex items-center gap-2 md:ml-2 md:border-l border-gray-600 md:pl-2"
+                  class="hidden md:flex items-center gap-2 md:ml-2 md:border-l border-line md:pl-2"
                 >
                   <input
                     type="checkbox"
@@ -358,7 +359,7 @@
                     checked
                     class="mr-1"
                   />
-                  <label for="enableGridCheckbox" class="text-sm text-gray-400"
+                  <label for="enableGridCheckbox" class="text-sm text-content-muted"
                     >Grid:</label
                   >
                   <input
@@ -368,9 +369,9 @@
                     max="14"
                     value="2"
                     placeholder="V"
-                    class="w-12 bg-gray-600 border border-gray-500 text-white rounded px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="w-12 bg-surface-muted border border-line text-content rounded px-2 py-1 text-sm focus:ring-palm-500 focus:border-palm-500"
                   />
-                  <span class="text-gray-400">x</span>
+                  <span class="text-content-muted">x</span>
                   <input
                     type="number"
                     id="gridHInput"
@@ -378,11 +379,11 @@
                     max="14"
                     value="2"
                     placeholder="H"
-                    class="w-12 bg-gray-600 border border-gray-500 text-white rounded px-2 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="w-12 bg-surface-muted border border-line text-content rounded px-2 py-1 text-sm focus:ring-palm-500 focus:border-palm-500"
                   />
                   <button
                     id="toggleGridBtn"
-                    class="bg-gray-600 hover:bg-gray-500 text-white p-1 rounded transition-colors"
+                    class="bg-surface-muted hover:bg-surface-muted text-content p-1 rounded transition-colors"
                     title="Toggle Grid"
                   >
                     <i data-lucide="grid-3x3" class="w-4 h-4"></i>
@@ -392,14 +393,14 @@
               <div class="flex items-center justify-center gap-2">
                 <button
                   id="resetBtn"
-                  class="bg-gray-600 hover:bg-gray-500 text-white p-2 px-3 rounded flex items-center gap-2 transition-colors"
+                  class="bg-surface-muted hover:bg-surface-muted text-content p-2 px-3 rounded flex items-center gap-2 transition-colors"
                 >
                   <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                   <span class="text-sm">Reset</span>
                 </button>
                 <button
                   id="addPageBtn"
-                  class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 px-3 rounded flex items-center gap-2 transition-colors"
+                  class="bg-palm-600 hover:bg-palm-500 text-white p-2 px-3 rounded flex items-center gap-2 transition-colors"
                 >
                   <i data-lucide="file-plus" class="w-4 h-4"></i>
                   <span class="text-sm">Add Page</span>
@@ -409,19 +410,19 @@
 
             <!-- Top Toolbar -->
             <div
-              class="bg-gray-700 rounded-lg p-3 mb-4 sticky top-[120px] z-20"
+              class="bg-surface-muted rounded-lg p-3 mb-4 sticky top-[120px] z-20"
             >
               <div
                 class="flex flex-wrap gap-2 justify-center items-center max-w-full py-1"
               >
                 <div
-                  class="text-gray-400 text-sm font-semibold mr-2 flex items-center gap-1"
+                  class="text-content-muted text-sm font-semibold mr-2 flex items-center gap-1"
                 >
                   <i data-lucide="wrench" class="w-4 h-4"></i> Fields:
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="text"
                   title="Text Field"
@@ -431,7 +432,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="checkbox"
                   title="Checkbox"
@@ -441,7 +442,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="radio"
                   title="Radio Button"
@@ -451,7 +452,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="dropdown"
                   title="Dropdown"
@@ -461,7 +462,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="optionlist"
                   title="Option List"
@@ -471,7 +472,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="button"
                   title="Button"
@@ -481,7 +482,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="signature"
                   title="Signature"
@@ -491,7 +492,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="date"
                   title="Date Field"
@@ -501,7 +502,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="image"
                   title="Image Field"
@@ -511,7 +512,7 @@
                 </div>
 
                 <div
-                  class="tool-item bg-gray-600 hover:bg-indigo-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
+                  class="tool-item bg-surface-muted hover:bg-palm-600 text-white p-2 rounded cursor-move transition-colors flex items-center gap-2"
                   draggable="true"
                   data-type="barcode"
                   title="Barcode Field"
@@ -521,7 +522,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-gray-700 rounded-lg p-4 mb-4 overflow-auto w-full">
+            <div class="bg-surface-muted rounded-lg p-4 mb-4 overflow-auto w-full">
               <div class="flex justify-center">
                 <div
                   id="pdfCanvasWrapper"
@@ -548,9 +549,9 @@
     </div>
 
     <!-- How It Works Section -->
-    <section class="max-w-4xl mx-auto px-4 py-12">
+    <section class="max-w-2xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -558,39 +559,39 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Upload File</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:createPdfForm.howItWorks.step1Title">Upload File</h3>
+            <p class="text-content-muted" data-i18n="tools:createPdfForm.howItWorks.step1Desc">
               Click or drag and drop your file to begin
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Process</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step2">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:createPdfForm.howItWorks.step2Title">Process</h3>
+            <p class="text-content-muted" data-i18n="tools:createPdfForm.howItWorks.step2Desc">
               Click the process button to start
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Download</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step3">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:createPdfForm.howItWorks.step3Title">Download</h3>
+            <p class="text-content-muted" data-i18n="tools:createPdfForm.howItWorks.step3Desc">
               Save your processed file instantly
             </p>
           </div>
@@ -601,46 +602,46 @@
     <!-- Related Tools Section -->
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="merge-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Merge Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online merge pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:createPdfForm.relatedTools.card1Name">Merge Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:createPdfForm.relatedTools.card1Desc">Free online merge pdf tool</p>
         </a>
         <a
           href="compress-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Compress Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online compress pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:createPdfForm.relatedTools.card2Name">Compress Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:createPdfForm.relatedTools.card2Desc">Free online compress pdf tool</p>
         </a>
         <a
           href="split-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Split Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online split pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:createPdfForm.relatedTools.card3Name">Split Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:createPdfForm.relatedTools.card3Desc">Free online split pdf tool</p>
         </a>
         <a
           href="edit-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Edit Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online edit pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:createPdfForm.relatedTools.card4Name">Edit Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:createPdfForm.relatedTools.card4Desc">Free online edit pdf tool</p>
         </a>
         <a
           href="rotate-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Rotate Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online rotate pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:createPdfForm.relatedTools.card5Name">Rotate Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:createPdfForm.relatedTools.card5Desc">Free online rotate pdf tool</p>
         </a>
       </div>
     </section>
@@ -648,44 +649,44 @@
     <!-- FAQ Section -->
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is form creator really free?
+            <span data-i18n="tools:createPdfForm.faq.q1">Is form creator really free?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:createPdfForm.faq.a1">
             Yes! igo is 100% free with no hidden fees, no signup required,
             and unlimited file processing.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Are my files private and secure?
+            <span data-i18n="tools:createPdfForm.faq.q2">Are my files private and secure?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:createPdfForm.faq.a2">
             Absolutely! All processing happens in your browser. Your files never
             leave your device, ensuring complete privacy.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is there a file size limit?
+            <span data-i18n="tools:createPdfForm.faq.q3">Is there a file size limit?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:createPdfForm.faq.a3">
             No! Process files of any size, as many times as you want, completely
             free.
           </p>
@@ -699,18 +700,18 @@
       class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75"
     >
       <div
-        class="bg-gray-800 rounded-lg shadow-2xl max-w-md w-full mx-4 border border-gray-700"
+        class="bg-surface-raised rounded-lg shadow-2xl max-w-md w-full mx-4 border border-line"
       >
         <div class="p-6">
-          <h3 id="errorModalTitle" class="text-xl font-bold text-white mb-3">
+          <h3 id="errorModalTitle" class="text-xl font-bold text-content mb-3">
             Error
           </h3>
-          <p id="errorModalMessage" class="text-gray-300 mb-6">
+          <p id="errorModalMessage" class="text-content-muted mb-6">
             An error occurred.
           </p>
           <button
             id="errorModalClose"
-            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition-colors"
+            class="w-full bg-palm-600 hover:bg-palm-700 text-white font-semibold py-2 px-4 rounded transition-colors"
           >
             Close
           </button>

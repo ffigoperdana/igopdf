@@ -88,14 +88,14 @@ function initializePage() {
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('border-indigo-500');
+      dropZone.classList.add('border-palm-500');
     });
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('border-indigo-500');
+      dropZone.classList.remove('border-palm-500');
     });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('border-indigo-500');
+      dropZone.classList.remove('border-palm-500');
       if (e.dataTransfer?.files.length) handleFiles(e.dataTransfer.files);
     });
   }
@@ -218,7 +218,7 @@ function renderFileList() {
 
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
 
     const leftSection = document.createElement('div');
     leftSection.className = 'flex items-center gap-3 flex-1 min-w-0';
@@ -226,17 +226,17 @@ function renderFileList() {
     const dragHandle = document.createElement('i');
     dragHandle.setAttribute('data-lucide', 'grip-vertical');
     dragHandle.className =
-      'drag-handle w-4 h-4 text-gray-400 cursor-grab flex-shrink-0';
+      'drag-handle w-4 h-4 text-content-muted cursor-grab flex-shrink-0';
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col min-w-0';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm';
+    nameSpan.className = 'truncate font-medium text-content text-sm';
     nameSpan.textContent = entry.file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = `${formatBytes(entry.file.size)} \u2022 ${entry.pageCount} pages`;
 
     infoContainer.append(nameSpan, metaSpan);
@@ -259,7 +259,7 @@ function renderFileList() {
   createIcons({ icons });
 
   const summary = document.createElement('div');
-  summary.className = 'text-xs text-gray-400 mt-1';
+  summary.className = 'text-xs text-content-muted mt-1';
   summary.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} \u2022 ${totalPages} total pages`;
   fileListEl.appendChild(summary);
 }

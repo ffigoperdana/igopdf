@@ -58,7 +58,7 @@ function updateFileDisplay() {
 
   const card = document.createElement('div');
   card.className =
-    'bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-indigo-500 transition-colors';
+    'bg-surface-muted p-3 rounded-lg border border-line hover:border-palm-500 transition-colors';
 
   const row = document.createElement('div');
   row.className = 'flex items-center justify-between';
@@ -71,7 +71,7 @@ function updateFileDisplay() {
   nameP.textContent = currentFile.name;
 
   const sizeP = document.createElement('p');
-  sizeP.className = 'text-gray-400 text-sm';
+  sizeP.className = 'text-content-muted text-sm';
   sizeP.textContent = fileSize;
 
   info.append(nameP, sizeP);
@@ -294,16 +294,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-indigo-500');
+    dropZone.classList.add('border-palm-500');
   });
 
   dropZone?.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
   });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
     const file = e.dataTransfer?.files[0];
     if (file) handleFileUpload(file);
   });

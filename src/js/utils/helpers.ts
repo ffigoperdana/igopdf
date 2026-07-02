@@ -7,6 +7,18 @@ import * as pdfjsLib from 'pdfjs-dist';
 import DOMPurify from 'dompurify';
 import type { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api';
 
+// Configure the pdf.js worker synchronously at module eval. helpers.ts is only
+// imported by pages that use pdf.js (the homepage uses helpers-light.ts), so
+// this doesn't affect the homepage bundle — but it guarantees any tool that
+// imports getPDFDocument has the worker set BEFORE it can call getDocument.
+// (Previously this guarantee came from ui.ts's module-eval setup, removed in the
+// perf refactor; a user uploading a file before main.ts's async setup finished
+// would otherwise hit "No GlobalWorkerOptions.workerSrc specified".)
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
+
 const STANDARD_SIZES = {
   A4: { width: 595.28, height: 841.89 },
   Letter: { width: 612, height: 792 },

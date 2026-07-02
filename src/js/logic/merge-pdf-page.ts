@@ -146,7 +146,7 @@ async function renderPageMergeThumbnails() {
     ) => {
       const wrapper = document.createElement('div');
       wrapper.className =
-        'page-thumbnail relative cursor-move flex flex-col items-center gap-1 p-2 border-2 border-gray-600 hover:border-indigo-500 rounded-lg bg-gray-700 transition-colors';
+        'page-thumbnail relative cursor-move flex flex-col items-center gap-1 p-2 border-2 border-line hover:border-palm-500 rounded-lg bg-surface-muted transition-colors';
       wrapper.dataset.fileName = fileKey;
       wrapper.dataset.pageIndex = (pageNumber - 1).toString();
 
@@ -159,14 +159,14 @@ async function renderPageMergeThumbnails() {
 
       const pageNumDiv = document.createElement('div');
       pageNumDiv.className =
-        'absolute top-1 left-1 bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-semibold shadow-lg';
+        'absolute top-1 left-1 bg-palm-600 text-white text-xs px-2 py-1 rounded-md font-semibold shadow-lg';
       pageNumDiv.textContent = pageNumber.toString();
 
       imgContainer.append(img, pageNumDiv);
 
       const fileNamePara = document.createElement('p');
       fileNamePara.className =
-        'text-xs text-gray-400 truncate w-full text-center';
+        'text-xs text-content-muted truncate w-full text-center';
       const fullTitle = displayName
         ? `${displayName} (page ${pageNumber})`
         : `Page ${pageNumber}`;
@@ -267,10 +267,10 @@ const resetState = async () => {
   const pagePanel = document.getElementById('page-mode-panel');
 
   if (fileModeBtn && pageModeBtn && filePanel && pagePanel) {
-    fileModeBtn.classList.add('bg-indigo-600', 'text-white');
-    fileModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-    pageModeBtn.classList.remove('bg-indigo-600', 'text-white');
-    pageModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+    fileModeBtn.classList.add('bg-palm-600', 'text-white');
+    fileModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+    pageModeBtn.classList.remove('bg-palm-600', 'text-white');
+    pageModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
 
     filePanel.classList.remove('hidden');
     pagePanel.classList.add('hidden');
@@ -495,7 +495,7 @@ export async function refreshMergeUI() {
 
     const li = document.createElement('li');
     li.className =
-      'bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-indigo-500 transition-colors';
+      'bg-surface-muted p-3 rounded-lg border border-line hover:border-palm-500 transition-colors';
     li.dataset.fileName = fileKey;
 
     const mainDiv = document.createElement('div');
@@ -508,7 +508,7 @@ export async function refreshMergeUI() {
 
     const dragHandle = document.createElement('div');
     dragHandle.className =
-      'drag-handle cursor-move text-gray-400 hover:text-white p-1 rounded transition-colors';
+      'drag-handle cursor-move text-content-muted hover:text-white p-1 rounded transition-colors';
     dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>`; // Safe: static content
 
     mainDiv.append(nameSpan, dragHandle);
@@ -521,14 +521,14 @@ export async function refreshMergeUI() {
 
     const label = document.createElement('label');
     label.htmlFor = `range-${safeFileName}`;
-    label.className = 'text-xs text-gray-400';
+    label.className = 'text-xs text-content-muted';
     label.textContent = `Pages (e.g., 1-3, 5) - Total: ${pageCount}`;
 
     const input = document.createElement('input');
     input.type = 'text';
     input.id = `range-${safeFileName}`;
     input.className =
-      'w-full bg-gray-800 border border-gray-600 text-white rounded-md p-2 text-sm mt-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors';
+      'w-full bg-surface-raised border border-line text-white rounded-md p-2 text-sm mt-1 focus:border-palm-500 focus:ring-1 focus:ring-palm-500 transition-colors';
     input.placeholder = 'Leave blank for all pages';
 
     inputWrapper.append(label, input);
@@ -564,10 +564,10 @@ export async function refreshMergeUI() {
     filePanel.classList.remove('hidden');
     pagePanel.classList.add('hidden');
 
-    newFileModeBtn.classList.add('bg-indigo-600', 'text-white');
-    newFileModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-    newPageModeBtn.classList.remove('bg-indigo-600', 'text-white');
-    newPageModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+    newFileModeBtn.classList.add('bg-palm-600', 'text-white');
+    newFileModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+    newPageModeBtn.classList.remove('bg-palm-600', 'text-white');
+    newPageModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
   });
 
   newPageModeBtn.addEventListener('click', async () => {
@@ -577,10 +577,10 @@ export async function refreshMergeUI() {
     filePanel.classList.add('hidden');
     pagePanel.classList.remove('hidden');
 
-    newPageModeBtn.classList.add('bg-indigo-600', 'text-white');
-    newPageModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-    newFileModeBtn.classList.remove('bg-indigo-600', 'text-white');
-    newFileModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+    newPageModeBtn.classList.add('bg-palm-600', 'text-white');
+    newPageModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+    newFileModeBtn.classList.remove('bg-palm-600', 'text-white');
+    newFileModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
 
     await renderPageMergeThumbnails();
   });
@@ -590,15 +590,15 @@ export async function refreshMergeUI() {
     filePanel.classList.add('hidden');
     pagePanel.classList.remove('hidden');
 
-    newPageModeBtn.classList.add('bg-indigo-600', 'text-white');
-    newPageModeBtn.classList.remove('bg-gray-700', 'text-gray-300');
-    newFileModeBtn.classList.remove('bg-indigo-600', 'text-white');
-    newFileModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+    newPageModeBtn.classList.add('bg-palm-600', 'text-white');
+    newPageModeBtn.classList.remove('bg-surface-muted', 'text-content-muted');
+    newFileModeBtn.classList.remove('bg-palm-600', 'text-white');
+    newFileModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
 
     await renderPageMergeThumbnails();
   } else {
-    newFileModeBtn.classList.add('bg-indigo-600', 'text-white');
-    newPageModeBtn.classList.add('bg-gray-700', 'text-gray-300');
+    newFileModeBtn.classList.add('bg-palm-600', 'text-white');
+    newPageModeBtn.classList.add('bg-surface-muted', 'text-content-muted');
   }
 }
 
@@ -630,17 +630,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', async (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const pdfFiles = Array.from(files).filter(

@@ -6,11 +6,10 @@
  * conflicts with Vite's HMR (Hot Module Replacement)
  */
 
-// Skip service worker registration in development mode
-const isDevelopment =
-  window.location.hostname === 'localhost' ||
-  window.location.hostname === '127.0.0.1' ||
-  window.location.port !== '';
+// Skip service worker registration only under the Vite dev server (HMR).
+// Production builds — including the Docker image served at localhost:8099 —
+// register the SW so the app is installable/offline-capable (PWA).
+const isDevelopment = import.meta.env.DEV;
 
 function collectTrustedWasmHosts(): string[] {
   const hosts = new Set<string>();

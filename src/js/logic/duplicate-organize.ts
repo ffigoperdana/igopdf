@@ -119,7 +119,7 @@ export async function renderDuplicateOrganizeThumbnails() {
 
     const imgContainer = document.createElement('div');
     imgContainer.className =
-      'w-full h-36 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border-2 border-gray-600';
+      'w-full h-36 bg-surface rounded-lg flex items-center justify-center overflow-hidden border-2 border-line';
 
     const img = document.createElement('img');
     img.src = canvas.toDataURL();
@@ -128,7 +128,7 @@ export async function renderDuplicateOrganizeThumbnails() {
 
     const pageNumberSpan = document.createElement('span');
     pageNumberSpan.className =
-      'page-number absolute top-1 left-1 bg-gray-900 bg-opacity-75 text-white text-xs rounded-full px-2 py-1';
+      'page-number absolute top-1 left-1 bg-surface bg-opacity-75 text-white text-xs rounded-full px-2 py-1';
     pageNumberSpan.textContent = pageNumber.toString();
 
     const controlsDiv = document.createElement('div');

@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="id">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lisensi - igo</title>
-    <meta name="description" content="Informasi lisensi dan atribusi igo." />
+    <title>Bantuan - igo</title>
+    <meta name="description" content="Bantuan, kebijakan internal, FAQ, lisensi, dan kontak dukungan igo." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href="https://igo.local/licensing" />
     <link rel="manifest" href="/site.webmanifest" />
@@ -14,24 +15,160 @@
   <body class="antialiased bg-background text-on-background">
     {{> navbar }}
 
-    <main class="container mx-auto min-h-screen px-4 py-10">
-      <section class="mx-auto max-w-3xl rounded border border-outline-variant bg-white p-6">
-        <p class="text-sm font-semibold uppercase text-vibrant-palm">Lisensi</p>
-        <h1 class="mt-2 text-3xl font-bold text-deep-forest">Lisensi dan Atribusi</h1>
-        <div class="mt-6 space-y-5 text-sm leading-6 text-on-surface-variant">
-          <p>
-            igo didistribusikan dengan lisensi AGPL-3.0-only mengikuti basis kode open-source yang digunakan.
-          </p>
-          <p>
-            Aplikasi ini menggunakan BentoPDF sebagai basis/engine pemrosesan PDF. Penyebutan ini dipertahankan untuk atribusi lisensi, bukan sebagai branding produk.
-          </p>
-          <p>
-            Komponen pihak ketiga seperti PDF.js, pdf-lib, Tesseract, PyMuPDF, Ghostscript, CoherentPDF, Lucide, Phosphor, dan pustaka lain tetap mengikuti lisensi masing-masing.
-          </p>
-          <p>
-            Source code dan perubahan internal perlu tetap tersedia sesuai ketentuan AGPL-3.0 bila aplikasi didistribusikan atau digunakan melalui jaringan sesuai kewajiban lisensi.
-          </p>
+    <main class="container mx-auto min-h-screen py-10">
+      <section class="mx-auto max-w-4xl">
+        <p class="text-sm font-semibold uppercase text-vibrant-palm" data-i18n="helpPage.eyebrow">Bantuan</p>
+        <h1 class="mt-2 text-3xl font-bold text-deep-forest dark:text-content" data-i18n="helpPage.title">
+          Bantuan, Kebijakan &amp; Lisensi
+        </h1>
+        <p class="mt-3 text-on-surface-variant" data-i18n="helpPage.intro">
+          Informasi penggunaan, kebijakan internal, pertanyaan umum, dan kontak
+          dukungan untuk pegawai BPDP.
+        </p>
+
+        <!-- Policy / warning + License -->
+        <div class="mt-8 grid gap-4 md:grid-cols-2">
+          <article class="panel p-6">
+            <div class="flex items-center gap-2 text-vibrant-palm">
+              <i data-lucide="shield-alert" class="h-5 w-5"></i>
+              <h2 class="text-lg font-bold" data-i18n="helpPage.policyTitle">Kebijakan &amp; Peringatan Internal</h2>
+            </div>
+            <ul class="mt-4 space-y-3 text-sm text-on-surface-variant">
+              <li>
+                <strong class="text-content" data-i18n="helpPage.policyItem1Label">Anti-gratifikasi.</strong> <span data-i18n="helpPage.policyItem1Text">Dilarang
+                meminta atau menerima gratifikasi dalam bentuk apa pun terkait
+                layanan pemrosesan dokumen.</span>
+              </li>
+              <li>
+                <strong class="text-content" data-i18n="helpPage.policyItem2Label">Jaga dokumen internal.</strong>
+                <span data-i18n="helpPage.policyItem2Text">Dilarang mengunggah atau membagikan dokumen kerja/rahasia ke
+                situs atau aplikasi PDF pihak ketiga di luar igo. Gunakan igo
+                yang memproses dokumen secara lokal di perangkat Anda.</span>
+              </li>
+              <li>
+                <strong class="text-content" data-i18n="helpPage.policyItem3Label">Kerahasiaan.</strong> <span data-i18n="helpPage.policyItem3Text">Patuhi
+                ketentuan kerahasiaan dan keamanan informasi BPDP yang berlaku.</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel p-6">
+            <div class="flex items-center gap-2 text-vibrant-palm">
+              <i data-lucide="scale" class="h-5 w-5"></i>
+              <h2 class="text-lg font-bold" data-i18n="helpPage.licenseTitle">Lisensi &amp; Atribusi</h2>
+            </div>
+            <div class="mt-4 space-y-3 text-sm leading-6 text-on-surface-variant">
+              <p data-i18n="helpPage.licenseP1">
+                igo didistribusikan dengan lisensi AGPL-3.0-only mengikuti basis
+                kode open-source yang digunakan.
+              </p>
+              <p data-i18n="helpPage.licenseP2">
+                Aplikasi ini menggunakan BentoPDF sebagai basis/engine
+                pemrosesan PDF. Penyebutan ini dipertahankan untuk atribusi
+                lisensi, bukan sebagai branding produk.
+              </p>
+              <p data-i18n="helpPage.licenseP3">
+                Komponen pihak ketiga seperti PDF.js, pdf-lib, Tesseract,
+                PyMuPDF, Ghostscript, CoherentPDF, Lucide, dan Phosphor tetap
+                mengikuti lisensi masing-masing.
+              </p>
+            </div>
+          </article>
         </div>
+
+        <!-- FAQ -->
+        <section class="mt-10">
+          <h2 class="text-2xl font-bold text-deep-forest dark:text-content" data-i18n="helpPage.faqTitle">
+            Pertanyaan Umum (FAQ)
+          </h2>
+          <div class="mt-4 space-y-3">
+            <details class="panel group p-4">
+              <summary class="flex cursor-pointer items-center justify-between font-semibold text-content">
+                <span data-i18n="helpPage.faq1Q">Apakah dokumen saya aman?</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.faq1A">
+                Sebagian besar alat memproses dokumen langsung di browser Anda
+                (client-side); file kerja tidak dikirim ke server.
+              </p>
+            </details>
+
+            <details class="panel group p-4">
+              <summary class="flex cursor-pointer items-center justify-between font-semibold text-content">
+                <span data-i18n="helpPage.faq2Q">Bagaimana cara mendapatkan akun?</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.faq2A">
+                Akun dibuat dan dikelola oleh administrator. Tidak ada
+                registrasi publik — hubungi administrator untuk mendapatkan
+                akses.
+              </p>
+            </details>
+
+            <details class="panel group p-4">
+              <summary class="flex cursor-pointer items-center justify-between font-semibold text-content">
+                <span data-i18n="helpPage.faq3Q">Lupa atau ingin reset password?</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.faq3A">
+                Hubungi administrator untuk mereset password akun Anda.
+              </p>
+            </details>
+
+            <details class="panel group p-4">
+              <summary class="flex cursor-pointer items-center justify-between font-semibold text-content">
+                <span data-i18n="helpPage.faq4Q">Bisakah igo dipasang sebagai aplikasi (offline)?</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.faq4A">
+                Ya. igo mendukung PWA — gunakan opsi "Instal" di browser Anda
+                untuk memasangnya di perangkat dan menjalankannya seperti
+                aplikasi biasa.
+              </p>
+            </details>
+
+            <details class="panel group p-4">
+              <summary class="flex cursor-pointer items-center justify-between font-semibold text-content">
+                <span data-i18n="helpPage.faq5Q">Menemukan bug atau kendala?</span>
+                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.faq5A">
+                Laporkan ke administrator melalui email atau telepon yang
+                tercantum di bagian kontak di bawah.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="panel mt-8 p-6">
+          <div class="flex items-center gap-2 text-vibrant-palm">
+            <i data-lucide="life-buoy" class="h-5 w-5"></i>
+            <h2 class="text-lg font-bold" data-i18n="helpPage.contactTitle">Butuh bantuan?</h2>
+          </div>
+          <p class="mt-3 text-sm text-on-surface-variant" data-i18n="helpPage.contactIntro">
+            Jika ada kendala, bug, atau pertanyaan seputar penggunaan igo,
+            hubungi administrator:
+          </p>
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-8">
+            <a
+              href="mailto:figo.putra@bpdp.or.id"
+              class="inline-flex items-center gap-2 text-sm font-semibold text-content hover:text-vibrant-palm"
+            >
+              <i data-lucide="mail" class="h-4 w-4"></i>
+              figo.putra@bpdp.or.id
+            </a>
+            <a
+              href="https://wa.me/6281216195308"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-sm font-semibold text-content hover:text-vibrant-palm"
+            >
+              <i data-lucide="message-circle" class="h-4 w-4"></i>
+              081216195308
+            </a>
+          </div>
+        </section>
       </section>
     </main>
 

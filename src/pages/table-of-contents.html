@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -99,20 +100,20 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <div
       id="uploader"
-      class="min-h-screen flex items-center justify-center p-4 bg-gray-900"
+      class="min-h-screen flex items-center justify-center p-4 bg-surface"
     >
       <div
         id="tool-uploader"
-        class="bg-gray-800 rounded-xl shadow-xl p-8 max-w-2xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl p-8 max-w-2xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools">
@@ -120,13 +121,13 @@
           </span>
         </button>
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:tableOfContents.name"
         >
           Table of Contents
         </h1>
         <p
-          class="text-gray-400 mb-6"
+          class="text-content-muted mb-6"
           data-i18n="tools:tableOfContents.subtitle"
         >
           Generate a table of contents page from PDF bookmarks.
@@ -135,23 +136,23 @@
         <!-- Drop Zone for Main PDF Upload -->
         <div
           id="drop-zone"
-          class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface-muted hover:bg-surface-muted transition-colors duration-300"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="upload-cloud"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-300">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select a file</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.hints.singlePdf">
+            <p class="text-xs text-content-muted" data-i18n="upload.hints.singlePdf">
               A single PDF file
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -170,7 +171,7 @@
         <div class="mt-6 space-y-4">
           <div>
             <label
-              class="block text-sm font-medium text-gray-300 mb-2"
+              class="block text-sm font-medium text-content-muted mb-2"
               data-i18n="tools:tableOfContents.titleLabel"
             >
               TOC Title
@@ -178,7 +179,7 @@
             <input
               type="text"
               id="toc-title"
-              class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-4 py-2 bg-surface-raised border border-line rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Table of Contents"
               data-i18n-placeholder="tools:tableOfContents.name"
             />
@@ -186,14 +187,14 @@
 
           <div>
             <label
-              class="block text-sm font-medium text-gray-300 mb-2"
+              class="block text-sm font-medium text-content-muted mb-2"
               data-i18n="tools:tableOfContents.fontSize"
             >
               Font Size
             </label>
             <select
               id="font-size"
-              class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-4 py-2 bg-surface-raised border border-line rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="10">10pt</option>
               <option value="11">11pt</option>
@@ -216,14 +217,14 @@
 
           <div>
             <label
-              class="block text-sm font-medium text-gray-300 mb-2"
+              class="block text-sm font-medium text-content-muted mb-2"
               data-i18n="tools:tableOfContents.fontFamily"
             >
               Font Family
             </label>
             <select
               id="font-family"
-              class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-4 py-2 bg-surface-raised border border-line rounded-lg text-content focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="0">Times Roman</option>
               <option value="1">Times Bold</option>
@@ -249,7 +250,7 @@
             />
             <label
               for="add-bookmark"
-              class="text-sm text-gray-300"
+              class="text-sm text-content-muted"
               data-i18n="tools:tableOfContents.addBookmark"
             >
               Add bookmark for TOC page
@@ -275,9 +276,9 @@
     </div>
 
     <!-- How It Works Section -->
-    <section class="max-w-4xl mx-auto px-4 py-12">
+    <section class="max-w-2xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -285,39 +286,39 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Upload File</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:tableOfContents.howItWorks.step1Title">Upload File</h3>
+            <p class="text-content-muted" data-i18n="tools:tableOfContents.howItWorks.step1Desc">
               Click or drag and drop your file to begin
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Process</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step2">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:tableOfContents.howItWorks.step2Title">Process</h3>
+            <p class="text-content-muted" data-i18n="tools:tableOfContents.howItWorks.step2Desc">
               Click the process button to start
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Download</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step3">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:tableOfContents.howItWorks.step3Title">Download</h3>
+            <p class="text-content-muted" data-i18n="tools:tableOfContents.howItWorks.step3Desc">
               Save your processed file instantly
             </p>
           </div>
@@ -328,46 +329,46 @@
     <!-- Related Tools Section -->
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="merge-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Merge Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online merge pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:tableOfContents.relatedTools.card1Name">Merge Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:tableOfContents.relatedTools.card1Desc">Free online merge pdf tool</p>
         </a>
         <a
           href="compress-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Compress Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online compress pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:tableOfContents.relatedTools.card2Name">Compress Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:tableOfContents.relatedTools.card2Desc">Free online compress pdf tool</p>
         </a>
         <a
           href="split-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Split Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online split pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:tableOfContents.relatedTools.card3Name">Split Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:tableOfContents.relatedTools.card3Desc">Free online split pdf tool</p>
         </a>
         <a
           href="edit-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Edit Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online edit pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:tableOfContents.relatedTools.card4Name">Edit Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:tableOfContents.relatedTools.card4Desc">Free online edit pdf tool</p>
         </a>
         <a
           href="rotate-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Rotate Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online rotate pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:tableOfContents.relatedTools.card5Name">Rotate Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:tableOfContents.relatedTools.card5Desc">Free online rotate pdf tool</p>
         </a>
       </div>
     </section>
@@ -375,44 +376,44 @@
     <!-- FAQ Section -->
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is table of contents really free?
+            <span data-i18n="tools:tableOfContents.faq.q1">Is table of contents really free?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:tableOfContents.faq.a1">
             Yes! igo is 100% free with no hidden fees, no signup required,
             and unlimited file processing.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Are my files private and secure?
+            <span data-i18n="tools:tableOfContents.faq.q2">Are my files private and secure?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:tableOfContents.faq.a2">
             Absolutely! All processing happens in your browser. Your files never
             leave your device, ensuring complete privacy.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is there a file size limit?
+            <span data-i18n="tools:tableOfContents.faq.q3">Is there a file size limit?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:tableOfContents.faq.a3">
             No! Process files of any size, as many times as you want, completely
             free.
           </p>

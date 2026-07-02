@@ -15,6 +15,8 @@ dist-ssr
 .env
 .env.production
 .env.local
+.env.localtest
+deploy/.env.localtest
 
 # Editor directories and files
 .vscode/*
@@ -48,6 +50,16 @@ libreoffice-wasm-package
 # helm chart
 bentopdf-*.tgz
 
-# test 
+# test
 dist-test
 test
+
+# AI assistant / agent working files — kept out of the repo
+CLAUDE.md
+.claude/
+.agents/
+.mimocode/
+.cursor/
+.aider*
+.plan/
+plans/

@@ -87,16 +87,16 @@ function renderSummary() {
 
   let summaryHTML = `
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <div class="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <p class="text-sm text-gray-400 mb-1">Total Pages</p>
+      <div class="bg-surface border border-line rounded-lg p-4">
+        <p class="text-sm text-content-muted mb-1">Total Pages</p>
         <p class="text-2xl font-bold text-white">${stats.totalPages}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <p class="text-sm text-gray-400 mb-1">Unique Page Sizes</p>
+      <div class="bg-surface border border-line rounded-lg p-4">
+        <p class="text-sm text-content-muted mb-1">Unique Page Sizes</p>
         <p class="text-2xl font-bold text-white">${stats.uniqueSizesCount}</p>
       </div>
-      <div class="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <p class="text-sm text-gray-400 mb-1">Document Type</p>
+      <div class="bg-surface border border-line rounded-lg p-4">
+        <p class="text-sm text-content-muted mb-1">Document Type</p>
         <p class="text-2xl font-bold ${stats.hasMixedSizes ? 'text-yellow-400' : 'text-green-400'}">
           ${stats.hasMixedSizes ? 'Mixed Sizes' : 'Uniform'}
         </p>
@@ -111,8 +111,8 @@ function renderSummary() {
           <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0"></i>
           <div>
             <h4 class="text-yellow-200 font-semibold mb-2">Mixed Page Sizes Detected</h4>
-            <p class="text-sm text-gray-300 mb-3">This document contains pages with different dimensions:</p>
-            <ul class="space-y-1 text-sm text-gray-300">
+            <p class="text-sm text-content-muted mb-3">This document contains pages with different dimensions:</p>
+            <ul class="space-y-1 text-sm text-content-muted">
               ${stats.uniqueSizes
                 .map(
                   (size: UniqueSizeEntry) => `
@@ -153,27 +153,27 @@ function renderTable(unit: string) {
     pageNumCell.textContent = String(pageData.pageNum);
 
     const dimensionsCell = document.createElement('td');
-    dimensionsCell.className = 'px-4 py-3 text-gray-300';
+    dimensionsCell.className = 'px-4 py-3 text-content-muted';
     dimensionsCell.textContent = `${width} x ${height} ${unit}`;
 
     const sizeCell = document.createElement('td');
-    sizeCell.className = 'px-4 py-3 text-gray-300';
+    sizeCell.className = 'px-4 py-3 text-content-muted';
     sizeCell.textContent = pageData.standardSize;
 
     const orientationCell = document.createElement('td');
-    orientationCell.className = 'px-4 py-3 text-gray-300';
+    orientationCell.className = 'px-4 py-3 text-content-muted';
     orientationCell.textContent = pageData.orientation;
 
     const aspectRatioCell = document.createElement('td');
-    aspectRatioCell.className = 'px-4 py-3 text-gray-300';
+    aspectRatioCell.className = 'px-4 py-3 text-content-muted';
     aspectRatioCell.textContent = aspectRatio;
 
     const areaCell = document.createElement('td');
-    areaCell.className = 'px-4 py-3 text-gray-300';
+    areaCell.className = 'px-4 py-3 text-content-muted';
     areaCell.textContent = area;
 
     const rotationCell = document.createElement('td');
-    rotationCell.className = 'px-4 py-3 text-gray-300';
+    rotationCell.className = 'px-4 py-3 text-content-muted';
     rotationCell.textContent = `${pageData.rotation}°`;
 
     row.append(
@@ -305,17 +305,17 @@ async function updateUI() {
   if (pageState.file) {
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col overflow-hidden';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+    nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
     nameSpan.textContent = pageState.file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = formatBytes(pageState.file.size);
 
     infoContainer.append(nameSpan, metaSpan);
@@ -375,17 +375,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropZone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       handleFileSelect(e.dataTransfer?.files);
     });
 

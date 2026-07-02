@@ -22,7 +22,7 @@ if (
 export const config = {
   port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv,
-  
+
   db: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -30,7 +30,7 @@ export const config = {
     user: process.env.DB_USER || 'igopdf',
     password: process.env.DB_PASSWORD || 'igopdf_password',
   },
-  
+
   session: {
     secret: sessionSecret,
     timeoutHours: parseInt(process.env.SESSION_TIMEOUT_HOURS || '3', 10),
@@ -42,28 +42,57 @@ export const config = {
         ? process.env.SESSION_COOKIE_SECURE === 'true'
         : nodeEnv === 'production',
   },
-  
+
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     credentials: true,
   },
-  
+
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
   },
-  
+
   captcha: {
     expiryMinutes: parseInt(process.env.CAPTCHA_EXPIRY_MINUTES || '5', 10),
     width: 150,
     height: 50,
   },
-  
+
   auth: {
     maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS || '5', 10),
     lockoutMinutes: parseInt(process.env.LOCKOUT_MINUTES || '15', 10),
   },
-  
+
+  // Active Directory / LDAP single sign-on. When enabled, an AD user who logs
+  // in with valid directory credentials is auto-provisioned locally with
+  // role 'user' (see authService.ts). Local accounts (the seeded admin, etc.)
+  // are unaffected and always authenticate against their stored password_hash.
+  ldap: {
+    enabled: process.env.LDAP_ENABLED === 'true',
+    url: process.env.LDAP_URL || '',
+    // Service/bind account used only to search the directory for the DN
+    // matching the submitted username. Should be a dedicated read-only
+    // service account, not a personal admin account, so login doesn't break
+    // if that person's password rotates or their account is disabled.
+    bindDn: process.env.LDAP_BIND_DN || '',
+    bindPassword: process.env.LDAP_BIND_PASSWORD || '',
+    baseDn: process.env.LDAP_BASE_DN || '',
+    loginField: process.env.LDAP_LOGIN_FIELD || 'sAMAccountName',
+    timeoutMs: parseInt(process.env.LDAP_TIMEOUT_MS || '5000', 10),
+    // TLS, only used when LDAP_URL is ldaps://. rejectUnauthorized defaults to
+    // true (verify the DC cert). Set LDAP_TLS_REJECT_UNAUTHORIZED=false for an
+    // internal self-signed AD cert, or set LDAP_TLS_CA_FILE to the internal CA
+    // cert path (mounted into the container) to verify it properly.
+    tlsRejectUnauthorized: process.env.LDAP_TLS_REJECT_UNAUTHORIZED !== 'false',
+    tlsCaFile: process.env.LDAP_TLS_CA_FILE || '',
+    // Minimum TLS version for ldaps:// connections (e.g. 'TLSv1', 'TLSv1.2').
+    // Empty = Node default (TLS 1.2+). Set 'TLSv1' for legacy AD DCs that only
+    // offer TLS 1.0/1.1 on LDAPS — Node otherwise resets the handshake
+    // (ECONNRESET) even though `ldapsearch`/OpenSSL would connect.
+    tlsMinVersion: process.env.LDAP_TLS_MIN_VERSION || '',
+  },
+
   logging: {
     level: process.env.LOG_LEVEL || 'info',
   },

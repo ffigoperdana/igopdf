@@ -68,11 +68,11 @@ function updateFileDisplay() {
   const pageCount = pageState.pdfDoc.getPageCount();
 
   displayArea.innerHTML = `
-        <div class="bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-indigo-500 transition-colors">
+        <div class="bg-surface-muted p-3 rounded-lg border border-line hover:border-palm-500 transition-colors">
             <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0">
                     <p class="truncate font-medium text-white">${escapeHtml(pageState.file.name)}</p>
-                    <p class="text-gray-400 text-sm">${fileSize} • ${pageCount} page${pageCount !== 1 ? 's' : ''}</p>
+                    <p class="text-content-muted text-sm">${fileSize} • ${pageCount} page${pageCount !== 1 ? 's' : ''}</p>
                 </div>
                 <button id="remove-file" class="text-red-400 hover:text-red-300 p-2 flex-shrink-0 ml-2" title="Remove file">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -172,16 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-indigo-500');
+    dropZone.classList.add('border-palm-500');
   });
 
   dropZone?.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
   });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
     const file = e.dataTransfer?.files[0];
     if (file) handleFileUpload(file);
   });

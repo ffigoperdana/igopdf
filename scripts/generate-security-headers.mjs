@@ -1,9 +1,19 @@
 #!/usr/bin/env node
 import { writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { THEME_NOFLASH_JS } from './theme-noflash.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+
+// CSP hash for the inline no-flash theme <script> (see theme-noflash.mjs).
+// Lets that one specific inline script run while keeping the strict main CSP
+// (no 'unsafe-inline'). Adding a hash does NOT disable 'self', so the external
+// module bundles still load.
+const themeScriptHash = `'sha256-${createHash('sha256')
+  .update(THEME_NOFLASH_JS, 'utf8')
+  .digest('base64')}'`;
 
 function originOf(urlStr) {
   if (!urlStr) return null;
@@ -20,20 +30,17 @@ function uniq(values) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
-const DEFAULT_WASM_ORIGINS = {
-  pymupdf: 'https://cdn.jsdelivr.net',
-  gs: 'https://cdn.jsdelivr.net',
-  cpdf: 'https://cdn.jsdelivr.net',
-};
 const DEFAULT_CORS_PROXY_ORIGIN =
   'https://bentopdf-cors-proxy.bentopdf.workers.dev';
 const DEFAULT_OCR_FONT_CDN_ORIGIN = 'https://rawcdn.githack.com';
 
-const wasmOrigins = [
-  originOf(process.env.VITE_WASM_PYMUPDF_URL) || DEFAULT_WASM_ORIGINS.pymupdf,
-  originOf(process.env.VITE_WASM_GS_URL) || DEFAULT_WASM_ORIGINS.gs,
-  originOf(process.env.VITE_WASM_CPDF_URL) || DEFAULT_WASM_ORIGINS.cpdf,
-];
+// WASM modules are self-hosted (same-origin) by default — see wasm-provider.ts.
+// Only widen the CSP when an external CDN is explicitly configured via env.
+const wasmOrigins = uniq([
+  originOf(process.env.VITE_WASM_PYMUPDF_URL),
+  originOf(process.env.VITE_WASM_GS_URL),
+  originOf(process.env.VITE_WASM_CPDF_URL),
+]);
 
 const tesseractOrigins = uniq([
   originOf(process.env.VITE_TESSERACT_WORKER_URL),
@@ -58,7 +65,7 @@ const fontOrigins = uniq([ocrFontOrigin].filter(Boolean));
 
 const directives = [
   `default-src 'self'`,
-  `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' blob: ${scriptOrigins.join(' ')}`.trim(),
+  `script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' blob: ${themeScriptHash} ${scriptOrigins.join(' ')}`.trim(),
   `worker-src 'self' blob:`,
   `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
   `img-src 'self' data: blob: https:`,

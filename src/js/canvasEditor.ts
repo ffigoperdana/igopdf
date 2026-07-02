@@ -226,7 +226,7 @@ export async function setupCanvasEditor(toolId: string) {
   const prevButton = document.createElement('button');
   prevButton.id = 'prev-page';
   prevButton.className =
-    'btn p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50';
+    'btn p-2 rounded-full bg-surface-muted hover:bg-surface-muted disabled:opacity-50';
   prevButton.innerHTML = '<i data-lucide="chevron-left"></i>';
 
   const pageInfo = document.createElement('span');
@@ -245,7 +245,7 @@ export async function setupCanvasEditor(toolId: string) {
   const nextButton = document.createElement('button');
   nextButton.id = 'next-page';
   nextButton.className =
-    'btn p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50';
+    'btn p-2 rounded-full bg-surface-muted hover:bg-surface-muted disabled:opacity-50';
   nextButton.innerHTML = '<i data-lucide="chevron-right"></i>';
 
   pageNav!.append(prevButton, pageInfo, nextButton);

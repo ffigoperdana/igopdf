@@ -30,17 +30,17 @@ const updateUI = () => {
     files.forEach((file, index) => {
       const fileDiv = document.createElement('div');
       fileDiv.className =
-        'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+        'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
       const infoContainer = document.createElement('div');
       infoContainer.className = 'flex items-center gap-2 overflow-hidden';
 
       const nameSpan = document.createElement('span');
-      nameSpan.className = 'truncate font-medium text-gray-200';
+      nameSpan.className = 'truncate font-medium text-content';
       nameSpan.textContent = file.name;
 
       const sizeSpan = document.createElement('span');
-      sizeSpan.className = 'flex-shrink-0 text-gray-400 text-xs';
+      sizeSpan.className = 'flex-shrink-0 text-content-muted text-xs';
       sizeSpan.textContent = `(${formatBytes(file.size)})`;
 
       infoContainer.append(nameSpan, sizeSpan);
@@ -202,17 +202,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       handleFileSelect(e.dataTransfer?.files ?? null);
     });
 

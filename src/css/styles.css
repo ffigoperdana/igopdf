@@ -5,6 +5,9 @@
 @import 'cropperjs/dist/cropper.css';
 @import 'tailwindcss';
 
+/* Enable `dark:` utilities driven by a `.dark` class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
   --color-deep-forest: #1F5630;
@@ -18,6 +21,53 @@
   --color-on-surface-variant: #414941;
   --color-outline-variant: #c0c9be;
   --color-outline: #717970;
+
+  /* Semantic surface/content tokens (theme-aware; dark values in .dark below).
+     Light defaults here — used by the shell + tool-page token migration. */
+  --color-surface: #f8faf4;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #eef0ea;
+  --color-surface-muted: #e5e7eb;
+  --color-content: #111827;
+  --color-content-muted: #4b5563;
+  --color-line: #d7dbd2;
+
+  /* Vibrant Palm — the single accent color, replacing the old indigo/purple.
+     palm-600 is the brand Vibrant Palm (#E67E22). The rest is a tuned ramp so
+     hover/focus/tint shades (palm-400..900) read well on the dark tool UI. */
+  --color-palm-50: #fdf4ec;
+  --color-palm-100: #fbe6d3;
+  --color-palm-200: #f6d0ac;
+  --color-palm-300: #f2bd88;
+  --color-palm-400: #f0a05a;
+  --color-palm-500: #ea8d3f;
+  --color-palm-600: #e67e22;
+  --color-palm-700: #c96812;
+  --color-palm-800: #a5530f;
+  --color-palm-900: #7d3f0c;
+}
+
+/* ── Dark theme (applied when <html class="dark">) ──────────────────────────
+   Values ≈ the app's previous hardcoded grays, so dark mode looks essentially
+   unchanged; LIGHT mode is the new addition. Brand colors (deep-forest,
+   vibrant-palm, palm-*) stay constant across themes. */
+.dark {
+  --color-surface: #0f172a;
+  --color-surface-raised: #1e293b;
+  --color-surface-sunken: #0b1220;
+  --color-surface-muted: #374151;
+  --color-content: #f1f5f9;
+  --color-content-muted: #94a3b8;
+  --color-line: #334155;
+
+  --color-background: #0f172a;
+  --color-on-background: #e2e8f0;
+  --color-on-surface: #e2e8f0;
+  --color-on-surface-variant: #94a3b8;
+  --color-paper-white: #1e293b;
+  --color-surface-gray: #0b1220;
+  --color-outline-variant: #334155;
+  --color-outline: #475569;
 }
 
 @layer base {
@@ -40,23 +90,38 @@ body {
 .tool-card {
   transition:
     transform 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
-  border: 1px solid #c0c9be;
-  background-color: #ffffff;
+    box-shadow 0.2s ease-in-out,
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+  border: 1px solid var(--color-line);
+  background-color: var(--color-surface-raised);
   padding: 1.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
+/* Dark: frosted translucent card, matching the navbar treatment. */
+.dark .tool-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
 .tool-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow:
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-color: #E67E22;
+  border-color: #e67e22;
+}
+
+.dark .tool-card:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: #e67e22;
 }
 
 .category-header {
@@ -72,7 +137,7 @@ body {
   cursor: pointer;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #191c19;
+  color: var(--color-vibrant-palm);
   text-align: left;
 }
 
@@ -80,12 +145,9 @@ body {
   margin-top: 0;
 }
 
-.category-header:hover {
-  color: #E67E22;
-}
-
+.category-header:hover,
 .category-header:hover .category-chevron {
-  color: #E67E22;
+  color: var(--color-content);
 }
 
 .category-tools {
@@ -171,25 +233,223 @@ body {
 
 /* Custom file input */
 input[type='file']::file-selector-button {
-  @apply bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg cursor-pointer hover:bg-indigo-700 transition-colors duration-200 mr-4;
+  @apply bg-palm-600 text-white font-semibold py-2 px-4 rounded-lg cursor-pointer hover:bg-palm-700 transition-colors duration-200 mr-4;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — subtle & theme-aware (no more green) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f2f4ee;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F5630;
-  border-radius: 4px;
+  background-color: var(--color-line);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #336941;
+  background-color: var(--color-content-muted);
+  background-clip: content-box;
+}
+
+/* Smooth theme switch — only active briefly while toggling (see theme.ts). */
+.theme-anim,
+.theme-anim *,
+.theme-anim *::before,
+.theme-anim *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease !important;
+}
+
+/* Content cards (About / Licensing / FAQ) — frosted in dark, like tool cards. */
+.panel {
+  border: 1px solid var(--color-line);
+  background-color: var(--color-surface-raised);
+  border-radius: 0.5rem;
+}
+
+.dark .panel {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Consistent side breathing room on wide screens: the default container hugs
+   the edges at exactly 2xl (~1536px), so cap it and add responsive padding.
+   Unlayered, so it overrides Tailwind's layered `.container` + `px-*`. */
+.container {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    padding-inline: 2rem;
+  }
+}
+
+/* Hide the browser-native password reveal/clear controls (Edge ::-ms-reveal /
+   ::-ms-clear) so only our own eye toggle shows — otherwise the password field
+   shows two eyes once you start typing. */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+  display: none;
+}
+
+/* Auth gate: guarded (navbar) pages ship <html class="auth-guard"> — baked in at
+   build time (vite.config.ts) — and stay blank (themed background, no visible
+   content) until main.ts confirms login and removes the class, or redirects to
+   /login. Without this the guarded page paints for a moment before the
+   client-side redirect (the "homepage flashes then bounces to login" bug). */
+html.auth-guard {
+  background-color: var(--color-background);
+}
+html.auth-guard body {
+  visibility: hidden;
+  /* Failsafe: if main.ts never runs (bundle blocked/errored) the class is never
+     removed — reveal anyway after 10s so the page can't stay blank forever.
+     Normal load removes the class in well under a second, so this never fires. */
+  animation: auth-guard-failsafe 0s linear 10s forwards;
+}
+@keyframes auth-guard-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+/* Reserve the box for lazy-rendered lucide icons: the <i data-lucide> placeholder
+   already carries size utilities (h-4 w-4 …) but is inline by default, so before
+   lucide swaps it for an <svg> it would collapse and shift layout (CLS). */
+i[data-lucide] {
+  display: inline-block;
+}
+
+/* ── Seamless cross-page (MPA) navigation via the View Transitions API ───────
+   Same-origin navigations cross-fade instead of hard-cutting; the navbar and
+   footer are named so the browser holds them in place (no flash/rebuild) while
+   the page body transitions. Non-supporting browsers just navigate normally. */
+@view-transition {
+  navigation: auto;
+}
+
+.igo-navbar {
+  view-transition-name: igo-navbar;
+}
+
+footer {
+  view-transition-name: igo-footer;
+}
+
+/* Sliding orange highlight BEHIND the active navbar item. The active item's
+   ::before carries `view-transition-name: nav-active`, so navigating to another
+   page makes the browser slide the pill from the old item to the new one
+   (only the visible copy renders, so desktop/mobile never collide). */
+.nav-item {
+  position: relative;
+  isolation: isolate;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.nav-item.block {
+  display: block;
+}
+
+.nav-item:hover {
+  color: var(--color-vibrant-palm);
+}
+
+.nav-item.is-active,
+.nav-item.is-active:hover {
+  color: #ffffff;
+}
+
+.nav-item.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-vibrant-palm);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 16px -4px rgba(230, 126, 34, 0.5);
+  view-transition-name: nav-active;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+}
+
+/* Hold the navbar & footer perfectly still across navigations. They carry a
+   view-transition-name (above), but we suppress the GROUP animation so they
+   swap instantly instead of cross-fading. Cross-fading a navbar whose
+   JS-hydrated controls (theme toggle, language pill, auth area) aren't yet
+   populated in the incoming snapshot is what produced the intermittent
+   flicker. The sliding active pill (nav-active) is a SEPARATE group and keeps
+   animating, so the highlight still glides between menu items. */
+::view-transition-group(igo-navbar),
+::view-transition-image-pair(igo-navbar),
+::view-transition-old(igo-navbar),
+::view-transition-new(igo-navbar),
+::view-transition-group(igo-footer),
+::view-transition-image-pair(igo-footer),
+::view-transition-old(igo-footer),
+::view-transition-new(igo-footer) {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Smooth open/close for <details> accordions (FAQ). Uses the modern
+   ::details-content pseudo + interpolate-size; degrades to instant elsewhere. */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 0.28s ease,
+      content-visibility 0.28s allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+  }
 }
 
 /* Style for drag-and-drop placeholder */
@@ -279,8 +539,8 @@ footer a {
 }
 
 .cta-button {
-  background-color: #4f46e5;
-  /* indigo-600 */
+  background-color: #e67e22;
+  /* palm-600 */
   color: white;
   font-weight: 600;
   padding: 12px 24px;
@@ -290,8 +550,8 @@ footer a {
 }
 
 .cta-button:hover {
-  background-color: #4338ca;
-  /* indigo-700 */
+  background-color: #c96812;
+  /* palm-700 */
 }
 
 .marker-text {
@@ -329,13 +589,13 @@ footer a {
   right: 0;
   bottom: 0;
   height: 6px;
-  background: linear-gradient(120deg, #6366f1, #8b5cf6);
+  background: linear-gradient(120deg, #ea8d3f, #c96812);
   z-index: -1;
 }
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(to right, transparent, #4d44f7, transparent);
+  background: linear-gradient(to right, transparent, #e67e22, transparent);
   /* Fades from transparent to indigo and back */
   margin: 2rem auto;
   /* my-16 */
@@ -350,8 +610,8 @@ footer a {
   /* py-3 px-8 */
   border-radius: 0.5rem;
   /* rounded-lg */
-  background-image: linear-gradient(to bottom, #6366f1, #4f46e5);
-  /* from-indigo-500 to-indigo-600 */
+  background-image: linear-gradient(to bottom, #ea8d3f, #e67e22);
+  /* from-palm-500 to-palm-600 */
   color: #ffffff;
   /* text-white */
   font-weight: 600;
@@ -363,8 +623,8 @@ footer a {
 
 .btn-gradient:hover {
   box-shadow:
-    0 10px 15px -3px rgba(79, 70, 229, 0.3),
-    0 4px 6px -4px rgba(79, 70, 229, 0.3);
+    0 10px 15px -3px rgba(230, 126, 34, 0.3),
+    0 4px 6px -4px rgba(230, 126, 34, 0.3);
 }
 
 .btn-gradient:focus {
@@ -372,8 +632,8 @@ footer a {
   outline-offset: 2px;
   box-shadow:
     0 0 0 2px #111827,
-    0 0 0 4px #818cf8;
-  /* focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-400 */
+    0 0 0 4px #f0a05a;
+  /* focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-palm-400 */
 }
 
 .btn-gradient:disabled {
@@ -390,8 +650,8 @@ footer a {
   /* h-16 */
   border: 5px solid #374151;
   /* border-gray-700 */
-  border-bottom-color: #4f46e5;
-  /* border-indigo-600 */
+  border-bottom-color: #e67e22;
+  /* border-palm-600 */
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;
@@ -420,9 +680,9 @@ footer a {
 
 /* Highlight for selected signature in the saved list */
 .saved-signature.selected {
-  border-color: #4f46e5;
-  /* indigo-600 */
-  box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+  border-color: #e67e22;
+  /* palm-600 */
+  box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
 }
 
 /* Cursor change when hovering over a placed signature */
@@ -447,8 +707,8 @@ footer a {
 }
 
 .faq-item.open .faq-question {
-  color: #818cf8;
-  /* indigo-400 */
+  color: #f0a05a;
+  /* palm-400 */
 }
 
 .faq-item.open .faq-icon {

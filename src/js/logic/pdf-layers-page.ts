@@ -64,17 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
       fileDisplayArea.innerHTML = '';
       const fileDiv = document.createElement('div');
       fileDiv.className =
-        'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+        'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
       const infoContainer = document.createElement('div');
       infoContainer.className = 'flex flex-col overflow-hidden';
 
       const nameSpan = document.createElement('div');
-      nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+      nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
       nameSpan.textContent = currentFile.name;
 
       const metaSpan = document.createElement('div');
-      metaSpan.className = 'text-xs text-gray-400';
+      metaSpan.className = 'text-xs text-content-muted';
       metaSpan.textContent = `${formatBytes(currentFile.size)} • ${t('common.loadingPageCount')}`;
 
       infoContainer.append(nameSpan, metaSpan);
@@ -465,17 +465,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       handleFileSelect(e.dataTransfer?.files ?? null);
     });
 

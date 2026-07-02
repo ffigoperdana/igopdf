@@ -2,18 +2,10 @@
   <div class="container mx-auto px-4">
     <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
       <div class="flex items-center gap-3">
-        <img
-          id="footer-logo"
-          src="{{baseUrl}}images/logo-igo.png"
-          alt="igo"
-          class="h-10 w-10 rounded border border-outline-variant bg-white object-contain p-1"
-        />
-        <div>
-          <p id="footer-brand" class="text-lg font-bold text-deep-forest">igo</p>
-          <p id="footer-copyright" class="text-sm text-on-surface-variant">
-            Internal PDF Workspace
-          </p>
-        </div>
+        <span class="inline-flex h-8 items-center text-content">{{> logo }}</span>
+        <p id="footer-copyright" class="text-sm text-on-surface-variant">
+          Internal PDF Workspace
+        </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-4 text-sm text-on-surface-variant">
@@ -24,7 +16,6 @@
         <a href="/about.html" class="hover:text-vibrant-palm" data-i18n="footer.aboutUs">Tentang</a>
         <a href="/privacy.html" class="hover:text-vibrant-palm" data-i18n="footer.privacyPolicy">Privasi</a>
         <a href="/licensing.html" class="hover:text-vibrant-palm" data-i18n="nav.licensing">Lisensi</a>
-        <!-- halo -->
       </div>
     </div>
   </div>

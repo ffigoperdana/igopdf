@@ -37,7 +37,7 @@ function createSection(title: string): {
   h3.textContent = title;
   const ul = document.createElement('ul');
   ul.className =
-    'space-y-3 text-sm bg-gray-900 p-4 rounded-lg border border-gray-700';
+    'space-y-3 text-sm bg-surface p-4 rounded-lg border border-line';
   wrapper.append(h3, ul);
   return { wrapper, ul };
 }
@@ -46,7 +46,7 @@ function createListItem(key: string, value: string): HTMLLIElement {
   const li = document.createElement('li');
   li.className = 'flex flex-col sm:flex-row';
   const strong = document.createElement('strong');
-  strong.className = 'w-40 flex-shrink-0 text-gray-400';
+  strong.className = 'w-40 flex-shrink-0 text-content-muted';
   strong.textContent = key;
   const div = document.createElement('div');
   div.className = 'flex-grow text-white break-all';
@@ -83,7 +83,7 @@ function createXmpListItem(
   li.className = 'flex flex-col sm:flex-row';
 
   const strong = document.createElement('strong');
-  strong.className = 'w-56 flex-shrink-0 text-gray-400';
+  strong.className = 'w-56 flex-shrink-0 text-content-muted';
   strong.textContent = key;
   strong.style.paddingLeft = `${indent * 1.2}rem`;
 
@@ -99,7 +99,7 @@ function createXmpHeaderItem(key: string, indent: number = 0): HTMLLIElement {
   const li = document.createElement('li');
   li.className = 'flex pt-2';
   const strong = document.createElement('strong');
-  strong.className = 'w-full flex-shrink-0 text-gray-300 font-medium';
+  strong.className = 'w-full flex-shrink-0 text-content-muted font-medium';
   strong.textContent = key;
   strong.style.paddingLeft = `${indent * 1.2}rem`;
   li.append(strong);
@@ -212,7 +212,7 @@ async function displayMetadata() {
         infoSection.ul.appendChild(createListItem(key, displayValue));
       }
     } else {
-      infoSection.ul.innerHTML = `<li><span class="text-gray-500 italic">- No Info Dictionary data found -</span></li>`;
+      infoSection.ul.innerHTML = `<li><span class="text-content-muted italic">- No Info Dictionary data found -</span></li>`;
     }
     metadataDisplay.appendChild(infoSection.wrapper);
 
@@ -227,7 +227,7 @@ async function displayMetadata() {
         fieldsSection.ul.appendChild(createListItem(fieldName, String(value)));
       }
     } else {
-      fieldsSection.ul.innerHTML = `<li><span class="text-gray-500 italic">- No interactive form fields found -</span></li>`;
+      fieldsSection.ul.innerHTML = `<li><span class="text-content-muted italic">- No interactive form fields found -</span></li>`;
     }
     metadataDisplay.appendChild(fieldsSection.wrapper);
 
@@ -248,18 +248,18 @@ async function displayMetadata() {
         }
 
         if (xmpSection.ul.children.length === 0) {
-          xmpSection.ul.innerHTML = `<li><span class="text-gray-500 italic">- No parseable XMP properties found -</span></li>`;
+          xmpSection.ul.innerHTML = `<li><span class="text-content-muted italic">- No parseable XMP properties found -</span></li>`;
         }
       } catch (xmlError) {
         console.error('Failed to parse XMP XML:', xmlError);
         xmpSection.ul.innerHTML = `<li><span class="text-red-500 italic">- Error parsing XMP XML. Displaying raw. -</span></li>`;
         const pre = document.createElement('pre');
-        pre.className = 'text-xs text-gray-300 whitespace-pre-wrap break-all';
+        pre.className = 'text-xs text-content-muted whitespace-pre-wrap break-all';
         pre.textContent = rawXmpString;
         xmpSection.ul.appendChild(pre);
       }
     } else {
-      xmpSection.ul.innerHTML = `<li><span class="text-gray-500 italic">- No XMP metadata found -</span></li>`;
+      xmpSection.ul.innerHTML = `<li><span class="text-content-muted italic">- No XMP metadata found -</span></li>`;
     }
     metadataDisplay.appendChild(xmpSection.wrapper);
 
@@ -287,17 +287,17 @@ async function updateUI() {
   if (pageState.file) {
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col overflow-hidden';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+    nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
     nameSpan.textContent = pageState.file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = `${formatBytes(pageState.file.size)}`;
 
     infoContainer.append(nameSpan, metaSpan);
@@ -366,17 +366,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropZone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const pdfFiles = Array.from(files).filter(function (f) {

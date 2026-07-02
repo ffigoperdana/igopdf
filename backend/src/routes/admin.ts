@@ -20,18 +20,34 @@ const router = Router();
 router.use(authMiddleware);
 router.use(requireAdmin);
 
-const createUserSchema = z.object({
-  username: z
-    .string()
-    .min(3)
-    .max(150)
-    .regex(
-      /^[a-zA-Z0-9._@-]+$/,
-      'Username can only contain letters, numbers, dots, underscores, hyphens, and @'
-    ),
-  password: z.string().min(8),
-  role: z.enum(['admin', 'user']),
-});
+const createUserSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3)
+      .max(150)
+      .regex(
+        /^[a-zA-Z0-9._@-]+$/,
+        'Username can only contain letters, numbers, dots, underscores, hyphens, and @'
+      ),
+    // Optional because LDAP-backed accounts (authSource: 'ldap') never store a
+    // local password — see the .refine() below, which still requires it for
+    // local accounts.
+    password: z.string().min(8).optional(),
+    role: z.enum(['admin', 'user']),
+    authSource: z.enum(['local', 'ldap']).optional().default('local'),
+  })
+  .refine((data) => data.authSource !== 'local' || Boolean(data.password), {
+    message: 'Password is required for local accounts',
+    path: ['password'],
+  })
+  .refine((data) => !(data.authSource === 'ldap' && data.role === 'admin'), {
+    // "Admin SELALU akun lokal": an LDAP-backed admin authenticates live
+    // against AD yet is invisible to this panel (listUsers is local-only), so
+    // it becomes an unmanageable "hidden admin". Disallow that combination.
+    message: 'Admin accounts must be local; LDAP users cannot be admins',
+    path: ['role'],
+  });
 
 const updateUserSchema = z.object({
   username: z
@@ -216,10 +232,10 @@ router.post('/users/:id/reset-password', async (req, res) => {
     const newPassword = validation.data.newPassword || generateRandomPassword();
     const result = await resetUserPassword(req.params.id, newPassword);
 
-    if (!result) {
-      res.status(404).json({
+    if (!result.success) {
+      res.status(result.error === 'User not found' ? 404 : 400).json({
         success: false,
-        error: 'User not found',
+        error: result.error || 'User not found',
       });
       return;
     }

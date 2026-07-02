@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -91,20 +92,20 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <div
       id="uploader"
-      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-gray-900"
+      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-surface"
     >
       <div
         id="tool-uploader"
-        class="bg-gray-800 rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools"
@@ -113,38 +114,38 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:fontToOutline.name"
         >
           Font to Outline
         </h1>
-        <p class="text-gray-400 mb-6" data-i18n="tools:fontToOutline.subtitle">
+        <p class="text-content-muted mb-6" data-i18n="tools:fontToOutline.subtitle">
           Convert all fonts to vector outlines for consistent rendering across
           all devices.
         </p>
 
         <div
           id="drop-zone"
-          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface hover:bg-surface-muted transition-colors duration-300"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="upload-cloud"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-400">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select files</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
             <p
-              class="text-xs text-gray-500"
+              class="text-xs text-content-muted"
               data-i18n="upload.hints.oneOrMorePdfs"
             >
               One or more PDF files
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -160,13 +161,13 @@
         <div id="file-controls" class="hidden mt-4 flex gap-3">
           <button
             id="add-more-btn"
-            class="btn bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
+            class="btn bg-palm-600 hover:bg-palm-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <i data-lucide="plus"></i> <span>Add More Files</span>
           </button>
           <button
             id="clear-files-btn"
-            class="btn bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
+            class="btn bg-surface-muted hover:bg-surface-muted text-content font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <i data-lucide="trash-2"></i> <span>Clear All</span>
           </button>
@@ -175,17 +176,17 @@
         <div id="file-display-area" class="mt-4 space-y-2"></div>
 
         <div id="tool-options" class="hidden mt-6">
-          <div class="p-4 bg-gray-900 rounded-lg border border-gray-700 mb-4">
-            <h3 class="text-sm font-semibold text-white mb-2">
+          <div class="p-4 bg-surface rounded-lg border border-line mb-4">
+            <h3 class="text-sm font-semibold text-content mb-2">
               What this tool does:
             </h3>
-            <ul class="text-xs text-gray-400 space-y-1 list-disc list-inside">
+            <ul class="text-xs text-content-muted space-y-1 list-disc list-inside">
               <li>Converts all text to vector paths/curves</li>
               <li>Eliminates font dependency issues</li>
               <li>Ensures consistent rendering across all devices</li>
               <li>Ideal for print-ready PDFs</li>
             </ul>
-            <p class="text-xs text-gray-500 mt-2">
+            <p class="text-xs text-content-muted mt-2">
               Note: Text will no longer be selectable or searchable after
               conversion.
             </p>
@@ -202,10 +203,10 @@
       class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
     >
       <div
-        class="bg-gray-800 p-8 rounded-lg flex flex-col items-center gap-4 border border-gray-700 shadow-xl"
+        class="bg-surface-raised p-8 rounded-lg flex flex-col items-center gap-4 border border-line shadow-xl"
       >
         <div class="solid-spinner"></div>
-        <p id="loader-text" class="text-white text-lg font-medium">
+        <p id="loader-text" class="text-content text-lg font-medium">
           Processing...
         </p>
       </div>
@@ -213,18 +214,18 @@
 
     <div
       id="alert-modal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden"
+      class="fixed inset-0 bg-surface bg-opacity-90 flex items-center justify-center z-50 hidden"
     >
       <div
-        class="bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full border border-gray-700"
+        class="bg-surface-raised rounded-lg shadow-xl p-6 max-w-sm w-full border border-line"
       >
-        <h3 id="alert-title" class="text-xl font-bold text-white mb-2">
+        <h3 id="alert-title" class="text-xl font-bold text-content mb-2">
           Alert
         </h3>
-        <p id="alert-message" class="text-gray-300 mb-6"></p>
+        <p id="alert-message" class="text-content-muted mb-6"></p>
         <button
           id="alert-ok"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          class="w-full bg-palm-600 hover:bg-palm-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           OK
         </button>
@@ -233,7 +234,7 @@
 
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -241,39 +242,39 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Upload PDF</h3>
-            <p class="text-gray-400">
+            <h3 class="text-lg font-semibold text-content mb-1">Upload PDF</h3>
+            <p class="text-content-muted">
               Select your PDF file with embedded fonts
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Convert</h3>
-            <p class="text-gray-400">
+            <h3 class="text-lg font-semibold text-content mb-1">Convert</h3>
+            <p class="text-content-muted">
               Ghostscript converts all fonts to vector paths
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Download</h3>
-            <p class="text-gray-400">Get your font-independent PDF instantly</p>
+            <h3 class="text-lg font-semibold text-content mb-1">Download</h3>
+            <p class="text-content-muted">Get your font-independent PDF instantly</p>
           </div>
         </div>
       </div>
@@ -281,106 +282,106 @@
 
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="flatten-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Flatten PDF</h3>
-          <p class="text-gray-400 text-sm">Make forms non-editable</p>
+          <h3 class="text-content font-semibold mb-1">Flatten PDF</h3>
+          <p class="text-content-muted text-sm">Make forms non-editable</p>
         </a>
         <a
           href="rasterize-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Rasterize PDF</h3>
-          <p class="text-gray-400 text-sm">Convert to image-based PDF</p>
+          <h3 class="text-content font-semibold mb-1">Rasterize PDF</h3>
+          <p class="text-content-muted text-sm">Convert to image-based PDF</p>
         </a>
         <a
           href="compress-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Compress PDF</h3>
-          <p class="text-gray-400 text-sm">Reduce PDF file size</p>
+          <h3 class="text-content font-semibold mb-1">Compress PDF</h3>
+          <p class="text-content-muted text-sm">Reduce PDF file size</p>
         </a>
         <a
           href="pdf-to-pdfa.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">PDF to PDF/A</h3>
-          <p class="text-gray-400 text-sm">Convert for archiving</p>
+          <h3 class="text-content font-semibold mb-1">PDF to PDF/A</h3>
+          <p class="text-content-muted text-sm">Convert for archiving</p>
         </a>
         <a
           href="repair-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Repair PDF</h3>
-          <p class="text-gray-400 text-sm">Fix corrupted PDF files</p>
+          <h3 class="text-content font-semibold mb-1">Repair PDF</h3>
+          <p class="text-content-muted text-sm">Fix corrupted PDF files</p>
         </a>
       </div>
     </section>
 
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
             What does "font to outline" mean?
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted">
             Converting fonts to outlines means transforming text characters from
             font-based representations into vector paths/curves. This ensures
             the PDF looks identical on any device, even if the original fonts
             aren't installed.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
             When should I use this tool?
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted">
             Use this tool when preparing PDFs for professional printing, sharing
             documents with special fonts, or when you need to ensure consistent
             appearance across different systems and devices.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
             Will the text still be selectable?
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted">
             No. After conversion, text becomes vector graphics and is no longer
             selectable or searchable. If you need searchable text, consider
             using the OCR tool after conversion.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
             Are my files private?
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted">
             Yes! All processing happens entirely in your browser using
             WebAssembly. Your files never leave your device.
           </p>

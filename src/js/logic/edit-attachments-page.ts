@@ -95,7 +95,7 @@ function displayAttachments(attachments: AttachmentInfo[]) {
 
   if (attachments.length === 0) {
     const noAttachments = document.createElement('p');
-    noAttachments.className = 'text-gray-400 text-center py-4';
+    noAttachments.className = 'text-content-muted text-center py-4';
     noAttachments.textContent = 'No attachments found in this PDF.';
     attachmentsList.appendChild(noAttachments);
     return;
@@ -126,7 +126,7 @@ function displayAttachments(attachments: AttachmentInfo[]) {
           element.classList.remove('opacity-50', 'line-through');
           const btn = element.querySelector('button');
           if (btn) {
-            btn.classList.remove('bg-gray-600');
+            btn.classList.remove('bg-surface-muted');
             btn.classList.add('bg-red-600');
           }
         }
@@ -142,7 +142,7 @@ function displayAttachments(attachments: AttachmentInfo[]) {
           element.classList.add('opacity-50', 'line-through');
           const btn = element.querySelector('button');
           if (btn) {
-            btn.classList.add('bg-gray-600');
+            btn.classList.add('bg-surface-muted');
             btn.classList.remove('bg-red-600');
           }
         }
@@ -158,7 +158,7 @@ function displayAttachments(attachments: AttachmentInfo[]) {
   for (const attachment of attachments) {
     const attachmentDiv = document.createElement('div');
     attachmentDiv.className =
-      'flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700';
+      'flex items-center justify-between p-3 bg-surface-raised rounded-lg border border-line';
     attachmentDiv.dataset.attachmentIndex = attachment.index.toString();
 
     const infoDiv = document.createElement('div');
@@ -169,7 +169,7 @@ function displayAttachments(attachments: AttachmentInfo[]) {
     nameSpan.textContent = attachment.name;
 
     const levelSpan = document.createElement('span');
-    levelSpan.className = 'text-gray-400 text-sm block';
+    levelSpan.className = 'text-content-muted text-sm block';
     if (attachment.page === 0) {
       levelSpan.textContent = 'Document-level attachment';
     } else {
@@ -182,19 +182,19 @@ function displayAttachments(attachments: AttachmentInfo[]) {
     actionsDiv.className = 'flex items-center gap-2';
 
     const removeBtn = document.createElement('button');
-    removeBtn.className = `${pageState.attachmentsToRemove.has(attachment.index) ? 'bg-gray-600' : 'bg-red-600'} hover:bg-red-700 text-white px-3 py-1 rounded text-sm`;
+    removeBtn.className = `${pageState.attachmentsToRemove.has(attachment.index) ? 'bg-surface-muted' : 'bg-red-600'} hover:bg-red-700 text-white px-3 py-1 rounded text-sm`;
     removeBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
     removeBtn.title = 'Remove attachment';
     removeBtn.onclick = function () {
       if (pageState.attachmentsToRemove.has(attachment.index)) {
         pageState.attachmentsToRemove.delete(attachment.index);
         attachmentDiv.classList.remove('opacity-50', 'line-through');
-        removeBtn.classList.remove('bg-gray-600');
+        removeBtn.classList.remove('bg-surface-muted');
         removeBtn.classList.add('bg-red-600');
       } else {
         pageState.attachmentsToRemove.add(attachment.index);
         attachmentDiv.classList.add('opacity-50', 'line-through');
-        removeBtn.classList.add('bg-gray-600');
+        removeBtn.classList.add('bg-surface-muted');
         removeBtn.classList.remove('bg-red-600');
       }
 
@@ -296,17 +296,17 @@ async function updateUI() {
   if (pageState.file) {
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col overflow-hidden';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+    nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
     nameSpan.textContent = pageState.file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = formatBytes(pageState.file.size);
 
     infoContainer.append(nameSpan, metaSpan);
@@ -365,17 +365,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropZone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const pdfFiles = Array.from(files).filter(function (f) {

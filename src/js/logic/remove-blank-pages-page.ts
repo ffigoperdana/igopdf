@@ -77,11 +77,11 @@ function updateFileDisplay() {
   const pageCount = pageState.pdfDoc.getPageCount();
 
   area.innerHTML = `
-        <div class="bg-gray-700 p-3 rounded-lg border border-gray-600 hover:border-indigo-500 transition-colors">
+        <div class="bg-surface-muted p-3 rounded-lg border border-line hover:border-palm-500 transition-colors">
             <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0">
                     <p class="truncate font-medium text-white">${escapeHtml(pageState.file.name)}</p>
-                    <p class="text-gray-400 text-sm">${fileSize} • ${pageCount} page${pageCount !== 1 ? 's' : ''}</p>
+                    <p class="text-content-muted text-sm">${fileSize} • ${pageCount} page${pageCount !== 1 ? 's' : ''}</p>
                 </div>
                 <button id="remove-file" class="text-red-400 hover:text-red-300 p-2 flex-shrink-0 ml-2" title="Remove file">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -242,14 +242,14 @@ function updatePreviewPanel() {
     const thumbnail = pageState.pageThumbnails.get(pageIndex) || '';
     const div = document.createElement('div');
     div.className =
-      'relative cursor-pointer flex flex-col items-center gap-1 p-2 border-2 border-red-500 rounded-lg bg-gray-700 transition-colors group';
+      'relative cursor-pointer flex flex-col items-center gap-1 p-2 border-2 border-red-500 rounded-lg bg-surface-muted transition-colors group';
     div.dataset.pageIndex = String(pageIndex);
     div.dataset.selected = 'true';
 
     div.innerHTML = `
             <div class="relative">
                 <img src="${thumbnail}" alt="Page ${pageIndex + 1}" class="rounded-md shadow-md max-w-full h-auto">
-                <div class="absolute top-1 left-1 bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-semibold shadow-lg z-10 pointer-events-none">
+                <div class="absolute top-1 left-1 bg-palm-600 text-white text-xs px-2 py-1 rounded-md font-semibold shadow-lg z-10 pointer-events-none">
                     ${pageIndex + 1}
                 </div>
                 <div class="absolute top-1 right-1 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center check-mark z-10">
@@ -272,12 +272,12 @@ function togglePageSelection(div: HTMLElement, pageIndex: number) {
   if (isSelected) {
     div.dataset.selected = 'false';
     div.classList.remove('border-red-500');
-    div.classList.add('border-gray-600', 'opacity-50');
+    div.classList.add('border-line', 'opacity-50');
     checkMark?.classList.add('hidden');
   } else {
     div.dataset.selected = 'true';
     div.classList.add('border-red-500');
-    div.classList.remove('border-gray-600', 'opacity-50');
+    div.classList.remove('border-line', 'opacity-50');
     checkMark?.classList.remove('hidden');
   }
 }
@@ -352,16 +352,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-indigo-500');
+    dropZone.classList.add('border-palm-500');
   });
 
   dropZone?.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
   });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-indigo-500');
+    dropZone.classList.remove('border-palm-500');
     const f = e.dataTransfer?.files[0];
     if (f) handleFileUpload(f);
   });

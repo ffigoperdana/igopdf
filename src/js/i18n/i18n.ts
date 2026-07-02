@@ -9,28 +9,15 @@ export const languageNames: Record<SupportedLanguage, string> = {
   en: 'English',
 };
 
-const LANGUAGE_PREFIX = /^\/(id|en)(?:\/|$)/;
-
+// NOTE: This deployment does not pre-generate per-language static pages
+// (that would require wiring scripts/generate-i18n-pages.mjs into the
+// Docker build, which also hardcodes upstream BentoPDF branding). So the
+// language is intentionally never encoded in the URL path — `changeLanguage`
+// below reloads the current page in place instead of navigating to a
+// /en/... or /id/... URL that wouldn't actually exist on disk. The function
+// name is kept for compatibility with existing callers even though it no
+// longer reads anything from the URL.
 export const getLanguageFromUrl = (): SupportedLanguage => {
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  let path = window.location.pathname;
-
-  if (basePath && basePath !== '/' && path.startsWith(basePath)) {
-    path = path.slice(basePath.length) || '/';
-  }
-
-  if (!path.startsWith('/')) {
-    path = '/' + path;
-  }
-
-  const langMatch = path.match(LANGUAGE_PREFIX);
-  if (
-    langMatch &&
-    supportedLanguages.includes(langMatch[1] as SupportedLanguage)
-  ) {
-    return langMatch[1] as SupportedLanguage;
-  }
-
   const storedLang = localStorage.getItem('i18nextLng');
   if (
     storedLang &&
@@ -94,42 +81,15 @@ export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18next.t(key, options);
 };
 
-export const changeLanguage = (lang: SupportedLanguage): void => {
-  if (!supportedLanguages.includes(lang)) return;
+export const changeLanguage = async (lang: SupportedLanguage): Promise<void> => {
+  if (!supportedLanguages.includes(lang) || lang === i18next.language) return;
   localStorage.setItem('i18nextLng', lang);
-
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  let relativePath = window.location.pathname;
-
-  if (basePath && basePath !== '/' && relativePath.startsWith(basePath)) {
-    relativePath = relativePath.slice(basePath.length) || '/';
-  }
-
-  if (!relativePath.startsWith('/')) {
-    relativePath = '/' + relativePath;
-  }
-
-  let pagePathWithoutLang = relativePath;
-  const langPrefixMatch = relativePath.match(/^\/(id|en)(\/.*)?$/);
-  if (langPrefixMatch) {
-    pagePathWithoutLang = langPrefixMatch[2] || '/';
-  }
-
-  if (!pagePathWithoutLang.startsWith('/')) {
-    pagePathWithoutLang = '/' + pagePathWithoutLang;
-  }
-
-  const newRelativePath =
-    lang === 'id' ? pagePathWithoutLang : `/${lang}${pagePathWithoutLang}`;
-
-  const newPath =
-    basePath && basePath !== '/'
-      ? `${basePath}${newRelativePath}`
-      : newRelativePath;
-
-  const newUrl =
-    newPath.replace(/\/+/g, '/') + window.location.search + window.location.hash;
-  window.location.href = newUrl;
+  // In-place switch (no reload → no white flash). i18next loads the target
+  // language's namespaces, then we re-run applyTranslations() over every
+  // [data-i18n] node and notify listeners (e.g. to refresh the ID|EN pill).
+  await i18next.changeLanguage(lang);
+  applyTranslations();
+  document.dispatchEvent(new CustomEvent('igo:languagechange', { detail: lang }));
 };
 
 export const applyTranslations = (): void => {
@@ -168,59 +128,10 @@ export const applyTranslations = (): void => {
 };
 
 export const rewriteLinks = (): void => {
-  const currentLang = getLanguageFromUrl();
-  if (currentLang === 'id') return;
-
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-  const links = document.querySelectorAll('a[href]');
-
-  links.forEach((link) => {
-    const href = link.getAttribute('href');
-    if (!href) return;
-
-    if (
-      href.startsWith('http') ||
-      href.startsWith('//') ||
-      href.startsWith('mailto:') ||
-      href.startsWith('tel:') ||
-      href.startsWith('#') ||
-      href.startsWith('javascript:') ||
-      href.startsWith('data:') ||
-      href.startsWith('vbscript:')
-    ) {
-      return;
-    }
-
-    if (href.includes('/assets/')) {
-      return;
-    }
-
-    const escapedBase = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const langPrefixRegex = new RegExp(`^(${escapedBase})?/?(id|en)(/|$)`);
-    if (langPrefixRegex.test(href)) {
-      return;
-    }
-
-    let newHref: string;
-    if (basePath && basePath !== '/' && href.startsWith(basePath)) {
-      const pathAfterBase = href.slice(basePath.length);
-      newHref = `${basePath}/${currentLang}${pathAfterBase}`;
-    } else if (href.startsWith('/')) {
-      newHref =
-        basePath && basePath !== '/'
-          ? `${basePath}/${currentLang}${href}`
-          : `/${currentLang}${href}`;
-    } else if (href === '' || href === 'index.html') {
-      newHref =
-        basePath && basePath !== '/'
-          ? `${basePath}/${currentLang}/`
-          : `/${currentLang}/`;
-    } else {
-      newHref = `/${currentLang}/${href}`;
-    }
-
-    link.setAttribute('href', newHref.replace(/([^:])\/+/g, '$1/'));
-  });
+  // No-op: URLs are never language-prefixed in this deployment (see
+  // changeLanguage() above), so internal links don't need rewriting.
+  // Kept as an exported no-op rather than removed so existing callers
+  // (main.ts) don't need to change.
 };
 
 export default i18next;

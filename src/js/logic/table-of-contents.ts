@@ -74,14 +74,14 @@ function renderFileDisplay(file: File) {
 
   const fileDiv = document.createElement('div');
   fileDiv.className =
-    'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+    'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
   const nameSpan = document.createElement('span');
-  nameSpan.className = 'truncate font-medium text-gray-200';
+  nameSpan.className = 'truncate font-medium text-content';
   nameSpan.textContent = file.name;
 
   const sizeSpan = document.createElement('span');
-  sizeSpan.className = 'flex-shrink-0 ml-4 text-gray-400';
+  sizeSpan.className = 'flex-shrink-0 ml-4 text-content-muted';
   sizeSpan.textContent = formatBytes(file.size);
 
   fileDiv.append(nameSpan, sizeSpan);

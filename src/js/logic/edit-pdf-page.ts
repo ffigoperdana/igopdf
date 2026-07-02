@@ -67,16 +67,16 @@ function initializePage() {
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('border-indigo-500');
+      dropZone.classList.add('border-palm-500');
     });
 
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('border-indigo-500');
+      dropZone.classList.remove('border-palm-500');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('border-indigo-500');
+      dropZone.classList.remove('border-palm-500');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         handleFiles(files);
@@ -260,18 +260,18 @@ function addFileEntries(fileDisplayArea: HTMLElement, files: File[]) {
     const file = files[i];
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
     fileDiv.setAttribute('data-pending-name', makeUniqueFileKey(i, file.name));
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col flex-1 min-w-0';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+    nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
     nameSpan.textContent = file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = formatBytes(file.size);
 
     infoContainer.append(nameSpan, metaSpan);

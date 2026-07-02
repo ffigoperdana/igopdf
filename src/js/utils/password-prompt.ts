@@ -28,38 +28,38 @@ function ensureSingleModal(): HTMLDivElement {
   modal.className =
     'fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden items-center justify-center p-4';
   modal.innerHTML = `
-    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl max-w-md w-full overflow-hidden">
+    <div class="bg-surface-raised rounded-xl border border-line shadow-2xl max-w-md w-full overflow-hidden">
       <div class="p-6">
         <div class="flex items-start gap-4 mb-4">
-          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-500/10 flex-shrink-0">
-            <i data-lucide="lock" class="w-6 h-6 text-indigo-400"></i>
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-palm-500/10 flex-shrink-0">
+            <i data-lucide="lock" class="w-6 h-6 text-palm-400"></i>
           </div>
           <div class="flex-1">
             <h3 id="password-modal-title" class="text-xl font-bold text-white mb-1">Password Required</h3>
-            <p id="password-modal-subtitle" class="text-gray-400 text-sm truncate"></p>
+            <p id="password-modal-subtitle" class="text-content-muted text-sm truncate"></p>
           </div>
         </div>
         <div class="mt-4">
           <div class="relative">
             <input type="password" id="password-modal-input"
-              class="w-full bg-gray-700 border border-gray-600 text-gray-200 rounded-lg px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="w-full bg-surface-muted border border-line text-content rounded-lg px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-palm-500 focus:border-transparent"
               placeholder="Enter password" autocomplete="off" />
             <button id="password-modal-toggle" type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200">
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content">
               <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
           </div>
           <p id="password-modal-error" class="text-xs text-red-400 mt-2 hidden"></p>
-          <p id="password-modal-progress" class="text-xs text-gray-400 mt-2 hidden"></p>
+          <p id="password-modal-progress" class="text-xs text-content-muted mt-2 hidden"></p>
         </div>
       </div>
-      <div class="flex gap-3 p-4 border-t border-gray-700">
+      <div class="flex gap-3 p-4 border-t border-line">
         <button id="password-modal-cancel"
-          class="flex-1 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
+          class="flex-1 px-4 py-2.5 bg-surface-muted hover:bg-surface-muted text-white rounded-lg font-medium transition-colors">
           Skip
         </button>
         <button id="password-modal-submit"
-          class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+          class="flex-1 px-4 py-2.5 bg-palm-600 hover:bg-palm-700 text-white rounded-lg font-medium transition-colors">
           Unlock
         </button>
       </div>
@@ -77,44 +77,44 @@ function ensureBatchModal(): HTMLDivElement {
   modal.className =
     'fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] hidden items-center justify-center p-4';
   modal.innerHTML = `
-    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="bg-surface-raised rounded-xl border border-line shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
       <div class="p-6 overflow-y-auto flex-1 min-h-0">
         <div class="flex items-start gap-4 mb-4">
-          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-500/10 flex-shrink-0">
-            <i data-lucide="lock" class="w-6 h-6 text-indigo-400"></i>
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-palm-500/10 flex-shrink-0">
+            <i data-lucide="lock" class="w-6 h-6 text-palm-400"></i>
           </div>
           <div class="flex-1">
             <h3 id="batch-modal-title" class="text-xl font-bold text-white mb-1"></h3>
-            <p class="text-gray-400 text-sm">Enter passwords for each encrypted file</p>
+            <p class="text-content-muted text-sm">Enter passwords for each encrypted file</p>
           </div>
         </div>
         <div class="flex items-center gap-2 mt-3 mb-3">
           <input type="checkbox" id="batch-modal-same-pw" checked
-            class="w-4 h-4 rounded bg-gray-700 border-gray-600 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer" />
-          <label for="batch-modal-same-pw" class="text-sm text-gray-300 cursor-pointer select-none">Use same password for all files</label>
+            class="w-4 h-4 rounded bg-surface-muted border-line text-palm-500 focus:ring-palm-500 focus:ring-offset-0 cursor-pointer" />
+          <label for="batch-modal-same-pw" class="text-sm text-content-muted cursor-pointer select-none">Use same password for all files</label>
         </div>
         <div id="batch-modal-shared" class="mb-3">
           <div class="relative">
             <input type="password" id="batch-modal-shared-input"
-              class="w-full bg-gray-700 border border-gray-600 text-gray-200 rounded-lg px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="w-full bg-surface-muted border border-line text-content rounded-lg px-4 py-2.5 pr-10 text-sm focus:ring-2 focus:ring-palm-500 focus:border-transparent"
               placeholder="Password for all files" autocomplete="off" />
             <button id="batch-modal-shared-toggle" type="button"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200">
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content">
               <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
         <div id="batch-modal-filelist" class="space-y-2 hidden"></div>
         <p id="batch-modal-error" class="text-xs text-red-400 mt-2 hidden"></p>
-        <p id="batch-modal-progress" class="text-xs text-gray-400 mt-2 hidden"></p>
+        <p id="batch-modal-progress" class="text-xs text-content-muted mt-2 hidden"></p>
       </div>
-      <div class="flex gap-3 p-4 border-t border-gray-700 flex-shrink-0">
+      <div class="flex gap-3 p-4 border-t border-line flex-shrink-0">
         <button id="batch-modal-cancel"
-          class="flex-1 px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
+          class="flex-1 px-4 py-2.5 bg-surface-muted hover:bg-surface-muted text-white rounded-lg font-medium transition-colors">
           Skip All
         </button>
         <button id="batch-modal-submit"
-          class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+          class="flex-1 px-4 py-2.5 bg-palm-600 hover:bg-palm-700 text-white rounded-lg font-medium transition-colors">
           Unlock All
         </button>
       </div>
@@ -461,14 +461,14 @@ export async function promptAndDecryptBatch(
   filelistEl.innerHTML = fileNames
     .map(
       (name, i) =>
-        `<div class="flex items-center gap-2 p-2 bg-gray-700/50 rounded-lg transition-all" data-file-idx="${i}">
-          <i data-lucide="file-lock" class="w-4 h-4 text-indigo-400 flex-shrink-0" data-icon-idx="${i}"></i>
-          <span class="text-sm text-gray-300 truncate flex-1" title="${esc(name)}">${esc(name)}</span>
+        `<div class="flex items-center gap-2 p-2 bg-surface-muted/50 rounded-lg transition-all" data-file-idx="${i}">
+          <i data-lucide="file-lock" class="w-4 h-4 text-palm-400 flex-shrink-0" data-icon-idx="${i}"></i>
+          <span class="text-sm text-content-muted truncate flex-1" title="${esc(name)}">${esc(name)}</span>
           <div class="flex items-center gap-1.5 flex-shrink-0">
             <input type="password" data-pw-idx="${i}" placeholder="Password"
-              class="w-32 bg-gray-600 border border-gray-500 text-gray-200 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-transparent" autocomplete="off" />
+              class="w-32 bg-surface-muted border border-line text-content rounded px-2 py-1 text-xs focus:ring-1 focus:ring-palm-500 focus:border-transparent" autocomplete="off" />
             <button type="button" data-skip-idx="${i}" title="Skip this file"
-              class="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-gray-600 transition-colors">
+              class="p-1 rounded text-content-muted hover:text-red-400 hover:bg-surface-muted transition-colors">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -555,7 +555,7 @@ export async function promptAndDecryptBatch(
       );
       if (iconEl) {
         iconEl.setAttribute('data-lucide', 'check-circle');
-        iconEl.classList.remove('text-indigo-400');
+        iconEl.classList.remove('text-palm-400');
         iconEl.classList.add('text-green-400');
       }
       createIcons({ icons });

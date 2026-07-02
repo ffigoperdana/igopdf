@@ -1,33 +1,35 @@
-<nav class="sticky top-0 z-30 border-b border-deep-forest/20 bg-deep-forest text-white shadow-sm">
+<nav
+  class="igo-navbar sticky top-0 z-30 border-b bg-deep-forest text-white border-white/10 shadow-sm dark:bg-surface-raised/80 dark:border-white/10 dark:backdrop-blur-xl"
+>
   <div class="container mx-auto px-4">
     <div class="flex h-16 items-center justify-between gap-4">
-      <a href="/index.html" class="flex items-center gap-3" aria-label="igo home">
-        <img
-          id="nav-logo"
-          src="{{baseUrl}}images/logo-igo.png"
-          alt="igo"
-          class="h-9 w-9 rounded bg-white object-contain p-1"
-        />
-        <span id="nav-brand" class="text-xl font-bold tracking-normal">igo</span>
+      <a
+        href="/index.html"
+        class="flex items-center text-white"
+        aria-label="igo home"
+      >
+        <span class="inline-flex h-8 items-center">{{> logo }}</span>
       </a>
 
-      <div class="hidden items-center gap-7 md:flex">
-        <a href="/index.html" class="text-sm font-medium text-white hover:text-vibrant-palm" data-i18n="nav.home">Beranda</a>
-        <a href="/about.html" class="text-sm font-medium text-white hover:text-vibrant-palm" data-i18n="nav.about">Tentang</a>
-        <a href="/licensing.html" class="text-sm font-medium text-white hover:text-vibrant-palm" data-i18n="nav.licensing">Lisensi</a>
+      <div class="hidden items-center gap-1 md:flex">
+        <a href="/index.html" class="nav-item" data-i18n="nav.home">Beranda</a>
+        <a href="/about.html" class="nav-item" data-i18n="nav.about">Tentang</a>
+        <a href="/licensing.html" class="nav-item" data-i18n="nav.licensing">Lisensi</a>
       </div>
 
-      <div class="hidden items-center gap-3 md:flex">
+      <div class="hidden items-center gap-2.5 md:flex">
         <div id="language-switcher-container"></div>
+        <div id="theme-toggle-container"></div>
         <div id="auth-area" class="flex items-center gap-3"></div>
       </div>
 
-      <div class="flex items-center gap-3 md:hidden">
+      <div class="flex items-center gap-1.5 md:hidden">
+        <div id="theme-toggle-container-mobile"></div>
         <div id="auth-area-mobile"></div>
         <button
           id="mobile-menu-button"
           type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded border border-white/20 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-vibrant-palm"
+          class="inline-flex h-10 w-10 items-center justify-center rounded border border-white/20 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-vibrant-palm"
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
@@ -43,11 +45,11 @@
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden border-t border-white/10 bg-deep-forest md:hidden">
+  <div id="mobile-menu" class="hidden border-t border-white/10 bg-deep-forest dark:bg-surface-raised dark:border-white/10 md:hidden">
     <div class="space-y-1 px-4 py-3">
-      <a href="/index.html" class="block px-3 py-2 text-white hover:text-vibrant-palm" data-i18n="nav.home">Beranda</a>
-      <a href="/about.html" class="block px-3 py-2 text-white hover:text-vibrant-palm" data-i18n="nav.about">Tentang</a>
-      <a href="/licensing.html" class="block px-3 py-2 text-white hover:text-vibrant-palm" data-i18n="nav.licensing">Lisensi</a>
+      <a href="/index.html" class="nav-item block" data-i18n="nav.home">Beranda</a>
+      <a href="/about.html" class="nav-item block" data-i18n="nav.about">Tentang</a>
+      <a href="/licensing.html" class="nav-item block" data-i18n="nav.licensing">Lisensi</a>
       <div class="px-3 py-2" id="mobile-language-switcher-container"></div>
       <div id="mobile-auth-menu" class="border-t border-white/10 pt-2"></div>
     </div>

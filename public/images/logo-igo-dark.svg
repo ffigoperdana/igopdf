@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="100%" height="100%">
+    <defs>
+        <style>
+            .bg { fill: #F4F6F9; }
+            .text-element { fill: #141619; }
+            .accent-fold { fill: #FF7A00; }
+            .doc-body { fill: #FFFFFF; }
+        </style>
+    </defs>
+
+    <g transform="translate(125, 55)">
+        <g>
+            <rect x="0" y="0" width="28" height="28" rx="6" fill="#FF7A00" />
+            <rect x="0" y="38" width="28" height="72" rx="0" class="text-element" />
+        </g>
+
+        <g transform="translate(42, -5)">
+            <path d="M 66,43
+                     L 66,104
+                     C 66,128 51,142 30,142
+                     C 12,142 3,132 2,118
+                     L 24,118
+                     C 25,124 28,126 31,126
+                     C 38,126 43,121 43,110
+                     L 43,103
+                     C 37,109 29,112 21,112
+                     C 6,112 -3,99 -3,78
+                     C -3,57 6,43 21,43
+                     C 29,43 37,46 43,52
+                     L 43,43
+                     Z
+                     M 43,78
+                     C 43,63 36,58 29,58
+                     C 21,58 16,63 16,78
+                     C 16,92 21,97 29,97
+                     C 36,97 43,92 43,78 Z"
+                  class="text-element" fill-rule="evenodd" />
+        </g>
+
+        <g transform="translate(120, 38)">
+            <path d="M 37,0
+                     C 57.43,0 74,16.57 74,37
+                     C 74,57.43 57.43,74 37,74
+                     C 16.57,74 0,57.43 0,37
+                     C 0,16.57 16.57,0 37,0 Z"
+                  class="text-element" />
+
+            <path d="M 23,17
+                     L 41,17
+                     L 41,27
+                     L 51,27
+                     L 51,55
+                     C 51,56.1 50.1,57 49,57
+                     L 25,57
+                     C 23.9,57 23,56.1 23,55
+                     L 23,17 Z"
+                  class="doc-body" />
+
+            <path d="M 41,17
+                     L 51,27
+                     L 41,27 Z"
+                  class="accent-fold" />
+        </g>
+    </g>
+</svg>

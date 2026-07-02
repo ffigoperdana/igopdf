@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -94,20 +95,20 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <div
       id="uploader"
-      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-gray-900"
+      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-surface"
     >
       <div
         id="tool-uploader"
-        class="bg-gray-800 rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools">
@@ -116,34 +117,34 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:addWatermark.name"
         >
           Add Watermark
         </h1>
-        <p class="text-gray-400 mb-6" data-i18n="tools:addWatermark.subtitle">
+        <p class="text-content-muted mb-6" data-i18n="tools:addWatermark.subtitle">
           Stamp text or an image over your PDF pages.
         </p>
 
         <div
           id="drop-zone"
-          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface hover:bg-surface-muted transition-colors duration-300"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="upload-cloud"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-400">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select a file</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.hints.pdfFile">
+            <p class="text-xs text-content-muted" data-i18n="upload.hints.pdfFile">
               PDF file
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -159,66 +160,66 @@
       </div>
     </div>
 
-    <div id="editor-panel" class="hidden bg-gray-900 px-2 sm:px-4 py-4 sm:py-8">
+    <div id="editor-panel" class="hidden bg-surface px-2 sm:px-4 py-4 sm:py-8">
       <div class="max-w-7xl mx-auto">
         <div
           class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 sm:justify-between mb-4 sm:mb-6"
         >
           <button
             id="editor-back-btn"
-            class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 font-semibold text-sm"
+            class="flex items-center gap-2 text-palm-400 hover:text-palm-300 font-semibold text-sm"
           >
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span>Change File</span>
           </button>
           <div
             id="editor-file-info"
-            class="text-xs sm:text-sm text-gray-400 truncate max-w-full sm:max-w-[60%]"
+            class="text-xs sm:text-sm text-content-muted truncate max-w-full sm:max-w-[60%]"
           ></div>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
           <div class="flex-1 min-w-0 flex flex-col">
             <div
-              class="bg-gray-800 rounded-xl border border-gray-700 p-2 sm:p-4 flex-1 flex flex-col"
+              class="bg-surface-raised rounded-xl border border-line p-2 sm:p-4 flex-1 flex flex-col"
             >
               <div class="flex items-center justify-between mb-2 sm:mb-3">
-                <span class="text-xs sm:text-sm font-medium text-gray-300"
+                <span class="text-xs sm:text-sm font-medium text-content-muted"
                   >Preview</span
                 >
                 <div class="flex items-center gap-2">
                   <button
                     id="prev-page-btn"
                     disabled
-                    class="p-1 rounded hover:bg-gray-700 text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    class="p-1 rounded hover:bg-surface-muted text-content-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
                   </button>
-                  <div class="flex items-center gap-1 text-xs text-gray-300">
+                  <div class="flex items-center gap-1 text-xs text-content-muted">
                     <input
                       id="page-num-input"
                       type="number"
                       min="1"
                       value="1"
-                      class="w-10 bg-gray-700 border border-gray-600 text-white rounded text-center text-xs py-0.5"
+                      class="w-10 bg-surface-muted border border-line text-content rounded text-center text-xs py-0.5"
                     />
                     <span>/ <span id="total-pages">1</span></span>
                   </div>
                   <button
                     id="next-page-btn"
                     disabled
-                    class="p-1 rounded hover:bg-gray-700 text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    class="p-1 rounded hover:bg-surface-muted text-content-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                   </button>
                 </div>
-                <span class="text-xs text-gray-500 hidden sm:inline"
+                <span class="text-xs text-content-muted hidden sm:inline"
                   >Drag watermark to position</span
                 >
               </div>
               <div
                 id="preview-wrapper"
-                class="flex-1 min-h-[200px] lg:min-h-0 flex items-center justify-center bg-gray-900 rounded-lg overflow-hidden"
+                class="flex-1 min-h-[200px] lg:min-h-0 flex items-center justify-center bg-surface rounded-lg overflow-hidden"
               >
                 <div
                   id="preview-container"
@@ -236,7 +237,7 @@
                     "
                   >
                     <div
-                      class="relative border border-dashed border-indigo-400/60 cursor-grab active:cursor-grabbing"
+                      class="relative border border-dashed border-palm-400/60 cursor-grab active:cursor-grabbing"
                     >
                       <div id="watermark-overlay" class="whitespace-nowrap">
                         CONFIDENTIAL
@@ -244,19 +245,19 @@
                       <img id="image-watermark-overlay" class="hidden" alt="" />
                       <div
                         data-handle="nw"
-                        class="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-indigo-500 rounded-sm cursor-nw-resize pointer-events-auto z-10"
+                        class="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-palm-500 rounded-sm cursor-nw-resize pointer-events-auto z-10"
                       ></div>
                       <div
                         data-handle="ne"
-                        class="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-indigo-500 rounded-sm cursor-ne-resize pointer-events-auto z-10"
+                        class="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-palm-500 rounded-sm cursor-ne-resize pointer-events-auto z-10"
                       ></div>
                       <div
                         data-handle="sw"
-                        class="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-indigo-500 rounded-sm cursor-sw-resize pointer-events-auto z-10"
+                        class="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-palm-500 rounded-sm cursor-sw-resize pointer-events-auto z-10"
                       ></div>
                       <div
                         data-handle="se"
-                        class="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-indigo-500 rounded-sm cursor-se-resize pointer-events-auto z-10"
+                        class="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-palm-500 rounded-sm cursor-se-resize pointer-events-auto z-10"
                       ></div>
                     </div>
                   </div>
@@ -267,35 +268,35 @@
 
           <div class="w-full lg:w-80 flex-shrink-0">
             <div
-              class="bg-gray-800 rounded-xl border border-gray-700 p-3 sm:p-5 space-y-3 sm:space-y-5"
+              class="bg-surface-raised rounded-xl border border-line p-3 sm:p-5 space-y-3 sm:space-y-5"
             >
               <div class="flex gap-2">
                 <button
                   id="type-text-btn"
-                  class="flex-1 py-2 px-3 text-sm font-medium rounded-lg bg-indigo-600 text-white transition-colors"
+                  class="flex-1 py-2 px-3 text-sm font-medium rounded-lg bg-palm-600 text-white transition-colors"
                 >
                   Text
                 </button>
                 <button
                   id="type-image-btn"
-                  class="flex-1 py-2 px-3 text-sm font-medium rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+                  class="flex-1 py-2 px-3 text-sm font-medium rounded-lg bg-surface-muted text-content-muted hover:bg-surface-muted transition-colors"
                 >
                   Image
                 </button>
               </div>
 
               <div
-                class="flex items-center gap-2 bg-gray-900 rounded-lg px-3 py-2"
+                class="flex items-center gap-2 bg-surface rounded-lg px-3 py-2"
               >
                 <input
                   type="checkbox"
                   id="apply-all-pages"
                   checked
-                  class="w-4 h-4 accent-indigo-500 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                  class="w-4 h-4 accent-palm-500 bg-surface-muted border-line rounded focus:ring-palm-500"
                 />
                 <label
                   for="apply-all-pages"
-                  class="text-sm text-gray-300 cursor-pointer"
+                  class="text-sm text-content-muted cursor-pointer"
                   data-i18n="tools:addWatermark.applyToAllPages"
                   >Apply to all pages</label
                 >
@@ -304,7 +305,7 @@
               <div id="page-range-section" class="space-y-1.5">
                 <label
                   for="page-range-input"
-                  class="block text-sm font-medium text-gray-300"
+                  class="block text-sm font-medium text-content-muted"
                   >Page Range</label
                 >
                 <input
@@ -312,9 +313,9 @@
                   id="page-range-input"
                   value="all"
                   placeholder="all  or  1-3, 5, 7-9"
-                  class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 text-sm placeholder-gray-500"
+                  class="w-full bg-surface-muted border border-line text-content rounded-lg p-2.5 text-sm placeholder-content-muted"
                 />
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-content-muted">
                   Use "all" or specify pages, e.g. 1-3, 5, 7-9
                 </p>
               </div>
@@ -324,21 +325,21 @@
                   <div>
                     <label
                       for="watermark-text"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                       >Text</label
                     >
                     <input
                       type="text"
                       id="watermark-text"
                       placeholder="CONFIDENTIAL"
-                      class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 text-sm"
+                      class="w-full bg-surface-muted border border-line text-content rounded-lg p-2.5 text-sm"
                     />
                   </div>
                   <div class="grid grid-cols-2 gap-3">
                     <div>
                       <label
                         for="font-size"
-                        class="block mb-1.5 text-sm font-medium text-gray-300"
+                        class="block mb-1.5 text-sm font-medium text-content-muted"
                         >Font Size</label
                       >
                       <input
@@ -347,13 +348,13 @@
                         value="72"
                         min="10"
                         max="200"
-                        class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 text-sm"
+                        class="w-full bg-surface-muted border border-line text-content rounded-lg p-2.5 text-sm"
                       />
                     </div>
                     <div>
                       <label
                         for="text-color"
-                        class="block mb-1.5 text-sm font-medium text-gray-300"
+                        class="block mb-1.5 text-sm font-medium text-content-muted"
                         >Color</label
                       >
                       <input
@@ -367,7 +368,7 @@
                   <div>
                     <label
                       for="opacity-text"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                     >
                       Opacity: <span id="opacity-value-text">0.3</span>
                     </label>
@@ -378,13 +379,13 @@
                       max="1"
                       step="0.05"
                       value="0.3"
-                      class="w-full h-2 bg-gray-700 rounded-lg cursor-pointer accent-indigo-500"
+                      class="w-full h-2 bg-surface-muted rounded-lg cursor-pointer accent-palm-500"
                     />
                   </div>
                   <div>
                     <label
                       for="angle-text"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                     >
                       Angle: <span id="angle-value-text">-45</span>&deg;
                     </label>
@@ -395,7 +396,7 @@
                       max="90"
                       step="1"
                       value="-45"
-                      class="w-full h-2 bg-gray-700 rounded-lg cursor-pointer accent-indigo-500"
+                      class="w-full h-2 bg-surface-muted rounded-lg cursor-pointer accent-palm-500"
                     />
                   </div>
                 </div>
@@ -406,20 +407,20 @@
                   <div>
                     <label
                       for="image-watermark-input"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                       >Watermark Image</label
                     >
                     <input
                       type="file"
                       id="image-watermark-input"
                       accept="image/png, image/jpeg"
-                      class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+                      class="w-full bg-surface-muted border border-line text-white rounded-lg p-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-palm-600 file:text-white hover:file:bg-palm-700"
                     />
                   </div>
                   <div>
                     <label
                       for="image-scale"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                     >
                       Scale: <span id="image-scale-value">100</span>%
                     </label>
@@ -430,13 +431,13 @@
                       max="200"
                       step="5"
                       value="100"
-                      class="w-full h-2 bg-gray-700 rounded-lg cursor-pointer accent-indigo-500"
+                      class="w-full h-2 bg-surface-muted rounded-lg cursor-pointer accent-palm-500"
                     />
                   </div>
                   <div>
                     <label
                       for="opacity-image"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                     >
                       Opacity: <span id="opacity-value-image">0.3</span>
                     </label>
@@ -447,13 +448,13 @@
                       max="1"
                       step="0.05"
                       value="0.3"
-                      class="w-full h-2 bg-gray-700 rounded-lg cursor-pointer accent-indigo-500"
+                      class="w-full h-2 bg-surface-muted rounded-lg cursor-pointer accent-palm-500"
                     />
                   </div>
                   <div>
                     <label
                       for="angle-image"
-                      class="block mb-1.5 text-sm font-medium text-gray-300"
+                      class="block mb-1.5 text-sm font-medium text-content-muted"
                     >
                       Angle: <span id="angle-value-image">0</span>&deg;
                     </label>
@@ -464,87 +465,87 @@
                       max="90"
                       step="1"
                       value="0"
-                      class="w-full h-2 bg-gray-700 rounded-lg cursor-pointer accent-indigo-500"
+                      class="w-full h-2 bg-surface-muted rounded-lg cursor-pointer accent-palm-500"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label class="block mb-1.5 text-sm font-medium text-gray-300"
+                <label class="block mb-1.5 text-sm font-medium text-content-muted"
                   >Position</label
                 >
                 <div class="grid grid-cols-3 gap-1.5">
                   <button
                     data-pos="0.15,0.15"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Top Left
                   </button>
                   <button
                     data-pos="0.5,0.15"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Top
                   </button>
                   <button
                     data-pos="0.85,0.15"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Top Right
                   </button>
                   <button
                     data-pos="0.15,0.5"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Left
                   </button>
                   <button
                     data-pos="0.5,0.5"
-                    class="pos-preset-btn py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-palm-600 hover:bg-palm-500 text-white rounded-md transition-colors"
                   >
                     Center
                   </button>
                   <button
                     data-pos="0.85,0.5"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Right
                   </button>
                   <button
                     data-pos="0.15,0.85"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Bottom Left
                   </button>
                   <button
                     data-pos="0.5,0.85"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Bottom
                   </button>
                   <button
                     data-pos="0.85,0.85"
-                    class="pos-preset-btn py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    class="pos-preset-btn py-1.5 text-xs bg-surface-muted hover:bg-surface-muted text-content-muted rounded-md transition-colors"
                   >
                     Bottom Right
                   </button>
                 </div>
               </div>
 
-              <div class="flex items-start gap-3 bg-gray-900 rounded-lg p-3">
+              <div class="flex items-start gap-3 bg-surface rounded-lg p-3">
                 <input
                   type="checkbox"
                   id="flatten-watermark"
-                  class="mt-0.5 w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
+                  class="mt-0.5 w-4 h-4 text-palm-600 bg-surface-muted border-line rounded focus:ring-palm-500"
                 />
                 <div>
                   <label
                     for="flatten-watermark"
-                    class="text-sm font-medium text-gray-300 cursor-pointer"
+                    class="text-sm font-medium text-content-muted cursor-pointer"
                     >Flatten watermark</label
                   >
-                  <p class="text-xs text-gray-500 mt-0.5">
+                  <p class="text-xs text-content-muted mt-0.5">
                     Bakes the watermark into page pixels, making it
                     tamper-resistant. Text will no longer be selectable.
                   </p>
@@ -565,12 +566,12 @@
       class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
     >
       <div
-        class="bg-gray-800 p-8 rounded-lg flex flex-col items-center gap-4 border border-gray-700 shadow-xl"
+        class="bg-surface-raised p-8 rounded-lg flex flex-col items-center gap-4 border border-line shadow-xl"
       >
         <div class="solid-spinner"></div>
         <p
           id="loader-text"
-          class="text-white text-lg font-medium"
+          class="text-content text-lg font-medium"
           data-i18n="loader.processing"
           data-i18n="loader.processing"
         >
@@ -581,23 +582,23 @@
 
     <div
       id="alert-modal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden"
+      class="fixed inset-0 bg-surface bg-opacity-90 flex items-center justify-center z-50 hidden"
     >
       <div
-        class="bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full border border-gray-700"
+        class="bg-surface-raised rounded-lg shadow-xl p-6 max-w-sm w-full border border-line"
       >
         <h3
           id="alert-title"
-          class="text-xl font-bold text-white mb-2"
+          class="text-xl font-bold text-content mb-2"
           data-i18n="alert.title"
           data-i18n="alert.title"
         >
           Alert
         </h3>
-        <p id="alert-message" class="text-gray-300 mb-6"></p>
+        <p id="alert-message" class="text-content-muted mb-6"></p>
         <button
           id="alert-ok"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          class="w-full bg-palm-600 hover:bg-palm-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           OK
         </button>
@@ -605,9 +606,9 @@
     </div>
 
     <!-- How It Works Section -->
-    <section class="max-w-4xl mx-auto px-4 py-12">
+    <section class="max-w-2xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -615,39 +616,39 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Upload File</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:addWatermark.howItWorks.step1Title">Upload File</h3>
+            <p class="text-content-muted" data-i18n="tools:addWatermark.howItWorks.step1Desc">
               Click or drag and drop your file to begin
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Process</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step2">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:addWatermark.howItWorks.step2Title">Process</h3>
+            <p class="text-content-muted" data-i18n="tools:addWatermark.howItWorks.step2Desc">
               Click the process button to start
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">Download</h3>
-            <p class="text-gray-400" data-i18n="howItWorks.step3">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:addWatermark.howItWorks.step3Title">Download</h3>
+            <p class="text-content-muted" data-i18n="tools:addWatermark.howItWorks.step3Desc">
               Save your processed file instantly
             </p>
           </div>
@@ -658,46 +659,46 @@
     <!-- Related Tools Section -->
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="merge-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Merge Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online merge pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:addWatermark.relatedTools.card1Name">Merge Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:addWatermark.relatedTools.card1Desc">Free online merge pdf tool</p>
         </a>
         <a
           href="compress-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Compress Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online compress pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:addWatermark.relatedTools.card2Name">Compress Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:addWatermark.relatedTools.card2Desc">Free online compress pdf tool</p>
         </a>
         <a
           href="split-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Split Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online split pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:addWatermark.relatedTools.card3Name">Split Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:addWatermark.relatedTools.card3Desc">Free online split pdf tool</p>
         </a>
         <a
           href="edit-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Edit Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online edit pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:addWatermark.relatedTools.card4Name">Edit Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:addWatermark.relatedTools.card4Desc">Free online edit pdf tool</p>
         </a>
         <a
           href="rotate-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Rotate Pdf</h3>
-          <p class="text-gray-400 text-sm">Free online rotate pdf tool</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:addWatermark.relatedTools.card5Name">Rotate Pdf</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:addWatermark.relatedTools.card5Desc">Free online rotate pdf tool</p>
         </a>
       </div>
     </section>
@@ -705,44 +706,44 @@
     <!-- FAQ Section -->
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is add watermark really free?
+            <span data-i18n="tools:addWatermark.faq.q1">Is add watermark really free?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:addWatermark.faq.a1">
             Yes! igo is 100% free with no hidden fees, no signup required,
             and unlimited file processing.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Are my files private and secure?
+            <span data-i18n="tools:addWatermark.faq.q2">Are my files private and secure?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:addWatermark.faq.a2">
             Absolutely! All processing happens in your browser. Your files never
             leave your device, ensuring complete privacy.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is there a file size limit?
+            <span data-i18n="tools:addWatermark.faq.q3">Is there a file size limit?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:addWatermark.faq.a3">
             No! Process files of any size, as many times as you want, completely
             free.
           </p>

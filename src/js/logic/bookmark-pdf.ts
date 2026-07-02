@@ -232,17 +232,17 @@ function showInputModal(
         if (field.type === 'text') {
           return `
   <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-2">${escapeHTML(field.label)}</label>
+    <label class="block text-sm font-medium text-content mb-2">${escapeHTML(field.label)}</label>
       <input type="text" id="modal-${field.name}" value="${escapeHTML(String(defaultValues[field.name] || ''))}"
-class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900"
+class="w-full px-3 py-2 border border-line rounded-lg text-content"
 placeholder="${escapeHTML(field.placeholder || '')}" />
   </div>
     `;
         } else if (field.type === 'select') {
           return `
   <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-2">${escapeHTML(field.label)}</label>
-      <select id="modal-${field.name}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900">
+    <label class="block text-sm font-medium text-content mb-2">${escapeHTML(field.label)}</label>
+      <select id="modal-${field.name}" class="w-full px-3 py-2 border border-line rounded-lg text-content">
         ${field.options
           .map(
             (opt) => `
@@ -261,24 +261,24 @@ placeholder="${escapeHTML(field.placeholder || '')}" />
             defaultValues.destX !== null && defaultValues.destX !== undefined;
           return `
   <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-2">${escapeHTML(field.label)}</label>
-      <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+    <label class="block text-sm font-medium text-content mb-2">${escapeHTML(field.label)}</label>
+      <div class="p-3 bg-surface rounded-lg border border-line space-y-2">
         <div class="flex items-center gap-2">
           <label class="flex items-center gap-1 text-xs">
             <input type="checkbox" id="modal-use-destination" class="w-4 h-4" ${hasDestination ? 'checked' : ''}>
-              <span class="text-gray-700">Set custom destination</span>
+              <span class="text-content">Set custom destination</span>
                 </label>
                 </div>
                 <div id="destination-controls" class="${hasDestination ? '' : 'hidden'} space-y-2">
                   <div class="grid grid-cols-2 gap-2">
                     <div>
-                    <label class="text-xs text-gray-600">Page</label>
+                    <label class="text-xs text-content-muted">Page</label>
                       <input type="number" id="modal-dest-page" min="1" max="${field.maxPages || 1}" value="${defaultValues.destPage || field.page || 1}"
-class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" step="1" />
+class="w-full px-2 py-1 border border-line rounded text-sm text-content" step="1" />
   </div>
   <div>
-  <label class="text-xs text-gray-600">Zoom(%)</label>
-    <select id="modal-dest-zoom" class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900">
+  <label class="text-xs text-content-muted">Zoom(%)</label>
+    <select id="modal-dest-zoom" class="w-full px-2 py-1 border border-line rounded text-sm text-content">
       <option value="">Inherit</option>
         <option value="0">Fit Page</option>
           <option value="50">50%</option>
@@ -292,20 +292,20 @@ class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" st
                       </div>
                       <div class="grid grid-cols-2 gap-2">
                         <div>
-                        <label class="text-xs text-gray-600">X Position</label>
+                        <label class="text-xs text-content-muted">X Position</label>
                           <input type="number" id="modal-dest-x" value="0" step="10"
-class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" />
+class="w-full px-2 py-1 border border-line rounded text-sm text-content" />
   </div>
   <div>
-  <label class="text-xs text-gray-600">Y Position</label>
+  <label class="text-xs text-content-muted">Y Position</label>
     <input type="number" id="modal-dest-y" value="0" step="10"
-class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" />
+class="w-full px-2 py-1 border border-line rounded text-sm text-content" />
   </div>
   </div>
   <button id="modal-pick-destination" class="w-full px-3 py-2 btn-gradient text-white rounded text-xs !flex items-center justify-center gap-1">
     <i data-lucide="crosshair" class="w-3 h-3"></i> Click on PDF to Pick Location
       </button>
-      <p class="text-xs text-gray-500 italic">Click the button above, then click on the PDF where you want the bookmark to jump to</p>
+      <p class="text-xs text-content-muted italic">Click the button above, then click on the PDF where you want the bookmark to jump to</p>
         </div>
         </div>
         </div>
@@ -313,8 +313,8 @@ class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" />
         } else if (field.type === 'preview') {
           return `
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">${escapeHTML(field.label)}</label>
-            <div id="modal-preview" class="style-preview bg-gray-50">
+          <label class="block text-sm font-medium text-content mb-2">${escapeHTML(field.label)}</label>
+            <div id="modal-preview" class="style-preview bg-surface">
               <span id="preview-text" style="font-size: 16px;">Preview Text</span>
                 </div>
                 </div>
@@ -326,12 +326,12 @@ class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-gray-900" />
 
     modal.innerHTML = `
                 <div class="p-6">
-                  <h3 class="text-xl font-bold text-gray-800 mb-4">${escapeHTML(title)}</h3>
+                  <h3 class="text-xl font-bold text-content mb-4">${escapeHTML(title)}</h3>
                     <div class="mb-6">
                       ${fieldsHTML}
 </div>
   <div class="flex gap-2 justify-end">
-    <button id="modal-cancel" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700">Cancel</button>
+    <button id="modal-cancel" class="px-4 py-2 rounded-lg bg-surface-muted hover:bg-gray-300 text-content">Cancel</button>
       <button id="modal-confirm" class="px-4 py-2 rounded btn-gradient text-white">Confirm</button>
         </div>
         </div>
@@ -829,10 +829,10 @@ function showConfirmModal(message: string): Promise<boolean> {
 
     modal.innerHTML = `
   <div class="p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Confirm Action</h3>
-      <p class="text-gray-600 mb-6">${escapeHTML(message)}</p>
+    <h3 class="text-xl font-bold text-content mb-4">Confirm Action</h3>
+      <p class="text-content-muted mb-6">${escapeHTML(message)}</p>
         <div class="flex gap-2 justify-end">
-          <button id="modal-cancel" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700">Cancel</button>
+          <button id="modal-cancel" class="px-4 py-2 rounded-lg bg-surface-muted hover:bg-gray-300 text-content">Cancel</button>
             <button id="modal-confirm" class="px-4 py-2 rounded btn-gradient text-white">Confirm</button>
               </div>
               </div>
@@ -882,8 +882,8 @@ function showAlertModal(title: string, message: string): Promise<boolean> {
 
     modal.innerHTML = `
               <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">${escapeHTML(title)}</h3>
-                  <p class="text-gray-600 mb-6">${escapeHTML(message)}</p>
+                <h3 class="text-xl font-bold text-content mb-4">${escapeHTML(title)}</h3>
+                  <p class="text-content-muted mb-6">${escapeHTML(message)}</p>
                     <div class="flex justify-end">
                       <button id="modal-ok" class="px-4 py-2 rounded btn-gradient text-white">OK</button>
                         </div>
@@ -916,10 +916,10 @@ function handleResize(): void {
   if (window.innerWidth >= 1024) {
     viewerSection?.classList.remove('hidden');
     bookmarksSection?.classList.remove('hidden');
-    showViewerBtn?.classList.remove('bg-indigo-600', 'text-white');
-    showViewerBtn?.classList.add('text-gray-300');
-    showBookmarksBtn?.classList.remove('bg-indigo-600', 'text-white');
-    showBookmarksBtn?.classList.add('text-gray-300');
+    showViewerBtn?.classList.remove('bg-palm-600', 'text-white');
+    showViewerBtn?.classList.add('text-content-muted');
+    showBookmarksBtn?.classList.remove('bg-palm-600', 'text-white');
+    showBookmarksBtn?.classList.add('text-content-muted');
   }
 }
 
@@ -928,19 +928,19 @@ window.addEventListener('resize', handleResize);
 showViewerBtn?.addEventListener('click', () => {
   viewerSection?.classList.remove('hidden');
   bookmarksSection?.classList.add('hidden');
-  showViewerBtn?.classList.add('bg-indigo-600', 'text-white');
-  showViewerBtn?.classList.remove('text-gray-300');
-  showBookmarksBtn?.classList.remove('bg-indigo-600', 'text-white');
-  showBookmarksBtn?.classList.add('text-gray-300');
+  showViewerBtn?.classList.add('bg-palm-600', 'text-white');
+  showViewerBtn?.classList.remove('text-content-muted');
+  showBookmarksBtn?.classList.remove('bg-palm-600', 'text-white');
+  showBookmarksBtn?.classList.add('text-content-muted');
 });
 
 showBookmarksBtn?.addEventListener('click', () => {
   viewerSection?.classList.add('hidden');
   bookmarksSection?.classList.remove('hidden');
-  showBookmarksBtn?.classList.add('bg-indigo-600', 'text-white');
-  showBookmarksBtn?.classList.remove('text-gray-300');
-  showViewerBtn?.classList.remove('bg-indigo-600', 'text-white');
-  showViewerBtn?.classList.add('text-gray-300');
+  showBookmarksBtn?.classList.add('bg-palm-600', 'text-white');
+  showBookmarksBtn?.classList.remove('text-content-muted');
+  showViewerBtn?.classList.remove('bg-palm-600', 'text-white');
+  showViewerBtn?.classList.add('text-content-muted');
 });
 
 importDropdownBtn?.addEventListener('click', (e: MouseEvent) => {
@@ -1058,10 +1058,10 @@ function resetToUploader(): void {
 
   viewerSection?.classList.remove('hidden');
   bookmarksSection?.classList.add('hidden');
-  showViewerBtn?.classList.add('bg-indigo-600', 'text-white');
-  showViewerBtn?.classList.remove('text-gray-300');
-  showBookmarksBtn?.classList.remove('bg-indigo-600', 'text-white');
-  showBookmarksBtn?.classList.add('text-gray-300');
+  showViewerBtn?.classList.add('bg-palm-600', 'text-white');
+  showViewerBtn?.classList.remove('text-content-muted');
+  showBookmarksBtn?.classList.remove('bg-palm-600', 'text-white');
+  showBookmarksBtn?.classList.add('text-content-muted');
 }
 
 document.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -1210,14 +1210,14 @@ function renderFileDisplay(file: File): void {
 
   const fileDiv = document.createElement('div');
   fileDiv.className =
-    'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+    'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
   const nameSpan = document.createElement('span');
-  nameSpan.className = 'truncate font-medium text-gray-200';
+  nameSpan.className = 'truncate font-medium text-content';
   nameSpan.textContent = file.name;
 
   const sizeSpan = document.createElement('span');
-  sizeSpan.className = 'flex-shrink-0 ml-4 text-gray-400';
+  sizeSpan.className = 'flex-shrink-0 ml-4 text-content-muted';
   sizeSpan.textContent = formatBytes(file.size);
 
   fileDiv.append(nameSpan, sizeSpan);
@@ -1578,13 +1578,13 @@ function getStyleClasses(style: BookmarkStyle): string {
 }
 
 function getTextColor(color: BookmarkColor | string): string {
-  if (!color) return 'text-gray-700';
+  if (!color) return 'text-content';
 
   if (typeof color === 'string' && color.startsWith('#')) {
     return '';
   }
 
-  return TEXT_COLOR_CLASSES[color] || 'text-gray-700';
+  return TEXT_COLOR_CLASSES[color] || 'text-content';
 }
 
 function renderBookmarkTree(): void {
@@ -1633,7 +1633,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
   const textColorClass = getTextColor(node.color);
 
   const div = document.createElement('div');
-  div.className = `flex items-center gap-2 p-2 rounded border border-gray-200 ${colorClass} ${highlight} ${isSelected ? 'ring-2 ring-blue-500' : ''} hover:bg-gray-50`;
+  div.className = `flex items-center gap-2 p-2 rounded border border-line ${colorClass} ${highlight} ${isSelected ? 'ring-2 ring-blue-500' : ''} hover:bg-surface`;
 
   if (batchMode) {
     const checkbox = document.createElement('input');
@@ -1661,7 +1661,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
   dragHandle.dataset.dragHandle = 'true';
   dragHandle.className = 'cursor-move flex-shrink-0';
   dragHandle.innerHTML =
-    '<i data-lucide="grip-vertical" class="w-4 h-4 text-gray-400"></i>';
+    '<i data-lucide="grip-vertical" class="w-4 h-4 text-content-muted"></i>';
   div.appendChild(dragHandle);
 
   if (hasChildren) {
@@ -1700,7 +1700,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
 
   titleDiv.innerHTML = `
                 <span class="text-sm block ${styleClass} ${textColorClass}" ${customColorStyle}>${escapeHTML(node.title)}${destinationIcon}</span>
-                <span class="text-xs text-gray-500">Page ${node.page}</span>
+                <span class="text-xs text-content-muted">Page ${node.page}</span>
             `;
 
   titleDiv.addEventListener('click', async () => {
@@ -1734,7 +1734,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
   actionsDiv.className = 'flex gap-1 flex-shrink-0';
 
   const addChildBtn = document.createElement('button');
-  addChildBtn.className = 'p-1 hover:bg-gray-200 rounded text-gray-700';
+  addChildBtn.className = 'p-1 hover:bg-surface-muted rounded text-content';
   addChildBtn.title = 'Add child';
   addChildBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i>';
   addChildBtn.addEventListener('click', async (e: MouseEvent) => {
@@ -1767,7 +1767,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
   actionsDiv.appendChild(addChildBtn);
 
   const editBtn = document.createElement('button');
-  editBtn.className = 'p-1 hover:bg-gray-200 rounded text-gray-700';
+  editBtn.className = 'p-1 hover:bg-surface-muted rounded text-content';
   editBtn.title = 'Edit';
   editBtn.innerHTML = '<i data-lucide="edit-2" class="w-4 h-4"></i>';
   editBtn.addEventListener('click', async (e: MouseEvent) => {
@@ -1845,7 +1845,7 @@ function createNodeElement(node: BookmarkNode, level = 0): HTMLLIElement {
   actionsDiv.appendChild(editBtn);
 
   const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'p-1 hover:bg-gray-200 rounded text-red-600';
+  deleteBtn.className = 'p-1 hover:bg-surface-muted rounded text-red-600';
   deleteBtn.title = 'Delete';
   deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
   deleteBtn.addEventListener('click', async (e: MouseEvent) => {

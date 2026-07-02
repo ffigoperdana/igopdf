@@ -1,94 +1,221 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - igo</title>
-    <meta name="description" content="Login igo - Internal PDF Tools Workspace" />
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
+    <title>Sign in - igo</title>
+    <meta name="description" content="Sign in to igo - Internal PDF Tools Workspace" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0f172a" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
     <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
     <link href="src/css/styles.css" rel="stylesheet" />
+    <style>
+      /* In an installed PWA, always show the clean single-column form (no hero). */
+      @media all and (display-mode: standalone) {
+        .login-hero {
+          display: none !important;
+        }
+        .login-shell {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
   </head>
-  <body class="bg-background min-h-screen flex items-center justify-center">
-    <div class="w-full max-w-md px-6">
-      <div class="bg-white rounded-lg shadow-lg p-8">
-        <div class="text-center mb-8">
-          <img src="images/logo-igo.png" alt="igo Logo" class="h-16 mx-auto mb-4" />
-          <h1 class="text-2xl font-bold text-ink-slate">igo</h1>
-          <p class="text-on-surface-variant mt-1">Internal PDF Workspace</p>
+  <body>
+    <div
+      class="login-shell grid min-h-screen bg-surface text-content lg:grid-cols-[1.05fr_0.95fr]"
+    >
+      <!-- Left hero: photo panel — always dark w/ white text, in both themes -->
+      <aside
+        class="login-hero relative hidden overflow-hidden p-12 text-white lg:flex lg:flex-col lg:justify-between"
+      >
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style="background-image: url('/images/login-bg.jpg')"
+          aria-hidden="true"
+        ></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-ink-slate/95 via-ink-slate/80 to-deep-forest/70"
+          aria-hidden="true"
+        ></div>
+
+        <div class="relative">
+          <span class="inline-flex h-14 items-center text-white">{{> logo }}</span>
         </div>
 
-        <form id="login-form" class="space-y-6">
-          <div>
-            <label for="username" class="block text-sm font-medium text-on-surface mb-2">Username atau email</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              required
-              minlength="3"
-              maxlength="150"
-              autocomplete="username"
-              class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
-              placeholder="Enter your username"
-            />
-          </div>
+        <div class="relative max-w-md">
+          <h1 class="text-5xl font-extrabold leading-tight tracking-tight">
+            Internal<br />Government<br />Operation
+          </h1>
+          <p class="mt-5 text-base leading-relaxed text-white/70">
+            Sign in with your company account to process and manage PDF
+            documents.
+          </p>
+        </div>
 
-          <div>
-            <label for="password" class="block text-sm font-medium text-on-surface mb-2">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              minlength="8"
-              autocomplete="current-password"
-              class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-on-surface mb-2">CAPTCHA</label>
-            <div class="flex items-center gap-4">
-              <div id="captcha-image" class="h-12 border border-outline-variant rounded bg-gray-100 flex items-center justify-center px-2"></div>
-              <button type="button" id="refresh-captcha" class="text-deep-forest hover:text-vibrant-palm text-sm font-medium">Refresh</button>
-            </div>
-            <input
-              type="text"
-              id="captcha-answer"
-              name="captcha-answer"
-              required
-              class="w-full px-4 py-3 mt-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-deep-forest focus:border-transparent text-on-surface"
-              placeholder="Masukkan jawaban CAPTCHA"
-            />
-            <input type="hidden" id="captcha-token" name="captcha-token" />
-          </div>
-
-          <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
-
-          <button
-            type="submit"
-            id="login-button"
-            class="w-full bg-deep-forest hover:bg-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+        <div class="relative flex flex-col gap-3 sm:flex-row">
+          <div
+            class="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
           >
-            Masuk
-          </button>
-        </form>
-
-        <div class="mt-6 text-center text-sm text-on-surface-variant">
-          <p>Hubungi administrator untuk akses akun.</p>
+            <svg class="h-6 w-6 text-vibrant-palm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z" />
+            </svg>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-white/50">Self-hosted</p>
+              <p class="text-sm font-semibold text-white">Company network</p>
+            </div>
+          </div>
+          <div
+            class="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
+          >
+            <svg class="h-6 w-6 text-vibrant-palm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4z" />
+            </svg>
+            <div>
+              <p class="text-xs uppercase tracking-wide text-white/50">Access</p>
+              <p class="text-sm font-semibold text-white">Approved users</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </aside>
 
-      <div class="mt-6 text-center text-xs text-on-surface-variant">
-        <p>igo Internal Workspace | Licensed under AGPL-3.0</p>
-      </div>
+      <!-- Right: sign-in form (theme-aware) -->
+      <main class="relative flex items-center justify-center px-6 py-12 sm:px-10">
+        <div id="theme-toggle-container" class="absolute right-4 top-4 z-10"></div>
+
+        <div class="w-full max-w-sm">
+          <!-- Compact logo for mobile (hero hidden there) -->
+          <div class="mb-8 lg:hidden">
+            <span class="inline-flex h-10 items-center text-content">{{> logo }}</span>
+          </div>
+
+          <h2 class="text-3xl font-bold tracking-tight">Sign in</h2>
+          <p class="mt-2 text-sm text-content-muted">
+            Use the account provided by your igo administrator.
+          </p>
+
+          <form id="login-form" class="mt-8 space-y-5">
+            <div>
+              <label for="username" class="mb-1.5 block text-sm font-semibold"
+                >Username <span class="text-vibrant-palm">*</span></label
+              >
+              <input
+                type="text"
+                id="username"
+                name="username"
+                required
+                minlength="3"
+                maxlength="150"
+                autocomplete="username"
+                class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
+                placeholder="your username"
+              />
+            </div>
+
+            <div>
+              <label for="password" class="mb-1.5 block text-sm font-semibold"
+                >Password <span class="text-vibrant-palm">*</span></label
+              >
+              <div class="relative">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  minlength="8"
+                  autocomplete="current-password"
+                  class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 pr-11 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  id="toggle-password"
+                  aria-label="Show password"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted hover:text-content"
+                >
+                  <svg id="eye-open" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  <svg id="eye-closed" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.6 10.6a3 3 0 004.2 4.2M9.9 4.2A10.9 10.9 0 0112 4c6.5 0 10 7 10 7a17.8 17.8 0 01-3.3 4.1M6.1 6.1A17.8 17.8 0 002 11s3.5 7 10 7a10.9 10.9 0 003.5-.6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-sm font-semibold"
+                >Verification code <span class="text-vibrant-palm">*</span></label
+              >
+              <div class="flex items-center gap-3">
+                <div
+                  id="captcha-image"
+                  class="flex h-12 w-[150px] items-center justify-center overflow-hidden rounded-lg border border-line bg-white"
+                ></div>
+                <button
+                  type="button"
+                  id="refresh-captcha"
+                  aria-label="Refresh code"
+                  class="rounded-lg border border-line p-2 text-content-muted transition hover:border-vibrant-palm hover:text-vibrant-palm"
+                >
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-2.64-6.36M21 3v6h-6" />
+                  </svg>
+                </button>
+                <input
+                  type="text"
+                  id="captcha-answer"
+                  name="captcha-answer"
+                  required
+                  autocomplete="off"
+                  class="min-w-0 flex-1 rounded-lg border border-line bg-surface-raised px-4 py-3 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
+                  placeholder="Code"
+                />
+                <input type="hidden" id="captcha-token" name="captcha-token" />
+              </div>
+            </div>
+
+            <div
+              id="error-message"
+              class="hidden rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300"
+            ></div>
+
+            <button
+              type="submit"
+              id="login-button"
+              class="w-full rounded-lg bg-vibrant-palm py-3 px-4 font-semibold text-white transition-colors duration-200 hover:bg-palm-700 focus:outline-none focus:ring-2 focus:ring-vibrant-palm/60 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-60"
+            >
+              Sign in
+            </button>
+          </form>
+
+          <p class="mt-8 text-center text-xs text-content-muted">
+            igo Internal Workspace · Licensed under AGPL-3.0
+          </p>
+        </div>
+
+        <a
+          href="/health"
+          class="absolute bottom-4 right-6 text-xs text-content-muted hover:text-content"
+          >Service status</a
+        >
+      </main>
     </div>
 
     <script type="module">
       import { login, getCaptcha } from './src/js/auth/session.js';
+      import { initTheme, createThemeToggle } from './src/js/theme.js';
+
+      initTheme();
+      const tc = document.getElementById('theme-toggle-container');
+      if (tc)
+        tc.appendChild(
+          createThemeToggle('text-content-muted hover:text-content hover:bg-content/5')
+        );
 
       let captchaToken = '';
 
@@ -101,33 +228,58 @@
         }
       }
 
-      document.getElementById('refresh-captcha').addEventListener('click', loadCaptcha);
+      document
+        .getElementById('refresh-captcha')
+        .addEventListener('click', loadCaptcha);
 
-      document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const captchaAnswer = document.getElementById('captcha-answer').value;
-        const errorDiv = document.getElementById('error-message');
-        const loginBtn = document.getElementById('login-button');
+      const pwInput = document.getElementById('password');
+      const eyeOpen = document.getElementById('eye-open');
+      const eyeClosed = document.getElementById('eye-closed');
+      document
+        .getElementById('toggle-password')
+        .addEventListener('click', (e) => {
+          const show = pwInput.type === 'password';
+          pwInput.type = show ? 'text' : 'password';
+          eyeOpen.classList.toggle('hidden', show);
+          eyeClosed.classList.toggle('hidden', !show);
+          e.currentTarget.setAttribute(
+            'aria-label',
+            show ? 'Hide password' : 'Show password'
+          );
+        });
 
-        errorDiv.classList.add('hidden');
-        loginBtn.disabled = true;
-          loginBtn.textContent = 'Memproses...';
+      document
+        .getElementById('login-form')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-        const result = await login(username, password, captchaToken, captchaAnswer);
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const captchaAnswer = document.getElementById('captcha-answer').value;
+          const errorDiv = document.getElementById('error-message');
+          const loginBtn = document.getElementById('login-button');
 
-        if (result.success) {
-          window.location.href = '/index.html';
-        } else {
-          errorDiv.textContent = result.error || 'Login failed';
-          errorDiv.classList.remove('hidden');
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Masuk';
-          loadCaptcha();
-        }
-      });
+          errorDiv.classList.add('hidden');
+          loginBtn.disabled = true;
+          loginBtn.textContent = 'Signing in...';
+
+          const result = await login(
+            username,
+            password,
+            captchaToken,
+            captchaAnswer
+          );
+
+          if (result.success) {
+            window.location.href = '/index.html';
+          } else {
+            errorDiv.textContent = result.error || 'Login failed';
+            errorDiv.classList.remove('hidden');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign in';
+            loadCaptcha();
+          }
+        });
 
       loadCaptcha();
     </script>

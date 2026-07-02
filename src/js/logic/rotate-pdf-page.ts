@@ -71,7 +71,7 @@ function createPageWrapper(
 
   const container = document.createElement('div');
   container.className =
-    'page-thumbnail relative bg-gray-700 rounded-lg overflow-hidden';
+    'page-thumbnail relative bg-surface-muted rounded-lg overflow-hidden';
   container.dataset.pageIndex = pageIndex.toString();
   container.dataset.pageNumber = pageNumber.toString();
 
@@ -96,11 +96,11 @@ function createPageWrapper(
 
   // Per-page rotation controls - Left and Right buttons only
   const controls = document.createElement('div');
-  controls.className = 'flex items-center justify-center gap-2 p-2 bg-gray-800';
+  controls.className = 'flex items-center justify-center gap-2 p-2 bg-surface-raised';
 
   const rotateLeftBtn = document.createElement('button');
   rotateLeftBtn.className =
-    'flex items-center gap-1 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 text-xs cursor-pointer';
+    'flex items-center gap-1 px-3 py-1.5 bg-surface-muted hover:bg-surface-muted text-white rounded border border-line text-xs cursor-pointer';
   rotateLeftBtn.innerHTML = '<i data-lucide="rotate-ccw" class="w-3 h-3"></i>';
   rotateLeftBtn.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -115,7 +115,7 @@ function createPageWrapper(
 
   const rotateRightBtn = document.createElement('button');
   rotateRightBtn.className =
-    'flex items-center gap-1 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 text-xs cursor-pointer';
+    'flex items-center gap-1 px-3 py-1.5 bg-surface-muted hover:bg-surface-muted text-white rounded border border-line text-xs cursor-pointer';
   rotateRightBtn.innerHTML = '<i data-lucide="rotate-cw" class="w-3 h-3"></i>';
   rotateRightBtn.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -174,17 +174,17 @@ async function updateUI() {
   if (pageState.file) {
     const fileDiv = document.createElement('div');
     fileDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col overflow-hidden';
 
     const nameSpan = document.createElement('div');
-    nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+    nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
     nameSpan.textContent = pageState.file.name;
 
     const metaSpan = document.createElement('div');
-    metaSpan.className = 'text-xs text-gray-400';
+    metaSpan.className = 'text-xs text-content-muted';
     metaSpan.textContent = `${formatBytes(pageState.file.size)} • Loading...`;
 
     infoContainer.append(nameSpan, metaSpan);
@@ -321,17 +321,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropZone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         const pdfFiles = Array.from(files).filter(function (f) {

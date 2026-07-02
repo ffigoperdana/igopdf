@@ -186,8 +186,8 @@ function updateOverlayScopeButtons() {
 
   const applyState = (button: HTMLButtonElement | null, active: boolean) => {
     if (!button) return;
-    button.classList.toggle('bg-indigo-600', active);
-    button.classList.toggle('bg-gray-700', !active);
+    button.classList.toggle('bg-palm-600', active);
+    button.classList.toggle('bg-surface-muted', !active);
   };
 
   applyState(allButton, pageState.overlayChangeScope === 'all');
@@ -653,16 +653,16 @@ function setViewMode(mode: 'overlay' | 'side-by-side') {
   if (mode === 'overlay') {
     if (wrapper)
       wrapper.className =
-        'compare-viewer-wrapper overlay-mode border border-slate-200';
+        'compare-viewer-wrapper overlay-mode border border-line';
     if (overlayControls) overlayControls.classList.remove('hidden');
     if (sideControls) sideControls.classList.add('hidden');
     if (btnOverlay) {
-      btnOverlay.classList.add('bg-indigo-600');
-      btnOverlay.classList.remove('bg-gray-700');
+      btnOverlay.classList.add('bg-palm-600');
+      btnOverlay.classList.remove('bg-surface-muted');
     }
     if (btnSide) {
-      btnSide.classList.remove('bg-indigo-600');
-      btnSide.classList.add('bg-gray-700');
+      btnSide.classList.remove('bg-palm-600');
+      btnSide.classList.add('bg-surface-muted');
     }
     if (canvas2 && opacitySlider) {
       canvas2.style.transition = 'opacity 150ms ease-in-out';
@@ -671,16 +671,16 @@ function setViewMode(mode: 'overlay' | 'side-by-side') {
   } else {
     if (wrapper)
       wrapper.className =
-        'compare-viewer-wrapper side-by-side-mode border border-slate-200';
+        'compare-viewer-wrapper side-by-side-mode border border-line';
     if (overlayControls) overlayControls.classList.add('hidden');
     if (sideControls) sideControls.classList.remove('hidden');
     if (btnOverlay) {
-      btnOverlay.classList.remove('bg-indigo-600');
-      btnOverlay.classList.add('bg-gray-700');
+      btnOverlay.classList.remove('bg-palm-600');
+      btnOverlay.classList.add('bg-surface-muted');
     }
     if (btnSide) {
-      btnSide.classList.add('bg-indigo-600');
-      btnSide.classList.remove('bg-gray-700');
+      btnSide.classList.add('bg-palm-600');
+      btnSide.classList.remove('bg-surface-muted');
     }
     if (canvas2) canvas2.style.opacity = '1';
     const panel2 = getElement<HTMLElement>('panel-2');
@@ -727,7 +727,7 @@ async function handleFileInput(
       icon.className = 'w-10 h-10 mb-3 text-green-500';
 
       const p = document.createElement('p');
-      p.className = 'text-sm text-gray-300 truncate';
+      p.className = 'text-sm text-content-muted truncate';
       p.textContent = file.name;
 
       if (docKey === 'pdfDoc1') documentNames.left = file.name;

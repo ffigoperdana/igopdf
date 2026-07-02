@@ -66,7 +66,7 @@ export function createPlaceholder(
 ): HTMLElement {
   const placeholder = document.createElement('div');
   placeholder.className =
-    'page-thumbnail relative cursor-move flex flex-col items-center gap-1 p-2 border-2 border-gray-600 rounded-lg bg-gray-800 transition-colors';
+    'page-thumbnail relative cursor-move flex flex-col items-center gap-1 p-2 border-2 border-line rounded-lg bg-surface-raised transition-colors';
   placeholder.dataset.pageNumber = pageNumber.toString();
   if (fileName) {
     placeholder.dataset.fileName = fileName;
@@ -76,10 +76,10 @@ export function createPlaceholder(
   // Create skeleton loader
   const skeletonContainer = document.createElement('div');
   skeletonContainer.className =
-    'relative w-full h-36 bg-gray-700 rounded-md animate-pulse flex items-center justify-center';
+    'relative w-full h-36 bg-surface-muted rounded-md animate-pulse flex items-center justify-center';
 
   const loadingText = document.createElement('span');
-  loadingText.className = 'text-gray-500 text-xs';
+  loadingText.className = 'text-content-muted text-xs';
   loadingText.textContent = 'Loading...';
 
   skeletonContainer.appendChild(loadingText);

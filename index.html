@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="id">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>igo - Internal PDF Workspace</title>
@@ -34,20 +35,19 @@
         <div class="container mx-auto px-4 py-8 md:py-10">
           <div class="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
             <div>
-              <p class="text-sm font-semibold uppercase text-vibrant-palm">igo</p>
-              <h1 class="mt-2 text-3xl font-extrabold text-deep-forest md:text-5xl">
-                Privacy-first PDF Workspace
+              <h1 class="text-3xl font-extrabold text-deep-forest dark:text-content md:text-5xl" data-i18n="homeHero.title">
+                Ruang Kerja PDF yang Mengutamakan Privasi
               </h1>
-              <p class="mt-4 max-w-2xl text-base text-on-surface-variant">
+              <p class="mt-4 max-w-2xl text-base text-on-surface-variant" data-i18n="homeHero.subtitle">
                 Pilih alat PDF yang dibutuhkan. Pemrosesan dokumen tetap berjalan di browser, sementara akses aplikasi dikelola melalui akun internal.
               </p>
             </div>
             <div class="rounded border border-outline-variant bg-surface-gray p-4">
               <div class="flex items-center gap-3">
-                <i data-lucide="shield-check" class="h-5 w-5 text-deep-forest"></i>
+                <i data-lucide="shield-check" class="h-5 w-5 text-deep-forest dark:text-content"></i>
                 <div>
-                  <p class="font-semibold text-ink-slate">Akses internal</p>
-                  <p class="text-sm text-on-surface-variant">Session, CAPTCHA, dan RBAC aktif.</p>
+                  <p class="font-semibold text-ink-slate dark:text-content" data-i18n="homeHero.badgeTitle">Akses internal</p>
+                  <p class="text-sm text-on-surface-variant" data-i18n="homeHero.badgeDesc">Session, CAPTCHA, dan RBAC aktif.</p>
                 </div>
               </div>
             </div>
@@ -58,7 +58,7 @@
       <section id="grid-view" class="container mx-auto px-4 py-8">
         <div id="tools-header" class="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 class="text-2xl font-bold text-ink-slate" data-i18n="simpleMode.title">Alat PDF</h2>
+            <h2 class="text-2xl font-bold text-ink-slate dark:text-content" data-i18n="simpleMode.title">Alat PDF</h2>
             <p class="mt-1 text-sm text-on-surface-variant" data-i18n="simpleMode.subtitle">Pilih alat untuk memulai</p>
           </div>
           <div class="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
@@ -67,18 +67,18 @@
               <input
                 id="search-bar"
                 type="search"
-                class="w-full rounded border border-outline-variant bg-white py-2 pl-10 pr-3 text-sm text-on-surface outline-none focus:border-deep-forest focus:ring-2 focus:ring-deep-forest/20"
+                class="w-full rounded border border-line bg-surface-raised py-2 pl-10 pr-3 text-sm text-content placeholder-content-muted outline-none focus:border-vibrant-palm focus:ring-2 focus:ring-vibrant-palm/30"
                 data-i18n-placeholder="tools.searchPlaceholder"
                 placeholder="Cari alat PDF"
               />
             </label>
             <button
               id="open-shortcuts-btn"
-              class="inline-flex items-center justify-center gap-2 rounded border border-outline-variant bg-white px-3 py-2 text-sm font-semibold text-deep-forest hover:bg-green-50"
+              class="inline-flex items-center justify-center gap-2 rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-palm-700"
               type="button"
             >
               <i data-lucide="settings" class="h-4 w-4"></i>
-              <span>Preferensi</span>
+              <span data-i18n="homeHero.preferences">Preferensi</span>
             </button>
           </div>
         </div>

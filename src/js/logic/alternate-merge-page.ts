@@ -46,10 +46,10 @@ async function updateUI() {
     // Show file count summary
     const summaryDiv = document.createElement('div');
     summaryDiv.className =
-      'flex items-center justify-between bg-gray-700 p-3 rounded-lg text-sm';
+      'flex items-center justify-between bg-surface-muted p-3 rounded-lg text-sm';
 
     const infoSpan = document.createElement('span');
-    infoSpan.className = 'text-gray-200';
+    infoSpan.className = 'text-content';
     infoSpan.textContent = `${pageState.files.length} PDF files selected`;
 
     const clearBtn = document.createElement('button');
@@ -82,7 +82,7 @@ async function updateUI() {
 
         const li = document.createElement('li');
         li.className =
-          'bg-gray-700 p-3 rounded-lg border border-gray-600 flex items-center justify-between';
+          'bg-surface-muted p-3 rounded-lg border border-line flex items-center justify-between';
         li.dataset.fileName = fileKey;
 
         const infoDiv = document.createElement('div');
@@ -93,14 +93,14 @@ async function updateUI() {
         nameSpan.textContent = file.name;
 
         const metaSpan = document.createElement('span');
-        metaSpan.className = 'text-sm text-gray-400 flex-shrink-0';
+        metaSpan.className = 'text-sm text-content-muted flex-shrink-0';
         metaSpan.textContent = `${formatBytes(file.size)} • ${pageCount} pages`;
 
         infoDiv.append(nameSpan, metaSpan);
 
         const dragHandle = document.createElement('div');
         dragHandle.className =
-          'drag-handle cursor-move text-gray-400 hover:text-white p-1 rounded ml-2';
+          'drag-handle cursor-move text-content-muted hover:text-white p-1 rounded ml-2';
         dragHandle.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>`;
 
         li.append(infoDiv, dragHandle);
@@ -237,17 +237,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropZone.addEventListener('dragover', function (e) {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', function (e) {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const files = e.dataTransfer?.files;
       if (files && files.length > 0) {
         handleFileSelect(files);

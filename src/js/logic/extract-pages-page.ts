@@ -42,16 +42,16 @@ function initializePage() {
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const droppedFiles = e.dataTransfer?.files;
       if (droppedFiles && droppedFiles.length > 0) {
         handleFile(droppedFiles[0]);
@@ -120,17 +120,17 @@ function updateFileDisplay() {
   fileDisplayArea.innerHTML = '';
   const fileDiv = document.createElement('div');
   fileDiv.className =
-    'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+    'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
 
   const infoContainer = document.createElement('div');
   infoContainer.className = 'flex flex-col flex-1 min-w-0';
 
   const nameSpan = document.createElement('div');
-  nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+  nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
   nameSpan.textContent = extractState.file.name;
 
   const metaSpan = document.createElement('div');
-  metaSpan.className = 'text-xs text-gray-400';
+  metaSpan.className = 'text-xs text-content-muted';
   metaSpan.textContent = `${formatBytes(extractState.file.size)} • ${extractState.totalPages} pages`;
 
   infoContainer.append(nameSpan, metaSpan);

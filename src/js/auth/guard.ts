@@ -1,10 +1,18 @@
 import { getCurrentUser, logout, isAdmin } from './session.js';
 
 let currentUser: { id: string; username: string; role: string } | null = null;
+let authPromise: Promise<void> | null = null;
 
 export async function initAuth(): Promise<void> {
-  currentUser = await getCurrentUser();
-  updateUI();
+  // Memoized: the early auth-gate (main.ts) and init() both await this, but the
+  // /auth/me round-trip must happen only once per page load.
+  if (!authPromise) {
+    authPromise = (async () => {
+      currentUser = await getCurrentUser();
+      updateUI();
+    })();
+  }
+  return authPromise;
 }
 
 export function getUser() {
@@ -28,37 +36,46 @@ function updateUI(): void {
   const authAreaMobile = document.getElementById('auth-area-mobile');
   const mobileAuthMenu = document.getElementById('mobile-auth-menu');
 
+  // Navbar inverts (green→white text in light, white→ink text in dark), so
+  // links inherit/flip; the orange button stays the same in both themes.
+  const linkCls =
+    'text-white hover:text-vibrant-palm text-sm font-medium';
+  const btnCls =
+    'bg-vibrant-palm hover:bg-palm-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors';
+
   if (currentUser) {
     const adminLinkDesktop = isAdmin(currentUser)
-      ? '<a href="/admin.html" class="text-white hover:text-vibrant-palm text-sm font-medium">Admin</a>'
+      ? `<a href="/admin.html" class="${linkCls}">Admin</a>`
       : '';
     const adminLinkMobile = isAdmin(currentUser)
-      ? '<a href="/admin.html" class="block px-3 py-2 text-white hover:text-vibrant-palm">Admin</a>'
+      ? '<a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a>'
       : '';
 
     const desktopHTML = `
       ${adminLinkDesktop}
-      <a href="/profile.html" class="text-white hover:text-vibrant-palm text-sm font-medium">Hello, ${currentUser.username}</a>
-      <button id="logout-btn" class="bg-vibrant-palm hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">Logout</button>
+      <a href="/profile.html" class="${linkCls}">Hello, ${currentUser.username}</a>
+      <button id="logout-btn" class="${btnCls}">Logout</button>
     `;
 
     const mobileHTML = `
       ${adminLinkMobile}
-      <a href="/profile.html" class="block px-3 py-2 text-white hover:text-vibrant-palm">Profile</a>
-      <button id="logout-btn-mobile" class="block w-full text-left px-3 py-2 text-white hover:text-vibrant-palm">Logout</button>
+      <a href="/profile.html" class="block px-3 py-2 hover:text-vibrant-palm">Profile</a>
+      <button id="logout-btn-mobile" class="block w-full text-left px-3 py-2 hover:text-vibrant-palm">Logout</button>
     `;
 
     if (authArea) authArea.innerHTML = desktopHTML;
-    if (authAreaMobile) authAreaMobile.innerHTML = `<span class="text-white text-sm">${currentUser.username}</span>`;
+    if (authAreaMobile)
+      authAreaMobile.innerHTML = `<span class="text-sm text-white">${currentUser.username}</span>`;
     if (mobileAuthMenu) mobileAuthMenu.innerHTML = mobileHTML;
 
     document.getElementById('logout-btn')?.addEventListener('click', () => logout());
     document.getElementById('logout-btn-mobile')?.addEventListener('click', () => logout());
   } else {
-    const loginHTML = '<a href="/login.html" class="bg-vibrant-palm hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">Login</a>';
-    
+    const loginHTML = `<a href="/login.html" class="${btnCls}">Login</a>`;
+
     if (authArea) authArea.innerHTML = loginHTML;
     if (authAreaMobile) authAreaMobile.innerHTML = '';
-    if (mobileAuthMenu) mobileAuthMenu.innerHTML = `<a href="/login.html" class="block px-3 py-2 text-white hover:text-vibrant-palm">Login</a>`;
+    if (mobileAuthMenu)
+      mobileAuthMenu.innerHTML = `<a href="/login.html" class="block px-3 py-2 hover:text-vibrant-palm">Login</a>`;
   }
 }

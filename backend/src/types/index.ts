@@ -1,9 +1,14 @@
+export type AuthSource = 'local' | 'ldap';
+
 export interface User {
   id: string;
   username: string;
-  passwordHash: string;
+  // Null for auth_source='ldap' users — their password is verified live
+  // against the directory, never stored locally.
+  passwordHash: string | null;
   role: 'admin' | 'user';
   isActive: boolean;
+  authSource: AuthSource;
   createdAt: Date;
   updatedAt: Date;
   lastLogin: Date | null;
@@ -55,8 +60,11 @@ export type UserRole = 'admin' | 'user';
 
 export interface CreateUserRequest {
   username: string;
-  password: string;
+  // Required unless authSource is 'ldap' (LDAP users authenticate against
+  // the directory, not a locally stored password).
+  password?: string;
   role: UserRole;
+  authSource?: AuthSource;
 }
 
 export interface UpdateUserRequest {

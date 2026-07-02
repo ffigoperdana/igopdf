@@ -426,6 +426,75 @@ function rewriteHtmlPathsPlugin(): Plugin {
   };
 }
 
+// Mark the active navbar link in the BUILT HTML so `.is-active` (and its
+// `view-transition-name: nav-active` pill) is present at first paint — before
+// the cross-document View-Transitions snapshot is captured. Doing this at build
+// time (rather than an inline script) keeps it CSP-safe (script-src has no
+// 'unsafe-inline') and removes the JS timing race that caused intermittent
+// navbar flicker. Mirrors setActiveNavItem()'s path normalization in main.ts.
+function markActiveNavPlugin(): Plugin {
+  const norm = (s: string): string =>
+    (s.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+
+  return {
+    name: 'mark-active-nav',
+    enforce: 'post',
+    writeBundle(options) {
+      const outDir = options.dir;
+      if (!outDir) return;
+
+      const walk = (dir: string): string[] => {
+        const out: string[] = [];
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const full = resolve(dir, entry.name);
+          if (entry.isDirectory()) out.push(...walk(full));
+          else if (entry.name.endsWith('.html')) out.push(full);
+        }
+        return out;
+      };
+
+      for (const file of walk(outDir)) {
+        let html = fs.readFileSync(file, 'utf8');
+        if (!html.includes('nav-item')) continue;
+        const page = norm(file.replace(/\\/g, '/'));
+        let changed = false;
+
+        html = html.replace(
+          /<a\b[^>]*\bclass="[^"]*\bnav-item\b[^"]*"[^>]*>/g,
+          (tag) => {
+            if (/\bis-active\b/.test(tag)) return tag;
+            const href = tag.match(/\bhref="([^"]*)"/);
+            if (!href || norm(href[1]) !== page) return tag;
+            changed = true;
+            return tag.replace(
+              /\bclass="([^"]*)\bnav-item\b([^"]*)"/,
+              'class="$1nav-item is-active$2"'
+            );
+          }
+        );
+
+        // Auth gate: every navbar page requires login (main.ts requireAuth), so
+        // hide it until auth resolves. Add `auth-guard` to <html>; CSS blanks the
+        // body until main.ts reveals (authed) or redirects to /login. Login has
+        // no navbar → no nav-item → excluded above.
+        if (!/<html[^>]*\bclass="[^"]*\bauth-guard\b/.test(html)) {
+          const guarded = html.replace(/<html\b([^>]*)>/, (_m, attrs) =>
+            /\bclass="/.test(attrs)
+              ? `<html${attrs.replace(/\bclass="([^"]*)"/, 'class="$1 auth-guard"')}>`
+              : `<html${attrs} class="auth-guard">`
+          );
+          if (guarded !== html) {
+            html = guarded;
+            changed = true;
+          }
+        }
+
+        if (changed) fs.writeFileSync(file, html);
+      }
+    },
+  };
+}
+
 export default defineConfig(() => {
   const USE_CDN = process.env.VITE_USE_CDN === 'true';
 
@@ -439,6 +508,21 @@ export default defineConfig(() => {
     {
       src: 'node_modules/embedpdf-snippet/dist/pdfium.wasm',
       dest: 'embedpdf',
+    },
+    // Self-hosted WASM modules for offline / air-gapped deployment. Copied from
+    // node_modules into /wasm/* so PyMuPDF + Ghostscript load same-origin with no
+    // external CDN. CoherentPDF is already bundled at public/coherentpdf.browser.min.js.
+    {
+      src: 'node_modules/@bentopdf/pymupdf-wasm/dist',
+      dest: 'wasm/pymupdf',
+    },
+    {
+      src: 'node_modules/@bentopdf/pymupdf-wasm/assets',
+      dest: 'wasm/pymupdf',
+    },
+    {
+      src: 'node_modules/@bentopdf/gs-wasm/assets/*',
+      dest: 'wasm/gs',
     },
   ];
 
@@ -460,6 +544,7 @@ export default defineConfig(() => {
       languageRouterPlugin(),
       flattenPagesPlugin(),
       rewriteHtmlPathsPlugin(),
+      markActiveNavPlugin(),
       tailwindcss(),
       nodePolyfills({
         include: ['buffer', 'stream', 'util', 'zlib', 'process'],
@@ -731,7 +816,6 @@ export default defineConfig(() => {
             'src/pages/font-to-outline.html'
           ),
           'deskew-pdf': resolve(__dirname, 'src/pages/deskew-pdf.html'),
-          'wasm-settings': resolve(__dirname, 'src/pages/wasm-settings.html'),
           'bates-numbering': resolve(
             __dirname,
             'src/pages/bates-numbering.html'

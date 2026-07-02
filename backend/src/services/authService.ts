@@ -3,6 +3,7 @@ import { pool } from '../config/database.js';
 import { sessionConfig } from '../config/session.js';
 import { config } from '../config/index.js';
 import { hashPassword, verifyPassword } from '../utils/password.js';
+import { authenticateLdap } from './ldapService.js';
 import { logger } from '../utils/logger.js';
 import type { User, Session } from '../types/index.js';
 
@@ -26,6 +27,7 @@ const USER_FIELDS = `
   password_hash AS "passwordHash",
   role,
   is_active AS "isActive",
+  auth_source AS "authSource",
   created_at AS "createdAt",
   updated_at AS "updatedAt",
   last_login AS "lastLogin",
@@ -36,60 +38,116 @@ function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
+function toSafeUser(user: User): Omit<User, 'passwordHash'> {
+  const { passwordHash, ...safe } = user;
+  return safe;
+}
+
+/**
+ * Auto-provisions an AD/LDAP user the first time they log in (full SSO model).
+ * Their password is never stored (password_hash stays NULL) — it's verified
+ * live against the directory on every login. Role defaults to 'user'; admins
+ * are always local accounts. ON CONFLICT makes two concurrent first-logins
+ * safe and simply returns the existing row.
+ */
+async function provisionLdapUser(username: string): Promise<User> {
+  const result = await pool.query<User>(
+    `INSERT INTO users (username, password_hash, role, auth_source)
+     VALUES ($1, NULL, 'user', 'ldap')
+     ON CONFLICT (username) DO UPDATE SET updated_at = NOW()
+     RETURNING ${USER_FIELDS}`,
+    [username]
+  );
+  return result.rows[0];
+}
+
 export async function login(
   username: string,
   password: string,
   ipAddress: string,
   userAgent: string
 ): Promise<LoginResult> {
+  const typedUsername = username.trim();
+
+  // Case-insensitive lookup: AD sAMAccountNames are case-insensitive, and this
+  // also makes local logins tolerant of capitalization. If a local account
+  // ever shares a name with an LDAP one, prefer the local row so LDAP can
+  // never shadow a locally-managed (e.g. admin) login.
   const userResult = await pool.query<User>(
     `SELECT ${USER_FIELDS}
      FROM users
-     WHERE username = $1`,
-    [username]
+     WHERE LOWER(username) = LOWER($1)
+     ORDER BY (auth_source = 'local') DESC
+     LIMIT 1`,
+    [typedUsername]
   );
 
-  if (userResult.rows.length === 0) {
-    await recordLoginAttempt(username, ipAddress, false);
-    return { success: false, error: 'Invalid username or password' };
+  let user: User | null = userResult.rows[0] ?? null;
+
+  // First-time SSO login: no local row yet. Verify against AD and, if the
+  // directory accepts the credentials, create the account on the fly.
+  if (!user) {
+    if (!config.ldap.enabled) {
+      await recordLoginAttempt(typedUsername, ipAddress, false);
+      return { success: false, error: 'Invalid username or password' };
+    }
+
+    const ldapResult = await authenticateLdap(typedUsername, password);
+    if (!ldapResult.success) {
+      await recordLoginAttempt(typedUsername, ipAddress, false);
+      return { success: false, error: 'Invalid username or password' };
+    }
+
+    user = await provisionLdapUser(typedUsername.toLowerCase());
+
+    await pool.query(`UPDATE users SET last_login = NOW() WHERE id = $1`, [
+      user.id,
+    ]);
+    const session = await createSession(user.id, ipAddress, userAgent);
+    await recordLoginAttempt(typedUsername, ipAddress, true);
+    await clearFailedLoginAttempts(typedUsername);
+    logger.info('LDAP user auto-provisioned on first login', {
+      userId: user.id,
+      username: user.username,
+    });
+
+    return { success: true, user: toSafeUser(user), session };
   }
 
-  const user = userResult.rows[0];
-
   if (!user.isActive) {
-    await recordLoginAttempt(username, ipAddress, false);
+    await recordLoginAttempt(typedUsername, ipAddress, false);
     return { success: false, error: 'Account is deactivated' };
   }
 
-  const passwordValid = await verifyPassword(password, user.passwordHash);
+  // Hybrid auth: users with auth_source='ldap' are verified live against
+  // Active Directory; everyone else (including the local admin account) keeps
+  // using the locally stored argon2 hash exactly as before.
+  const passwordValid =
+    user.authSource === 'ldap'
+      ? (await authenticateLdap(typedUsername, password)).success
+      : user.passwordHash
+        ? await verifyPassword(password, user.passwordHash)
+        : false;
+
   if (!passwordValid) {
-    await recordLoginAttempt(username, ipAddress, false);
+    await recordLoginAttempt(typedUsername, ipAddress, false);
     return { success: false, error: 'Invalid username or password' };
   }
 
-  await pool.query(
-    `UPDATE users SET last_login = NOW() WHERE id = $1`,
-    [user.id]
-  );
+  await pool.query(`UPDATE users SET last_login = NOW() WHERE id = $1`, [
+    user.id,
+  ]);
 
   const session = await createSession(user.id, ipAddress, userAgent);
 
-  await recordLoginAttempt(username, ipAddress, true);
+  await recordLoginAttempt(typedUsername, ipAddress, true);
+  await clearFailedLoginAttempts(typedUsername);
 
   logger.info('User logged in', { userId: user.id, username: user.username });
 
   return {
     success: true,
-    user: {
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      lastLogin: user.lastLogin,
-      createdBy: user.createdBy,
-    },
+    user: toSafeUser(user),
     session,
   };
 }
@@ -159,18 +217,31 @@ async function recordLoginAttempt(
   );
 }
 
+// A successful login resets the account's lockout counter so earlier fat-finger
+// failures don't count against the user going forward.
+async function clearFailedLoginAttempts(username: string): Promise<void> {
+  await pool.query(
+    `DELETE FROM login_attempts
+     WHERE LOWER(username) = LOWER($1) AND success = false`,
+    [username]
+  );
+}
+
 export async function getRecentLoginAttempts(
   username: string,
-  ipAddress: string,
   minutes: number = 15
 ): Promise<{ count: number; lastAttempt: Date | null }> {
+  // Count per-USERNAME failures only (no IP term). The per-IP throttle is
+  // handled separately by loginLimiter; counting by IP here would let one
+  // attacker lock out every user sharing an office NAT / reverse-proxy IP —
+  // a real risk for this internal app served behind a single-IP WAF.
   const result = await pool.query(
     `SELECT COUNT(*) as count, MAX(attempted_at) as last_attempt
      FROM login_attempts
-     WHERE (username = $1 OR ip_address = $2)
-       AND attempted_at > NOW() - ($3::int * INTERVAL '1 minute')
+     WHERE LOWER(username) = LOWER($1)
+       AND attempted_at > NOW() - ($2::int * INTERVAL '1 minute')
        AND success = false`,
-    [username, ipAddress, minutes]
+    [username, minutes]
   );
 
   return {

@@ -11,6 +11,7 @@ const USER_FIELDS = `
   password_hash AS "passwordHash",
   role,
   is_active AS "isActive",
+  auth_source AS "authSource",
   created_at AS "createdAt",
   updated_at AS "updatedAt",
   last_login AS "lastLogin",
@@ -49,7 +50,11 @@ export async function listUsers(
   role?: string,
   isActive?: boolean
 ): Promise<{ users: SafeUser[]; total: number }> {
-  let whereClause = 'WHERE 1=1';
+  // Admin user-management is for LOCAL accounts only. LDAP/AD users are pure
+  // SSO — they're auto-provisioned on login and governed entirely by Active
+  // Directory, so they're intentionally excluded from this list (and its count)
+  // to keep the admin panel focused on the accounts it actually manages.
+  let whereClause = "WHERE auth_source = 'local'";
   const params: unknown[] = [];
   let paramIndex = 1;
 
@@ -98,17 +103,34 @@ export async function createUser(
   request: CreateUserRequest,
   createdBy?: string
 ): Promise<SafeUser> {
-  const passwordHash = await hashPassword(request.password);
+  const authSource = request.authSource ?? 'local';
+
+  // LDAP-backed accounts don't store a local password at all — they're
+  // verified live against the directory on every login (see authService.ts).
+  // Local accounts still need one, same as before this feature existed.
+  if (authSource !== 'ldap' && !request.password) {
+    throw new Error('Password is required for local accounts');
+  }
+
+  // Admins must be local accounts — an LDAP admin would be a hidden,
+  // unmanageable admin (the admin panel only lists local users). Enforced here
+  // as well as in admin.ts createUserSchema (defense in depth).
+  if (authSource === 'ldap' && request.role === 'admin') {
+    throw new Error('LDAP-backed accounts cannot be admins');
+  }
+
+  const passwordHash =
+    authSource === 'ldap' ? null : await hashPassword(request.password as string);
 
   const result = await pool.query<User>(
-    `INSERT INTO users (username, password_hash, role, created_by)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO users (username, password_hash, role, auth_source, created_by)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING ${USER_FIELDS}`,
-    [request.username, passwordHash, request.role, createdBy || null]
+    [request.username, passwordHash, request.role, authSource, createdBy || null]
   );
 
   const user = result.rows[0];
-  logger.info('User created', { userId: user.id, username: user.username });
+  logger.info('User created', { userId: user.id, username: user.username, authSource });
   return sanitizeUser(user);
 }
 
@@ -128,6 +150,13 @@ export async function updateUser(
   }
 
   const currentUser = currentResult.rows[0];
+
+  // Keep admin strictly local: promoting an LDAP user to admin would create a
+  // hidden admin (the panel lists local accounts only).
+  if (request.role === 'admin' && currentUser.authSource === 'ldap') {
+    throw new Error('LDAP-backed accounts cannot be promoted to admin');
+  }
+
   const demotesLastAdmin =
     currentUser.role === 'admin' &&
     currentUser.isActive &&
@@ -215,7 +244,24 @@ export async function deleteUser(id: string): Promise<boolean> {
 export async function resetUserPassword(
   id: string,
   newPassword: string
-): Promise<boolean> {
+): Promise<{ success: boolean; error?: string }> {
+  const userResult = await pool.query<User>(
+    `SELECT auth_source AS "authSource" FROM users WHERE id = $1`,
+    [id]
+  );
+
+  if (userResult.rows.length === 0) {
+    return { success: false, error: 'User not found' };
+  }
+
+  if (userResult.rows[0].authSource === 'ldap') {
+    return {
+      success: false,
+      error:
+        'This account authenticates via Active Directory — its password cannot be reset here.',
+    };
+  }
+
   const passwordHash = await hashPassword(newPassword);
   const result = await pool.query(
     `UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
@@ -225,9 +271,9 @@ export async function resetUserPassword(
   if ((result.rowCount ?? 0) > 0) {
     await pool.query(`DELETE FROM sessions WHERE user_id = $1`, [id]);
     logger.info('User password reset', { userId: id });
-    return true;
+    return { success: true };
   }
-  return false;
+  return { success: false, error: 'User not found' };
 }
 
 export async function changePassword(
@@ -236,7 +282,7 @@ export async function changePassword(
   newPassword: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await pool.query<User>(
-    `SELECT id, password_hash AS "passwordHash" FROM users WHERE id = $1`,
+    `SELECT id, password_hash AS "passwordHash", auth_source AS "authSource" FROM users WHERE id = $1`,
     [userId]
   );
 
@@ -245,8 +291,19 @@ export async function changePassword(
   }
 
   const user = result.rows[0];
+
+  if (user.authSource === 'ldap') {
+    return {
+      success: false,
+      error:
+        'This account authenticates via Active Directory — change your password there, not in this app.',
+    };
+  }
+
   const { verifyPassword } = await import('../utils/password.js');
-  const valid = await verifyPassword(currentPassword, user.passwordHash);
+  const valid = user.passwordHash
+    ? await verifyPassword(currentPassword, user.passwordHash)
+    : false;
 
   if (!valid) {
     return { success: false, error: 'Current password is incorrect' };

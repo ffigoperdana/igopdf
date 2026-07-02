@@ -19,11 +19,71 @@
     "name": "Gabung PDF",
     "subtitle": "Gabungkan beberapa PDF menjadi satu file. Mempertahankan Bookmark.",
     "retainPageLabels": "Pertahankan label halaman asli dari setiap file",
-    "retainPageLabelsHint": "Mati (default): PDF yang digabungkan menggunakan penomoran halaman alami 1–N. Aktif: label halaman asli setiap file dipertahankan (dapat menghasilkan label ganda)."
+    "retainPageLabelsHint": "Mati (default): PDF yang digabungkan menggunakan penomoran halaman alami 1–N. Aktif: label halaman asli setiap file dipertahankan (dapat menghasilkan label ganda).",
+    "howItWorks": {
+      "step1Title": "Unggah PDF",
+      "step1Desc": "Pilih atau seret dan lepas beberapa berkas PDF yang ingin Anda gabungkan",
+      "step2Title": "Atur Urutan",
+      "step2Desc": "Seret berkas ke atas atau ke bawah untuk mengurutkannya sesuai keinginan Anda",
+      "step3Title": "Gabungkan Berkas",
+      "step3Desc": "Klik tombol gabung untuk menyatukan semua PDF menjadi satu dokumen",
+      "step4Title": "Unduh",
+      "step4Desc": "Simpan PDF hasil gabungan Anda - semua halaman tergabung sesuai urutan yang Anda pilih"
+    },
+    "relatedTools": {
+      "card1Name": "Pisah PDF",
+      "card1Desc": "Alat pisah PDF daring gratis",
+      "card2Name": "Kelola PDF",
+      "card2Desc": "Alat kelola PDF daring gratis",
+      "card3Name": "Kompres PDF",
+      "card3Desc": "Alat kompres PDF daring gratis",
+      "card4Name": "Putar PDF",
+      "card4Desc": "Alat putar PDF daring gratis",
+      "card5Name": "Hapus Halaman",
+      "card5Desc": "Alat hapus halaman daring gratis"
+    },
+    "faq": {
+      "q1": "Berapa banyak PDF yang dapat saya gabungkan sekaligus?",
+      "a1": "Tak terbatas! Gabungkan sebanyak apa pun berkas PDF yang Anda perlukan dalam satu operasi. Tidak ada batasan jumlah berkas maupun ukuran total.",
+      "q2": "Apakah penggabungan akan menurunkan kualitas PDF?",
+      "a2": "Tidak! igo mempertahankan kualitas asli semua PDF saat menggabungkan. Dokumen Anda tetap tajam dan jelas tanpa penurunan kualitas.",
+      "q3": "Dapatkah saya mengatur ulang halaman setelah memilih berkas?",
+      "a3": "Ya! Cukup seret dan lepas berkas untuk menyusunnya dalam urutan apa pun sebelum mengklik tombol gabung."
+    }
   },
   "splitPdf": {
     "name": "Pisah PDF",
-    "subtitle": "Ekstrak rentang halaman ke PDF baru."
+    "subtitle": "Ekstrak rentang halaman ke PDF baru.",
+    "howItWorks": {
+      "step1Title": "Unggah PDF",
+      "step1Desc": "Pilih berkas PDF yang ingin Anda pisahkan atau ekstrak halamannya",
+      "step2Title": "Pilih Metode Pemisahan",
+      "step2Desc": "Pilih halaman tertentu, rentang halaman, atau pisahkan menjadi halaman individual",
+      "step3Title": "Pratinjau & Pilih",
+      "step3Desc": "Lihat gambar mini halaman dan pilih dengan tepat halaman yang Anda inginkan",
+      "step4Title": "Pisahkan & Unduh",
+      "step4Desc": "Unduh halaman hasil ekstraksi sebagai PDF terpisah atau sebagai berkas ZIP"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Ekstrak Halaman",
+      "card2Desc": "Alat ekstrak halaman daring gratis",
+      "card3Name": "Atur PDF",
+      "card3Desc": "Alat atur PDF daring gratis",
+      "card4Name": "Kompres PDF",
+      "card4Desc": "Alat kompres PDF daring gratis",
+      "card5Name": "Hapus Halaman",
+      "card5Desc": "Alat hapus halaman daring gratis"
+    },
+    "faq": {
+      "q1": "Bisakah saya mengekstrak rentang halaman tertentu?",
+      "a1": "Ya! Anda dapat mengekstrak halaman atau rentang halaman tertentu dari PDF Anda. Pilih dengan tepat halaman yang Anda butuhkan atau pisahkan menjadi berkas individual.",
+      "q2": "Apakah PDF hasil pemisahan akan menurun kualitasnya?",
+      "a2": "Tidak! PDF hasil pemisahan mempertahankan kualitas yang sama persis dengan dokumen aslinya. Tidak terjadi kompresi atau penurunan kualitas.",
+      "q3": "Bisakah saya memisahkan beberapa PDF sekaligus?",
+      "a3": "Ya, proses beberapa PDF secara berkelompok untuk pengelolaan dokumen yang efisien."
+    }
   },
   "compressPdf": {
     "name": "Kompres PDF",
@@ -49,36 +109,260 @@
     "removeMetadata": "Hapus metadata",
     "subsetFonts": "Subset font (hapus glyph yang tidak digunakan)",
     "removeThumbnails": "Hapus thumbnail tersemat",
-    "compressButton": "Kompres PDF"
+    "compressButton": "Kompres PDF",
+    "howItWorks": {
+      "step1Title": "Unggah PDF",
+      "step1Desc": "Klik atau seret dan lepas satu atau beberapa berkas PDF",
+      "step2Title": "Pilih Algoritma",
+      "step2Desc": "Pilih Condense (disarankan) atau Photon (untuk PDF dengan banyak foto)",
+      "step3Title": "Pilih Tingkat Kompresi",
+      "step3Desc": "Pilih kompresi Light, Balanced, Aggressive, atau Extreme",
+      "step4Title": "Sesuaikan & Kompres",
+      "step4Desc": "Secara opsional aktifkan grayscale atau pengaturan khusus, lalu kompres",
+      "step5Title": "Unduh",
+      "step5Desc": "Simpan PDF terkompresi Anda - hingga 90% lebih kecil"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Pisahkan PDF",
+      "card2Desc": "Alat pisahkan PDF daring gratis",
+      "card3Name": "PDF ke JPG",
+      "card3Desc": "Alat konversi PDF ke JPG daring gratis"
+    },
+    "faq": {
+      "q1": "Apa perbedaan antara Condense dan Photon?",
+      "a1": "Condense menghapus bobot mati, mengoptimalkan gambar, dan menyubset font - terbaik untuk sebagian besar PDF. Photon mengonversi halaman menjadi gambar - ideal untuk PDF dengan banyak foto/hasil pindaian, tetapi membuat teks tidak dapat dipilih.",
+      "q2": "Tingkat kompresi mana yang sebaiknya saya gunakan?",
+      "a2": "Balanced (disarankan) menawarkan pengurangan ukuran yang besar dengan kehilangan kualitas minimal. Gunakan Light untuk mempertahankan kualitas maksimal, Aggressive untuk berkas yang lebih kecil, atau Extreme untuk kompresi maksimal.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak ada batasan! Kompres sebanyak apa pun PDF yang Anda butuhkan, dengan ukuran berapa pun, sepenuhnya gratis."
+    }
   },
   "pdfEditor": {
     "name": "Editor PDF",
-    "subtitle": "Anotasi, sorot, redaksi, komentar, tambah bentuk/gambar, cari, dan lihat PDF."
+    "subtitle": "Anotasi, sorot, redaksi, komentar, tambah bentuk/gambar, cari, dan lihat PDF.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Kompres PDF",
+      "card1Desc": "Alat kompres PDF online gratis",
+      "card2Name": "Gabungkan PDF",
+      "card2Desc": "Alat gabungkan PDF online gratis",
+      "card3Name": "Putar PDF",
+      "card3Desc": "Alat putar PDF online gratis",
+      "card4Name": "Hapus Halaman",
+      "card4Desc": "Alat hapus halaman online gratis",
+      "card5Name": "Tambah Watermark",
+      "card5Desc": "Alat tambah watermark online gratis"
+    },
+    "faq": {
+      "q1": "Apakah edit PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "jpgToPdf": {
     "name": "JPG ke PDF",
-    "subtitle": "Buat PDF dari gambar JPG, JPEG, dan JPEG2000 (JP2/JPX)."
+    "subtitle": "Buat PDF dari gambar JPG, JPEG, dan JPEG2000 (JP2/JPX).",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara langsung"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah jpg ke pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "signPdf": {
     "name": "Tanda Tangan PDF",
-    "subtitle": "Gambar, ketik, atau unggah tanda tangan Anda."
+    "subtitle": "Gambar, ketik, atau unggah tanda tangan Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah sign pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "cropPdf": {
     "name": "Potong PDF",
-    "subtitle": "Potong margin setiap halaman di PDF Anda."
+    "subtitle": "Potong margin setiap halaman di PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat pangkas PDF ini benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "extractPages": {
     "name": "Ekstrak Halaman",
-    "subtitle": "Simpan pilihan halaman sebagai file baru."
+    "subtitle": "Simpan pilihan halaman sebagai file baru.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah ekstrak halaman benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "duplicateOrganize": {
     "name": "Duplikat & Atur",
     "subtitle": "Duplikat, susun ulang, dan hapus halaman.",
-    "saveChanges": "Simpan Perubahan"
+    "saveChanges": "Simpan Perubahan",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Pisahkan PDF",
+      "card2Desc": "Alat pisahkan PDF daring gratis",
+      "card3Name": "Putar PDF",
+      "card3Desc": "Alat putar PDF daring gratis",
+      "card4Name": "Hapus Halaman",
+      "card4Desc": "Alat hapus halaman daring gratis",
+      "card5Name": "Ekstrak Halaman",
+      "card5Desc": "Alat ekstrak halaman daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah organize pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "deletePages": {
     "name": "Hapus Halaman",
-    "subtitle": "Hapus halaman tertentu dari dokumen Anda."
+    "subtitle": "Hapus halaman tertentu dari dokumen Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah hapus halaman benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "editBookmarks": {
     "name": "Edit Bookmark",
@@ -89,7 +373,35 @@
     "jsonFormat": "Format JSON",
     "uploadCsvAction": "Klik untuk unggah CSV",
     "uploadJsonAction": "Klik untuk unggah JSON",
-    "orDragHere": "atau seret ke sini"
+    "orDragHere": "atau seret ke sini",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah bookmark benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "tableOfContents": {
     "name": "Daftar Isi",
@@ -105,11 +417,67 @@
     "errorReadingFileWithMessage": "Kesalahan membaca file: {{message}}",
     "successGeneratedDownloadStarted": "Daftar isi berhasil dibuat! Unduhan dimulai.",
     "workerErrorWithMessage": "Kesalahan: {{message}}",
-    "workerErrorOccurred": "Kesalahan worker terjadi. Periksa konsol untuk detail."
+    "workerErrorOccurred": "Kesalahan worker terjadi. Periksa konsol untuk detail.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah daftar isi ini benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pageNumbers": {
     "name": "Nomor Halaman",
-    "subtitle": "Sisipkan nomor halaman ke dokumen Anda."
+    "subtitle": "Sisipkan nomor halaman ke dokumen Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat nomor halaman ini benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "addPageLabels": {
     "name": "Tambahkan label halaman",
@@ -177,15 +545,99 @@
   "addWatermark": {
     "name": "Tambah Watermark",
     "subtitle": "Cap teks atau gambar di atas halaman PDF Anda.",
-    "applyToAllPages": "Terapkan ke semua halaman"
+    "applyToAllPages": "Terapkan ke semua halaman",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah tambah tanda air benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "headerFooter": {
     "name": "Header & Footer",
-    "subtitle": "Tambah teks ke bagian atas dan bawah halaman."
+    "subtitle": "Tambah teks ke bagian atas dan bawah halaman.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah header footer benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "invertColors": {
     "name": "Balik Warna",
-    "subtitle": "Buat versi \"mode gelap\" dari PDF Anda."
+    "subtitle": "Buat versi \"mode gelap\" dari PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah invert warna benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "scannerEffect": {
     "name": "Efek Pemindai",
@@ -220,11 +672,67 @@
   },
   "backgroundColor": {
     "name": "Warna Latar Belakang",
-    "subtitle": "Ubah warna latar belakang PDF Anda."
+    "subtitle": "Ubah warna latar belakang PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat warna latar belakang benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "changeTextColor": {
     "name": "Ubah Warna Teks",
-    "subtitle": "Ubah warna teks di PDF Anda."
+    "subtitle": "Ubah warna teks di PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pengubahan warna teks benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "addStamps": {
     "name": "Tambah Stempel",
@@ -232,57 +740,390 @@
     "usernameLabel": "Nama Pengguna Stempel",
     "usernamePlaceholder": "Masukkan nama Anda (untuk stempel)",
     "usernameHint": "Nama ini akan muncul pada stempel yang Anda buat.",
-    "saveButton": "Simpan PDF yang Distempel"
+    "saveButton": "Simpan PDF yang Distempel",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah fitur tambah stempel benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan dilakukan di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "removeAnnotations": {
     "name": "Hapus Anotasi",
-    "subtitle": "Hapus komentar, sorotan, dan tautan."
+    "subtitle": "Hapus komentar, sorotan, dan tautan.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah penghapusan anotasi benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfFormFiller": {
     "name": "Pengisi Formulir PDF",
     "subtitle": "Isi formulir langsung di browser. Juga mendukung formulir XFA.",
     "uploadHint": "Unggah PDF dengan bidang formulir. Isi langsung di penampil di bawah, lalu klik tombol untuk menyimpan dan mengunduh formulir yang telah diisi. Juga mendukung formulir XFA.",
     "xfaNoteTitle": "Catatan tentang Formulir XFA:",
-    "xfaNoteDescription": "XFA (XML Forms Architecture) adalah format lama yang hanya didukung oleh penampil PDF tertentu seperti igo dan Firefox. Jika Anda membuka PDF XFA di perangkat lunak lain dan melihat halaman kosong atau tidak ada bidang formulir, itu berarti penampil tersebut tidak mendukung XFA. Untuk melihat dan mengisi formulir XFA dengan benar, gunakan Firefox atau Form Filler igo."
+    "xfaNoteDescription": "XFA (XML Forms Architecture) adalah format lama yang hanya didukung oleh penampil PDF tertentu seperti igo dan Firefox. Jika Anda membuka PDF XFA di perangkat lunak lain dan melihat halaman kosong atau tidak ada bidang formulir, itu berarti penampil tersebut tidak mendukung XFA. Untuk melihat dan mengisi formulir XFA dengan benar, gunakan Firefox atau Form Filler igo.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah form filler benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "createPdfForm": {
     "name": "Buat Formulir PDF",
     "subtitle": "Buat formulir PDF yang dapat diisi dengan bidang teks drag-and-drop.",
     "orSeparator": "ATAU",
-    "createBlankPdf": "Buat PDF Kosong"
+    "createBlankPdf": "Buat PDF Kosong",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pembuat formulir ini benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "removeBlankPages": {
     "name": "Hapus Halaman Kosong",
     "subtitle": "Deteksi dan hapus halaman kosong secara otomatis.",
-    "sensitivityHint": "Lebih tinggi = lebih ketat, hanya halaman yang benar-benar kosong. Lebih rendah = mengizinkan halaman dengan sedikit konten."
+    "sensitivityHint": "Lebih tinggi = lebih ketat, hanya halaman yang benar-benar kosong. Lebih rendah = mengizinkan halaman dengan sedikit konten.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah penghapusan halaman kosong benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "imageToPdf": {
     "name": "Gambar ke PDF",
-    "subtitle": "Konversi JPG, PNG, BMP, GIF, TIFF, PNM, PGM, PBM, PPM, PAM, JXR, JPX, JP2, PSD, SVG, HEIC, WebP ke PDF."
+    "subtitle": "Konversi JPG, PNG, BMP, GIF, TIFF, PNM, PGM, PBM, PPM, PAM, JXR, JPX, JP2, PSD, SVG, HEIC, WebP ke PDF.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi gambar ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pngToPdf": {
     "name": "PNG ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar PNG."
+    "subtitle": "Buat PDF dari satu atau lebih gambar PNG.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah png to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "webpToPdf": {
     "name": "WebP ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar WebP."
+    "subtitle": "Buat PDF dari satu atau lebih gambar WebP.",
+    "howItWorks": {
+      "step1Title": "Unggah File",
+      "step1Desc": "Klik atau seret dan letakkan file Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan file hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi WebP ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan file tanpa batas.",
+      "q2": "Apakah file saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. File Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran file?",
+      "a3": "Tidak! Proses file dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "svgToPdf": {
     "name": "SVG ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar SVG."
+    "subtitle": "Buat PDF dari satu atau lebih gambar SVG.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step2Title": "Proses",
+      "step3Title": "Unduh"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah svg to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu registrasi, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "bmpToPdf": {
     "name": "BMP ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar BMP."
+    "subtitle": "Buat PDF dari satu atau lebih gambar BMP.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi BMP ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "heicToPdf": {
     "name": "HEIC ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar HEIC."
+    "subtitle": "Buat PDF dari satu atau lebih gambar HEIC.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi HEIC ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "tiffToPdf": {
     "name": "TIFF ke PDF",
-    "subtitle": "Buat PDF dari satu atau lebih gambar TIFF."
+    "subtitle": "Buat PDF dari satu atau lebih gambar TIFF.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah tiff to pdf benar-benar gratis?",
+      "a1": "Ya! igo sepenuhnya gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "textToPdf": {
     "name": "Teks ke PDF",
@@ -295,7 +1136,35 @@
     "textColor": "Warna Teks",
     "pageSize": "Ukuran Halaman",
     "rtlAutoDetectNote": "Bahasa RTL (Arab, Urdu, Persia, dll.) terdeteksi secara otomatis dan arah teks disesuaikan.",
-    "createButton": "Buat PDF"
+    "createButton": "Buat PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah txt to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "jsonToPdf": {
     "name": "JSON ke PDF",
@@ -314,6 +1183,34 @@
       "zipError": "Kesalahan membuat ZIP: {{message}}",
       "workerError": "Kesalahan Worker: {{message}}",
       "getStarted": "Pilih file JSON untuk memulai"
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi JSON ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "pdfToJpg": {
@@ -331,6 +1228,36 @@
     },
     "loader": {
       "converting": "Mengonversi ke JPG..."
+    },
+    "howItWorks": {
+      "step1Title": "Unggah PDF",
+      "step1Desc": "Pilih berkas PDF yang ingin Anda konversi menjadi gambar",
+      "step2Title": "Pilih Kualitas",
+      "step2Desc": "Pilih kualitas gambar (Rendah, Sedang, Tinggi, Maksimum)",
+      "step3Title": "Pilih Halaman",
+      "step3Desc": "Konversi semua halaman atau pilih halaman tertentu untuk diekstrak",
+      "step4Title": "Unduh Gambar",
+      "step4Desc": "Simpan gambar JPG satu per satu atau sebagai arsip ZIP"
+    },
+    "relatedTools": {
+      "card1Name": "PDF ke PNG",
+      "card1Desc": "Alat PDF ke PNG online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "PDF ke WebP",
+      "card4Desc": "Alat PDF ke WebP online gratis",
+      "card5Name": "Ekstrak Gambar",
+      "card5Desc": "Alat ekstrak gambar online gratis"
+    },
+    "faq": {
+      "q1": "Kualitas apa yang sebaiknya saya pilih?",
+      "a1": "Gunakan Tinggi atau Maksimum untuk gambar berkualitas cetak, Sedang untuk penggunaan web, atau Rendah untuk menghemat ruang penyimpanan. Kualitas yang lebih tinggi menghasilkan ukuran berkas yang lebih besar.",
+      "q2": "Apakah saya bisa mengonversi halaman tertentu saja?",
+      "a2": "Ya! Anda dapat memilih untuk mengonversi semua halaman atau memilih halaman tertentu yang Anda inginkan sebagai gambar JPG.",
+      "q3": "Apakah berkas JPG dikompresi?",
+      "a3": "Ya, JPG adalah format terkompresi. Anda mengendalikan tingkat kualitasnya - kualitas yang lebih tinggi berarti kompresi yang lebih sedikit dan ukuran berkas yang lebih besar."
     }
   },
   "pdfToPng": {
@@ -348,6 +1275,34 @@
     },
     "loader": {
       "converting": "Mengonversi ke PNG..."
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf ke png benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "pdfToWebp": {
@@ -365,6 +1320,34 @@
     },
     "loader": {
       "converting": "Mengonversi ke WebP..."
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to webp benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "pdfToBmp": {
@@ -380,6 +1363,34 @@
     },
     "loader": {
       "converting": "Mengonversi ke BMP..."
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke BMP benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "pdfToTiff": {
@@ -400,6 +1411,34 @@
       "noFileExplanation": "Silakan unggah file PDF terlebih dahulu.",
       "conversionSuccess": "PDF berhasil dikonversi ke TIFF!",
       "conversionError": "Gagal mengonversi PDF ke TIFF. File mungkin rusak."
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to tiff benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "pdfToCbz": {
@@ -434,7 +1473,35 @@
   },
   "pdfToGreyscale": {
     "name": "PDF ke Skala Abu-abu",
-    "subtitle": "Konversi semua warna ke hitam dan putih."
+    "subtitle": "Konversi semua warna ke hitam dan putih.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke skala abu-abu benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfToJson": {
     "name": "PDF ke JSON",
@@ -452,6 +1519,34 @@
       "zipError": "Kesalahan membuat ZIP: {{message}}",
       "workerError": "Kesalahan Worker: {{message}}",
       "getStarted": "Pilih file PDF untuk memulai"
+    },
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to json benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
     }
   },
   "ocrPdf": {
@@ -506,65 +1601,483 @@
     "characterFilteringLabel": "Penyaringan Karakter:",
     "characterFilteringDescription": "Gunakan whitelist untuk memfilter karakter yang tidak diinginkan dan meningkatkan akurasi untuk jenis dokumen tertentu (faktur, formulir, dll.).",
     "multiLanguageSupportLabel": "Dukungan Multi-bahasa:",
-    "multiLanguageSupportDescription": "Pilih beberapa bahasa untuk dokumen yang berisi konten bahasa campuran."
+    "multiLanguageSupportDescription": "Pilih beberapa bahasa untuk dokumen yang berisi konten bahasa campuran.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah OCR PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "alternateMerge": {
     "name": "Alternatif & Campur Halaman",
     "subtitle": "Gabung PDF dengan menggantikan halaman dari setiap PDF. Mempertahankan Bookmark.",
     "retainPageLabels": "Pertahankan label halaman asli dari setiap file",
-    "retainPageLabelsHint": "Mati (default): PDF yang digabungkan menggunakan penomoran halaman alami 1–N. Aktif: label halaman asli setiap file dipertahankan (dapat menghasilkan label ganda)."
+    "retainPageLabelsHint": "Mati (default): PDF yang digabungkan menggunakan penomoran halaman alami 1–N. Aktif: label halaman asli setiap file dipertahankan (dapat menghasilkan label ganda).",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas yang telah diproses secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah alternate merge benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "addAttachments": {
     "name": "Tambah Lampiran",
-    "subtitle": "Sematkan satu atau lebih file ke PDF Anda."
+    "subtitle": "Sematkan satu atau lebih file ke PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah menambahkan lampiran benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "extractAttachments": {
     "name": "Ekstrak Lampiran",
-    "subtitle": "Ekstrak semua file tersemat dari PDF sebagai ZIP."
+    "subtitle": "Ekstrak semua file tersemat dari PDF sebagai ZIP.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah ekstrak lampiran benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "editAttachments": {
     "name": "Edit Lampiran",
-    "subtitle": "Lihat atau hapus lampiran di PDF Anda."
+    "subtitle": "Lihat atau hapus lampiran di PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda seketika"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah edit lampiran benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya aman dan bersifat pribadi?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "dividePages": {
     "name": "Bagi Halaman",
-    "subtitle": "Bagi halaman secara horizontal atau vertikal."
+    "subtitle": "Bagi halaman secara horizontal atau vertikal.",
+    "howItWorks": {
+      "step2Title": "Proses",
+      "step3Title": "Unduh",
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah membagi halaman benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan file tanpa batas.",
+      "q2": "Apakah file saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. File Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran file?",
+      "a3": "Tidak! Proses file dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "addBlankPage": {
     "name": "Tambah Halaman Kosong",
-    "subtitle": "Sisipkan halaman kosong di mana saja di PDF Anda."
+    "subtitle": "Sisipkan halaman kosong di mana saja di PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah tambah halaman kosong benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "reversePages": {
     "name": "Balik Halaman",
-    "subtitle": "Balik urutan semua halaman di dokumen Anda."
+    "subtitle": "Balik urutan semua halaman di dokumen Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas yang telah diproses secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pembalikan halaman benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "rotatePdf": {
     "name": "Putar PDF",
-    "subtitle": "Putar halaman dalam kenaikan 90 derajat."
+    "subtitle": "Putar halaman dalam kenaikan 90 derajat.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepaskan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda seketika"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Pisahkan PDF",
+      "card2Desc": "Alat pisahkan PDF daring gratis",
+      "card3Name": "Atur PDF",
+      "card3Desc": "Alat atur PDF daring gratis",
+      "card4Name": "Kompres PDF",
+      "card4Desc": "Alat kompres PDF daring gratis",
+      "card5Name": "Hapus Halaman",
+      "card5Desc": "Alat hapus halaman daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah rotate PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "rotateCustom": {
     "name": "Putar dengan Derajat Kustom",
-    "subtitle": "Putar halaman dengan sudut kustom apa pun."
+    "subtitle": "Putar halaman dengan sudut kustom apa pun.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah putar kustom benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "nUpPdf": {
     "name": "N-Up PDF",
-    "subtitle": "Susun beberapa halaman ke satu lembar."
+    "subtitle": "Susun beberapa halaman ke satu lembar.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah n up pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya aman dan terjaga privasinya?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "combineToSinglePage": {
     "name": "Gabung ke Halaman Tunggal",
-    "subtitle": "Jahit semua halaman menjadi satu gulungan berkelanjutan."
+    "subtitle": "Jahit semua halaman menjadi satu gulungan berkelanjutan.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF gratis daring",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF gratis daring",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF gratis daring",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF gratis daring",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF gratis daring"
+    },
+    "faq": {
+      "q1": "Apakah combine single page benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "viewMetadata": {
     "name": "Lihat Metadata",
-    "subtitle": "Periksa properti tersembunyi PDF Anda."
+    "subtitle": "Periksa properti tersembunyi PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepaskan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas Anda yang telah diproses secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah lihat metadata benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "editMetadata": {
     "name": "Edit Metadata",
-    "subtitle": "Ubah penulis, judul, dan properti lainnya."
+    "subtitle": "Ubah penulis, judul, dan properti lainnya.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah edit metadata benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfsToZip": {
     "name": "PDF ke ZIP",
-    "subtitle": "Paket beberapa file PDF ke arsip ZIP."
+    "subtitle": "Paket beberapa file PDF ke arsip ZIP.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to zip benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "comparePdfs": {
     "name": "Bandingkan PDF",
@@ -608,91 +2121,620 @@
     "loadingFile": "Memuat {{name}}...",
     "invalidFile": "File tidak valid",
     "invalidFileMsg": "Silakan pilih file PDF yang valid.",
-    "loadError": "Tidak dapat memuat PDF. Mungkin rusak atau dilindungi kata sandi."
+    "loadError": "Tidak dapat memuat PDF. Mungkin rusak atau dilindungi kata sandi.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat bandingkan PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "posterizePdf": {
     "name": "Posterisasi PDF",
-    "subtitle": "Pisah halaman besar menjadi beberapa halaman lebih kecil."
+    "subtitle": "Pisah halaman besar menjadi beberapa halaman lebih kecil.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step2Title": "Proses",
+      "step3Title": "Unduh"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah posterize pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "fixPageSize": {
     "name": "Perbaiki Ukuran Halaman",
-    "subtitle": "Standarkan semua halaman ke ukuran seragam."
+    "subtitle": "Standarkan semua halaman ke ukuran seragam.",
+    "howItWorks": {
+      "step1Title": "Unggah File",
+      "step1Desc": "Klik atau seret dan lepas file Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan file hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah perbaikan ukuran halaman benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan file tanpa batas.",
+      "q2": "Apakah file saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. File Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran file?",
+      "a3": "Tidak! Proses file berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "linearizePdf": {
     "name": "Linierisasi PDF",
-    "subtitle": "Optimalkan PDF untuk tampilan web cepat."
+    "subtitle": "Optimalkan PDF untuk tampilan web cepat.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah linearize PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pageDimensions": {
     "name": "Dimensi Halaman",
-    "subtitle": "Analisis ukuran halaman, orientasi, dan unit."
+    "subtitle": "Analisis ukuran halaman, orientasi, dan unit.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat dimensi halaman ini benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "removeRestrictions": {
     "name": "Hapus Pembatasan",
-    "subtitle": "Hapus perlindungan kata sandi dan pembatasan keamanan yang terkait dengan file PDF yang ditandatangani secara digital."
+    "subtitle": "Hapus perlindungan kata sandi dan pembatasan keamanan yang terkait dengan file PDF yang ditandatangani secara digital.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah penghapusan pembatasan benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "repairPdf": {
     "name": "Perbaiki PDF",
-    "subtitle": "Pulihkan data dari file PDF yang rusak atau rusak."
+    "subtitle": "Pulihkan data dari file PDF yang rusak atau rusak.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah repair pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu registrasi, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "encryptPdf": {
     "name": "Enkripsi PDF",
-    "subtitle": "Kunci PDF Anda dengan menambahkan kata sandi."
+    "subtitle": "Kunci PDF Anda dengan menambahkan kata sandi.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah encrypt pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "sanitizePdf": {
     "name": "Sanitasi PDF",
-    "subtitle": "Hapus metadata, anotasi, skrip, dan lainnya."
+    "subtitle": "Hapus metadata, anotasi, skrip, dan lainnya.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah sanitasi PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "decryptPdf": {
     "name": "Dekripsi PDF",
-    "subtitle": "Buka kunci PDF dengan menghapus perlindungan kata sandi."
+    "subtitle": "Buka kunci PDF dengan menghapus perlindungan kata sandi.",
+    "howItWorks": {
+      "step2Title": "Proses",
+      "step3Title": "Unduh",
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah decrypt PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "flattenPdf": {
     "name": "Ratakan PDF",
-    "subtitle": "Buat bidang formulir dan anotasi tidak dapat diedit."
+    "subtitle": "Buat bidang formulir dan anotasi tidak dapat diedit.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil pemrosesan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah flatten PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "removeMetadata": {
     "name": "Hapus Metadata",
-    "subtitle": "Hapus data tersembunyi dari PDF Anda."
+    "subtitle": "Hapus data tersembunyi dari PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah penghapusan metadata benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "changePermissions": {
     "name": "Ubah Izin",
-    "subtitle": "Atur atau ubah izin pengguna pada PDF."
+    "subtitle": "Atur atau ubah izin pengguna pada PDF.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah ubah izin benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "odtToPdf": {
     "name": "ODT ke PDF",
     "subtitle": "Konversi file OpenDocument Text ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File ODT",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah odt to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "csvToPdf": {
     "name": "CSV ke PDF",
     "subtitle": "Konversi file spreadsheet CSV ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File CSV",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi CSV ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "rtfToPdf": {
     "name": "RTF ke PDF",
     "subtitle": "Konversi dokumen Rich Text Format ke PDF. Mendukung beberapa file.",
     "acceptedFormats": "File RTF",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah rtf to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "wordToPdf": {
     "name": "Word ke PDF",
     "subtitle": "Konversi dokumen Word (DOCX, DOC, ODT, RTF) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File DOCX, DOC, ODT, RTF",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas Word",
+      "step1Desc": "Pilih atau seret berkas DOCX atau DOC yang ingin Anda konversi",
+      "step2Title": "Konversi Otomatis",
+      "step2Desc": "Konversi dimulai secara otomatis dan diproses di peramban Anda",
+      "step3Title": "Pratinjau Hasil",
+      "step3Desc": "Lihat PDF hasil konversi dengan format yang tetap terjaga",
+      "step4Title": "Unduh PDF",
+      "step4Desc": "Simpan berkas PDF Anda dengan format yang terjaga sempurna"
+    },
+    "relatedTools": {
+      "card1Name": "Pdf ke Docx",
+      "card1Desc": "Alat pdf ke docx daring gratis",
+      "card2Name": "Excel ke Pdf",
+      "card2Desc": "Alat excel ke pdf daring gratis",
+      "card3Name": "Powerpoint ke Pdf",
+      "card3Desc": "Alat powerpoint ke pdf daring gratis",
+      "card4Name": "Txt ke Pdf",
+      "card4Desc": "Alat txt ke pdf daring gratis",
+      "card5Name": "Gabung Pdf",
+      "card5Desc": "Alat gabung pdf daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah alat ini bekerja dengan berkas .doc dan .docx?",
+      "a1": "Ya! igo mendukung format Microsoft Word lama (.doc) maupun yang lebih baru (.docx).",
+      "q2": "Apakah formatnya akan tetap terjaga?",
+      "a2": "Ya! Font, gambar, tabel, header, footer, dan seluruh format tetap terjaga persis seperti tampilannya di Word.",
+      "q3": "Bisakah saya mengonversi berkas Word yang dilindungi kata sandi?",
+      "a3": "Anda perlu membuka kunci berkas yang dilindungi kata sandi terlebih dahulu sebelum mengonversinya ke PDF."
+    }
   },
   "excelToPdf": {
     "name": "Excel ke PDF",
     "subtitle": "Konversi spreadsheet Excel (XLSX, XLS, ODS, CSV) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File XLSX, XLS, ODS, CSV",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "PDF ke Excel",
+      "card1Desc": "Alat PDF ke Excel daring gratis",
+      "card2Name": "Word ke PDF",
+      "card2Desc": "Alat Word ke PDF daring gratis",
+      "card3Name": "CSV ke PDF",
+      "card3Desc": "Alat CSV ke PDF daring gratis",
+      "card4Name": "Gabung PDF",
+      "card4Desc": "Alat gabung PDF daring gratis",
+      "card5Name": "Kompres PDF",
+      "card5Desc": "Alat kompres PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi Excel ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "powerpointToPdf": {
     "name": "PowerPoint ke PDF",
     "subtitle": "Konversi presentasi PowerPoint (PPTX, PPT, ODP) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File PPTX, PPT, ODP",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda seketika"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah powerpoint ke pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "markdownToPdf": {
     "name": "Markdown ke PDF",
@@ -712,12 +2754,47 @@
     "optAllowHtml": "Izinkan tag HTML",
     "optBreaks": "Konversi baris baru ke <br>",
     "optLinkify": "Konversi otomatis URL ke tautan",
-    "optTypographer": "Typographer (kutipan cerdas, dll.)"
+    "optTypographer": "Typographer (kutipan cerdas, dll.)",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah markdown to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjamin.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfBooklet": {
     "name": "Buku Kecil PDF",
     "subtitle": "Susun ulang halaman untuk pencetakan buku kecil dua sisi. Lipat dan jahit untuk membuat buku kecil.",
-    "howItWorks": "Cara kerjanya:",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
     "step1": "Unggah file PDF.",
     "step2": "Halaman akan disusun ulang dalam urutan buku kecil.",
     "step3": "Cetak dua sisi, balik di tepi pendek, lipat dan jahit.",
@@ -728,113 +2805,665 @@
     "pagesPerSheet": "Halaman per Lembar",
     "createBooklet": "Buat Buku Kecil",
     "processing": "Memproses...",
-    "pageCount": "Jumlah halaman akan diisi ke kelipatan 4 jika diperlukan."
+    "pageCount": "Jumlah halaman akan diisi ke kelipatan 4 jika diperlukan.",
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf booklet benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "xpsToPdf": {
     "name": "XPS ke PDF",
     "subtitle": "Konversi dokumen XPS/OXPS ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File XPS, OXPS",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah xps to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "mobiToPdf": {
     "name": "MOBI ke PDF",
     "subtitle": "Konversi e-book MOBI ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File MOBI",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi MOBI ke PDF benar-benar gratis?",
+      "a1": "Ya! igo sepenuhnya gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "epubToPdf": {
     "name": "EPUB ke PDF",
     "subtitle": "Konversi e-book EPUB ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File EPUB",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi EPUB ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "fb2ToPdf": {
     "name": "FB2 ke PDF",
     "subtitle": "Konversi e-book FictionBook (FB2) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File FB2",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah fb2 to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "cbzToPdf": {
     "name": "CBZ ke PDF",
     "subtitle": "Konversi arsip buku komik (CBZ/CBR) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File CBZ, CBR",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara langsung"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi CBZ ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat, sehingga privasi terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "wpdToPdf": {
     "name": "WPD ke PDF",
     "subtitle": "Konversi dokumen WordPerfect (WPD) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File WPD",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah wpd to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "wpsToPdf": {
     "name": "WPS ke PDF",
     "subtitle": "Konversi dokumen WPS Office ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File WPS",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepaskan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi WPS ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya aman dan terjaga privasinya?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "xmlToPdf": {
     "name": "XML ke PDF",
     "subtitle": "Konversi dokumen XML ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File XML",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah xml to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pagesToPdf": {
     "name": "Pages ke PDF",
     "subtitle": "Konversi dokumen Apple Pages ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File Pages",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi pages ke pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "odgToPdf": {
     "name": "ODG ke PDF",
     "subtitle": "Konversi file OpenDocument Graphics (ODG) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File ODG",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi ODG ke PDF benar-benar gratis?",
+      "a1": "Ya! igo sepenuhnya gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "odsToPdf": {
     "name": "ODS ke PDF",
     "subtitle": "Konversi file OpenDocument Spreadsheet (ODS) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File ODS",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah ods to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "odpToPdf": {
     "name": "ODP ke PDF",
     "subtitle": "Konversi file OpenDocument Presentation (ODP) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File ODP",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi ODP ke PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pubToPdf": {
     "name": "PUB ke PDF",
     "subtitle": "Konversi file Microsoft Publisher (PUB) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File PUB",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pub to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "vsdToPdf": {
     "name": "VSD ke PDF",
     "subtitle": "Konversi file Microsoft Visio (VSD, VSDX) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File VSD, VSDX",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Merge Pdf",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Compress Pdf",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Split Pdf",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit Pdf",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Rotate Pdf",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah vsd to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "psdToPdf": {
     "name": "PSD ke PDF",
     "subtitle": "Konversi file Adobe Photoshop (PSD) ke format PDF. Mendukung beberapa file.",
     "acceptedFormats": "File PSD",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan letakkan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah psd to pdf benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfToSvg": {
     "name": "PDF ke SVG",
-    "subtitle": "Konversi setiap halaman file PDF menjadi grafik vektor skalabel (SVG) untuk kualitas sempurna di ukuran apa pun."
+    "subtitle": "Konversi setiap halaman file PDF menjadi grafik vektor skalabel (SVG) untuk kualitas sempurna di ukuran apa pun.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda seketika"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke SVG benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "extractTables": {
     "name": "Ekstrak Tabel PDF",
-    "subtitle": "Ekstrak tabel dari file PDF dan ekspor sebagai CSV, JSON, atau Markdown."
+    "subtitle": "Ekstrak tabel dari file PDF dan ekspor sebagai CSV, JSON, atau Markdown.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepaskan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah ekstrak tabel benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya aman dan terjaga privasinya?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pdfToCsv": {
     "name": "PDF ke CSV",
-    "subtitle": "Ekstrak tabel dari PDF dan konversi ke format CSV."
+    "subtitle": "Ekstrak tabel dari PDF dan konversi ke format CSV.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan letakkan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to csv benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfToExcel": {
     "name": "PDF ke Excel",
-    "subtitle": "Ekstrak tabel dari PDF dan konversi ke format Excel (XLSX)."
+    "subtitle": "Ekstrak tabel dari PDF dan konversi ke format Excel (XLSX).",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke Excel benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjamin sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pdfToText": {
     "name": "PDF ke Teks",
@@ -842,7 +3471,35 @@
     "noteLabel": "Catatan:",
     "noteText": "Alat ini HANYA bekerja dengan PDF yang dibuat secara digital. Untuk dokumen pindai atau PDF berbasis gambar, gunakan alat OCR PDF kami sebagai gantinya.",
     "convertButton": "Ekstrak Teks",
-    "note": "Alat ini bekerja HANYA dengan PDF yang dibuat secara digital. Untuk dokumen terpindai atau PDF berbasis gambar, gunakan alat OCR PDF kami sebagai gantinya."
+    "note": "Alat ini bekerja HANYA dengan PDF yang dibuat secara digital. Untuk dokumen terpindai atau PDF berbasis gambar, gunakan alat OCR PDF kami sebagai gantinya.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to text benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjamin.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "digitalSignPdf": {
     "name": "Tanda Tangan Digital PDF",
@@ -933,7 +3590,31 @@
   "validateSignaturePdf": {
     "name": "Validasi Tanda Tangan PDF",
     "pageTitle": "Validasi Tanda Tangan PDF - Verifikasi Tanda Tangan Digital | igo",
-    "subtitle": "Verifikasi tanda tangan digital di file PDF Anda. Periksa validitas sertifikat, lihat detail penandatangan, dan konfirmasi integritas dokumen. Semua pemrosesan terjadi di browser Anda."
+    "subtitle": "Verifikasi tanda tangan digital di file PDF Anda. Periksa validitas sertifikat, lihat detail penandatangan, dan konfirmasi integritas dokumen. Semua pemrosesan terjadi di browser Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah PDF Anda",
+      "step1Desc": "Pilih berkas PDF yang telah ditandatangani secara digital dari perangkat Anda",
+      "step2Title": "Analisis Otomatis",
+      "step2Desc": "Alat ini mengekstrak dan mengurai seluruh tanda tangan digital dalam dokumen",
+      "step3Title": "Lihat Hasil",
+      "step3Desc": "Lihat informasi penanda tangan, keabsahan sertifikat, dan status tanda tangan"
+    },
+    "relatedTools": {
+      "card1Name": "Tanda Tangan Digital",
+      "card1Desc": "Tambahkan tanda tangan kriptografis",
+      "card2Name": "Enkripsi PDF",
+      "card2Desc": "Lindungi PDF dengan kata sandi",
+      "card3Name": "Lihat Metadata",
+      "card3Desc": "Periksa properti PDF"
+    },
+    "faq": {
+      "q1": "Jenis tanda tangan apa saja yang dapat divalidasi?",
+      "a1": "Alat ini memvalidasi tanda tangan digital PKCS#7 yang dibuat dengan sertifikat X.509, format standar yang digunakan oleh sebagian besar alat penandatanganan PDF dan otoritas sertifikat.",
+      "q2": "Apa arti \"Sertifikat Bertanda Tangan Sendiri\"?",
+      "a2": "Sertifikat bertanda tangan sendiri (self-signed) adalah sertifikat yang penerbit dan subjeknya sama. Meskipun tanda tangannya secara teknis valid, hal ini berarti sertifikat tersebut tidak diterbitkan oleh Otoritas Sertifikat (CA) tepercaya.",
+      "q3": "Apakah PDF saya diunggah ke server?",
+      "a3": "Tidak, semua pemrosesan terjadi sepenuhnya di peramban Anda. Berkas PDF Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi dan keamanan sepenuhnya."
+    }
   },
   "timestampPdf": {
     "name": "Stempel Waktu PDF",
@@ -948,7 +3629,37 @@
     "name": "Email ke PDF",
     "subtitle": "Konversi file email (EML, MSG) ke format PDF. Mendukung ekspor Outlook dan format email standar.",
     "acceptedFormats": "File EML, MSG",
-    "convertButton": "Konversi ke PDF"
+    "convertButton": "Konversi ke PDF",
+    "howItWorks": {
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol konversi untuk menghasilkan PDF Anda",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas PDF hasil konversi Anda secara instan",
+      "step1Title": "Unggah Berkas Email",
+      "step1Desc": "Klik atau seret dan lepas berkas .eml atau .msg Anda untuk memulai"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Word ke PDF",
+      "card2Desc": "Konversi dokumen Word ke PDF",
+      "card3Name": "Kompres PDF",
+      "card3Desc": "Alat kompres PDF daring gratis",
+      "card4Name": "Teks ke PDF",
+      "card4Desc": "Konversi berkas teks ke PDF",
+      "card5Name": "Edit PDF",
+      "card5Desc": "Alat edit PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Format email apa saja yang didukung?",
+      "a1": "igo mendukung berkas .eml (format email standar) dan .msg (Microsoft Outlook). Ini adalah format yang paling umum untuk email yang diekspor atau disimpan.",
+      "q2": "Apakah konversi email ke PDF benar-benar gratis?",
+      "a2": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q3": "Apakah email saya tetap terjaga kerahasiaannya?",
+      "a3": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas email Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi penuh untuk komunikasi yang bersifat sensitif.",
+      "q4": "Bagaimana dengan lampiran email?",
+      "a4": "PDF menampilkan daftar lampiran di bagian bawah dan juga menyematkan berkas aslinya ke dalam PDF. Anda dapat mengaksesnya melalui panel Lampiran pada pembaca PDF seperti Adobe Reader atau Foxit."
+    }
   },
   "fontToOutline": {
     "name": "Font ke Garis Tepi",
@@ -960,31 +3671,224 @@
   },
   "pdfToWord": {
     "name": "PDF ke Word",
-    "subtitle": "Konversi file PDF ke dokumen Word yang dapat diedit."
+    "subtitle": "Konversi file PDF ke dokumen Word yang dapat diedit.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Word ke PDF",
+      "card1Desc": "Alat word ke PDF daring gratis",
+      "card2Name": "PDF ke Teks",
+      "card2Desc": "Alat PDF ke teks daring gratis",
+      "card3Name": "PDF ke Excel",
+      "card3Desc": "Alat PDF ke Excel daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Ekstrak Halaman",
+      "card5Desc": "Alat ekstrak halaman daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke DOCX benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "extractImages": {
     "name": "Ekstrak Gambar",
-    "subtitle": "Ekstrak semua gambar yang tertanam dari file PDF Anda."
+    "subtitle": "Ekstrak semua gambar yang tertanam dari file PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah ekstrak gambar benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfToMarkdown": {
     "name": "PDF ke Markdown",
-    "subtitle": "Konversi teks dan tabel PDF ke format Markdown."
+    "subtitle": "Konversi teks dan tabel PDF ke format Markdown.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf to markdown benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Semua pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "preparePdfForAi": {
     "name": "Siapkan PDF untuk AI",
-    "subtitle": "Ekstrak konten PDF sebagai JSON LlamaIndex untuk pipeline RAG/LLM."
+    "subtitle": "Ekstrak konten PDF sebagai JSON LlamaIndex untuk pipeline RAG/LLM.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepaskan berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil olahan Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah prepare pdf for ai benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batas ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "pdfOcg": {
     "name": "Lapisan PDF (OCG)",
-    "subtitle": "Lihat, beralih, tambah, dan hapus lapisan OCG di PDF Anda."
+    "subtitle": "Lihat, beralih, tambah, dan hapus lapisan OCG di PDF Anda.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabungkan PDF",
+      "card1Desc": "Alat gabungkan PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisahkan PDF",
+      "card3Desc": "Alat pisahkan PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah pdf layers benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya privat dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi tetap terjaga sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pdfToPdfa": {
     "name": "PDF ke PDF/A",
-    "subtitle": "Konversi PDF ke PDF/A untuk pengarsipan jangka panjang."
+    "subtitle": "Konversi PDF ke PDF/A untuk pengarsipan jangka panjang.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step1Desc": "Klik atau seret dan lepas berkas Anda untuk memulai",
+      "step2Title": "Proses",
+      "step2Desc": "Klik tombol proses untuk memulai",
+      "step3Title": "Unduh",
+      "step3Desc": "Simpan berkas hasil proses Anda secara instan"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF online gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF online gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF online gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF online gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF online gratis"
+    },
+    "faq": {
+      "q1": "Apakah konversi PDF ke PDF/A benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu mendaftar, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga menjamin privasi sepenuhnya.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas dengan ukuran berapa pun, sebanyak yang Anda inginkan, sepenuhnya gratis."
+    }
   },
   "rasterizePdf": {
     "name": "Rasterisasi PDF",
-    "subtitle": "Konversi PDF ke PDF berbasis gambar. Ratakan lapisan dan hapus teks yang dapat dipilih."
+    "subtitle": "Konversi PDF ke PDF berbasis gambar. Ratakan lapisan dan hapus teks yang dapat dipilih.",
+    "howItWorks": {
+      "step1Title": "Unggah Berkas",
+      "step2Title": "Proses",
+      "step3Title": "Unduh"
+    },
+    "relatedTools": {
+      "card1Name": "Gabung PDF",
+      "card1Desc": "Alat gabung PDF daring gratis",
+      "card2Name": "Kompres PDF",
+      "card2Desc": "Alat kompres PDF daring gratis",
+      "card3Name": "Pisah PDF",
+      "card3Desc": "Alat pisah PDF daring gratis",
+      "card4Name": "Edit PDF",
+      "card4Desc": "Alat edit PDF daring gratis",
+      "card5Name": "Putar PDF",
+      "card5Desc": "Alat putar PDF daring gratis"
+    },
+    "faq": {
+      "q1": "Apakah rasterisasi PDF benar-benar gratis?",
+      "a1": "Ya! igo 100% gratis tanpa biaya tersembunyi, tanpa perlu pendaftaran, dan pemrosesan berkas tanpa batas.",
+      "q2": "Apakah berkas saya bersifat pribadi dan aman?",
+      "a2": "Tentu saja! Seluruh pemrosesan berlangsung di peramban Anda. Berkas Anda tidak pernah meninggalkan perangkat Anda, sehingga privasi Anda sepenuhnya terjaga.",
+      "q3": "Apakah ada batasan ukuran berkas?",
+      "a3": "Tidak! Proses berkas berukuran berapa pun, sebanyak yang Anda mau, sepenuhnya gratis."
+    }
   },
   "pdfWorkflow": {
     "name": "Pembangun Alur Kerja PDF",

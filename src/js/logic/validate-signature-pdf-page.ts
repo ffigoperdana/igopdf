@@ -68,16 +68,16 @@ function initializePage(): void {
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      dropZone.classList.add('bg-gray-700');
+      dropZone.classList.add('bg-surface-muted');
     });
 
     dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
     });
 
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.classList.remove('bg-gray-700');
+      dropZone.classList.remove('bg-surface-muted');
       const droppedFiles = e.dataTransfer?.files;
       if (droppedFiles && droppedFiles.length > 0) {
         handlePdfFile(droppedFiles[0]);
@@ -95,16 +95,16 @@ function initializePage(): void {
   if (certDropZone) {
     certDropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
-      certDropZone.classList.add('bg-gray-700');
+      certDropZone.classList.add('bg-surface-muted');
     });
 
     certDropZone.addEventListener('dragleave', () => {
-      certDropZone.classList.remove('bg-gray-700');
+      certDropZone.classList.remove('bg-surface-muted');
     });
 
     certDropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      certDropZone.classList.remove('bg-gray-700');
+      certDropZone.classList.remove('bg-surface-muted');
       const droppedFiles = e.dataTransfer?.files;
       if (droppedFiles && droppedFiles.length > 0) {
         handleCertFile(droppedFiles[0]);
@@ -158,17 +158,17 @@ function updatePdfDisplay(): void {
 
   const fileDiv = document.createElement('div');
   fileDiv.className =
-    'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+    'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
 
   const infoContainer = document.createElement('div');
   infoContainer.className = 'flex flex-col flex-1 min-w-0';
 
   const nameSpan = document.createElement('div');
-  nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+  nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
   nameSpan.textContent = state.pdfFile.name;
 
   const metaSpan = document.createElement('div');
-  metaSpan.className = 'text-xs text-gray-400';
+  metaSpan.className = 'text-xs text-content-muted';
   metaSpan.textContent = formatBytes(state.pdfFile.size);
 
   infoContainer.append(nameSpan, metaSpan);
@@ -241,13 +241,13 @@ function updateCertDisplay(): void {
 
   const certDiv = document.createElement('div');
   certDiv.className =
-    'flex items-center justify-between bg-gray-700 p-3 rounded-lg';
+    'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
 
   const infoContainer = document.createElement('div');
   infoContainer.className = 'flex flex-col flex-1 min-w-0';
 
   const nameSpan = document.createElement('div');
-  nameSpan.className = 'truncate font-medium text-gray-200 text-sm mb-1';
+  nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
 
   const cn = state.trustedCert.subject.getField('CN');
   nameSpan.textContent = (cn?.value as string) || state.trustedCertFile.name;
@@ -307,10 +307,10 @@ function displayResults(): void {
 
   if (state.results.length === 0) {
     resultsContainer.innerHTML = `
-            <div class="bg-gray-700 rounded-lg p-6 text-center border border-gray-600">
-                <i data-lucide="file-x" class="w-12 h-12 mx-auto mb-4 text-gray-400"></i>
+            <div class="bg-surface-muted rounded-lg p-6 text-center border border-line">
+                <i data-lucide="file-x" class="w-12 h-12 mx-auto mb-4 text-content-muted"></i>
                 <h3 class="text-lg font-semibold text-white mb-2">No Signatures Found</h3>
-                <p class="text-gray-400">This PDF does not contain any digital signatures.</p>
+                <p class="text-content-muted">This PDF does not contain any digital signatures.</p>
             </div>
         `;
     createIcons({ icons });
@@ -319,7 +319,7 @@ function displayResults(): void {
 
   const summaryDiv = document.createElement('div');
   summaryDiv.className =
-    'mb-4 p-3 bg-gray-700 rounded-lg border border-gray-600';
+    'mb-4 p-3 bg-surface-muted rounded-lg border border-line';
 
   const validCount = state.results.filter(
     (r) => r.isValid && !r.isExpired
@@ -329,17 +329,17 @@ function displayResults(): void {
     : 0;
 
   let summaryHtml = `
-        <p class="text-gray-300">
+        <p class="text-content-muted">
             <span class="font-semibold text-white">${state.results.length}</span> 
             signature${state.results.length > 1 ? 's' : ''} found
-            <span class="text-gray-500">•</span>
+            <span class="text-content-muted">•</span>
             <span class="${validCount === state.results.length ? 'text-green-400' : 'text-yellow-400'}">${validCount} valid</span>
         </p>
     `;
 
   if (state.trustedCert) {
     summaryHtml += `
-            <p class="text-xs text-gray-400 mt-1">
+            <p class="text-xs text-content-muted mt-1">
                 <i data-lucide="shield-check" class="inline w-3 h-3 mr-1"></i>
                 Trust verification: ${trustVerified}/${state.results.length} signatures verified against custom certificate
             </p>
@@ -362,7 +362,7 @@ function createSignatureCard(
   index: number
 ): HTMLElement {
   const card = document.createElement('div');
-  card.className = 'bg-gray-700 rounded-lg p-4 border border-gray-600 mb-4';
+  card.className = 'bg-surface-muted rounded-lg p-4 border border-line mb-4';
 
   let statusColor = 'text-green-400';
   let statusIcon = 'check-circle';
@@ -413,7 +413,7 @@ function createSignatureCard(
         '<span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded ml-2"><i data-lucide="shield-check" class="inline w-3 h-3 mr-1"></i>Trusted</span>';
     } else {
       trustBadge =
-        '<span class="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded ml-2"><i data-lucide="shield-x" class="inline w-3 h-3 mr-1"></i>Not in trust chain</span>';
+        '<span class="text-xs bg-surface-muted text-content-muted px-2 py-1 rounded ml-2"><i data-lucide="shield-x" class="inline w-3 h-3 mr-1"></i>Not in trust chain</span>';
     }
   }
 
@@ -440,15 +440,15 @@ function createSignatureCard(
         <div class="space-y-3 text-sm">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <p class="text-gray-400">Signed By</p>
+                    <p class="text-content-muted">Signed By</p>
                     <p class="text-white font-medium">${escapeHtml(result.signerName)}</p>
-                    ${result.signerOrg ? `<p class="text-gray-400 text-xs">${escapeHtml(result.signerOrg)}</p>` : ''}
-                    ${result.signerEmail ? `<p class="text-gray-400 text-xs">${escapeHtml(result.signerEmail)}</p>` : ''}
+                    ${result.signerOrg ? `<p class="text-content-muted text-xs">${escapeHtml(result.signerOrg)}</p>` : ''}
+                    ${result.signerEmail ? `<p class="text-content-muted text-xs">${escapeHtml(result.signerEmail)}</p>` : ''}
                 </div>
                 <div>
-                    <p class="text-gray-400">Issuer</p>
+                    <p class="text-content-muted">Issuer</p>
                     <p class="text-white font-medium">${escapeHtml(result.issuer)}</p>
-                    ${result.issuerOrg ? `<p class="text-gray-400 text-xs">${escapeHtml(result.issuerOrg)}</p>` : ''}
+                    ${result.issuerOrg ? `<p class="text-content-muted text-xs">${escapeHtml(result.issuerOrg)}</p>` : ''}
                 </div>
             </div>
 
@@ -456,7 +456,7 @@ function createSignatureCard(
               result.signatureDate
                 ? `
                 <div>
-                    <p class="text-gray-400">Signed On</p>
+                    <p class="text-content-muted">Signed On</p>
                     <p class="text-white">${formatDate(result.signatureDate)}</p>
                 </div>
             `
@@ -465,11 +465,11 @@ function createSignatureCard(
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <p class="text-gray-400">Valid From</p>
+                    <p class="text-content-muted">Valid From</p>
                     <p class="text-white">${formatDate(result.validFrom)}</p>
                 </div>
                 <div>
-                    <p class="text-gray-400">Valid Until</p>
+                    <p class="text-content-muted">Valid Until</p>
                     <p class="${result.isExpired ? 'text-red-400' : 'text-white'}">${formatDate(result.validTo)}</p>
                 </div>
             </div>
@@ -478,7 +478,7 @@ function createSignatureCard(
               result.reason
                 ? `
                 <div>
-                    <p class="text-gray-400">Reason</p>
+                    <p class="text-content-muted">Reason</p>
                     <p class="text-white">${escapeHtml(result.reason)}</p>
                 </div>
             `
@@ -489,7 +489,7 @@ function createSignatureCard(
               result.location
                 ? `
                 <div>
-                    <p class="text-gray-400">Location</p>
+                    <p class="text-content-muted">Location</p>
                     <p class="text-white">${escapeHtml(result.location)}</p>
                 </div>
             `
@@ -497,13 +497,13 @@ function createSignatureCard(
             }
 
             <details class="mt-2">
-                <summary class="cursor-pointer text-indigo-400 hover:text-indigo-300 text-sm">
+                <summary class="cursor-pointer text-palm-400 hover:text-palm-300 text-sm">
                     Technical Details
                 </summary>
-                <div class="mt-2 p-3 bg-gray-800 rounded text-xs space-y-1">
-                    <p><span class="text-gray-400">Serial Number:</span> <span class="text-gray-300 font-mono">${escapeHtml(result.serialNumber)}</span></p>
-                    <p><span class="text-gray-400">Digest Algorithm:</span> <span class="text-gray-300">${escapeHtml(result.algorithms.digest)}</span></p>
-                    <p><span class="text-gray-400">Signature Algorithm:</span> <span class="text-gray-300">${escapeHtml(result.algorithms.signature)}</span></p>
+                <div class="mt-2 p-3 bg-surface-raised rounded text-xs space-y-1">
+                    <p><span class="text-content-muted">Serial Number:</span> <span class="text-content-muted font-mono">${escapeHtml(result.serialNumber)}</span></p>
+                    <p><span class="text-content-muted">Digest Algorithm:</span> <span class="text-content-muted">${escapeHtml(result.algorithms.digest)}</span></p>
+                    <p><span class="text-content-muted">Signature Algorithm:</span> <span class="text-content-muted">${escapeHtml(result.algorithms.signature)}</span></p>
                     ${result.errorMessage ? `<p class="text-red-400">Error: ${escapeHtml(result.errorMessage)}</p>` : ''}
                     ${result.unsupportedAlgorithmReason ? `<p class="text-yellow-300">${escapeHtml(result.unsupportedAlgorithmReason)}</p>` : ''}
                 </div>

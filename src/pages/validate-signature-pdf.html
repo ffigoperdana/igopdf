@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -96,20 +97,20 @@
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
   </head>
 
-  <body class="antialiased bg-gray-900">
+  <body class="antialiased bg-surface">
     {{> navbar }}
 
     <div
       id="uploader"
-      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-gray-900"
+      class="min-h-screen flex flex-col items-center justify-start py-12 p-4 bg-surface"
     >
       <div
         id="tool-uploader"
-        class="bg-gray-800 rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-gray-200 border border-gray-700"
+        class="bg-surface-raised rounded-xl shadow-xl px-4 py-8 md:p-8 max-w-2xl w-full text-content border border-line"
       >
         <button
           id="back-to-tools"
-          class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 mb-6 font-semibold"
+          class="flex items-center gap-2 text-palm-400 hover:text-palm-300 mb-6 font-semibold"
         >
           <i data-lucide="arrow-left" class="cursor-pointer"></i>
           <span class="cursor-pointer" data-i18n="tools.backToTools">
@@ -118,13 +119,13 @@
         </button>
 
         <h1
-          class="text-2xl font-bold text-white mb-2"
+          class="text-2xl font-bold text-content mb-2"
           data-i18n="tools:validateSignaturePdf.name"
         >
           Validate PDF Signature
         </h1>
         <p
-          class="text-gray-400 mb-6"
+          class="text-content-muted mb-6"
           data-i18n="tools:validateSignaturePdf.subtitle"
         >
           Verify digital signatures in your PDF files. Check certificate
@@ -134,26 +135,26 @@
 
         <div
           id="drop-zone"
-          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300"
+          class="relative flex flex-col items-center justify-center w-full h-48 md:h-64 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface hover:bg-surface-muted transition-colors duration-300"
         >
           <div class="flex flex-col items-center justify-center pt-5 pb-6">
             <i
               data-lucide="cloud-upload"
-              class="w-10 h-10 mb-3 text-gray-400"
+              class="w-10 h-10 mb-3 text-content-muted"
             ></i>
-            <p class="mb-2 text-sm text-gray-400">
+            <p class="mb-2 text-sm text-content-muted">
               <span class="font-semibold" data-i18n="upload.clickToSelect"
                 >Click to select a file</span
               >
               <span data-i18n="upload.orDragAndDrop">or drag and drop</span>
             </p>
             <p
-              class="text-xs text-gray-500"
+              class="text-xs text-content-muted"
               data-i18n="upload.hints.pdfDocuments"
             >
               PDF Documents
             </p>
-            <p class="text-xs text-gray-500" data-i18n="upload.filesNeverLeave">
+            <p class="text-xs text-content-muted" data-i18n="upload.filesNeverLeave">
               Your files never leave your device.
             </p>
           </div>
@@ -169,21 +170,21 @@
 
         <div id="custom-cert-section" class="hidden mt-6 space-y-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-gray-300">
+            <h2 class="text-sm font-semibold text-content-muted">
               Custom Certificate File X.509 (Optional)
             </h2>
           </div>
-          <p class="text-xs text-gray-500">
+          <p class="text-xs text-content-muted">
             Upload a trusted X.509 certificate to validate against a custom
             trust source.
           </p>
           <div
             id="cert-drop-zone"
-            class="relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer bg-gray-900 hover:bg-gray-700 transition-colors duration-300"
+            class="relative flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-line rounded-xl cursor-pointer bg-surface hover:bg-surface-muted transition-colors duration-300"
           >
             <div class="flex flex-col items-center justify-center py-2">
-              <i data-lucide="shield" class="w-6 h-6 mb-1 text-gray-400"></i>
-              <p class="text-xs text-gray-400">
+              <i data-lucide="shield" class="w-6 h-6 mb-1 text-content-muted"></i>
+              <p class="text-xs text-content-muted">
                 Upload certificate (.pem, .crt, .cer)
               </p>
             </div>
@@ -198,7 +199,7 @@
         </div>
 
         <div id="results-section" class="hidden mt-6">
-          <h2 class="text-lg font-semibold text-white mb-4">
+          <h2 class="text-lg font-semibold text-content mb-4">
             Signature Validation Results
           </h2>
           <div id="results-container"></div>
@@ -211,10 +212,10 @@
       class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
     >
       <div
-        class="bg-gray-800 p-8 rounded-lg flex flex-col items-center gap-4 border border-gray-700 shadow-xl"
+        class="bg-surface-raised p-8 rounded-lg flex flex-col items-center gap-4 border border-line shadow-xl"
       >
         <div class="solid-spinner"></div>
-        <p id="loader-text" class="text-white text-lg font-medium">
+        <p id="loader-text" class="text-content text-lg font-medium">
           Processing...
         </p>
       </div>
@@ -222,22 +223,22 @@
 
     <div
       id="alert-modal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden"
+      class="fixed inset-0 bg-surface bg-opacity-90 flex items-center justify-center z-50 hidden"
     >
       <div
-        class="bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full border border-gray-700"
+        class="bg-surface-raised rounded-lg shadow-xl p-6 max-w-sm w-full border border-line"
       >
         <h3
           id="alert-title"
-          class="text-xl font-bold text-white mb-2"
+          class="text-xl font-bold text-content mb-2"
           data-i18n="alert.title"
         >
           Alert
         </h3>
-        <p id="alert-message" class="text-gray-300 mb-6"></p>
+        <p id="alert-message" class="text-content-muted mb-6"></p>
         <button
           id="alert-ok"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          class="w-full bg-palm-600 hover:bg-palm-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           OK
         </button>
@@ -245,9 +246,9 @@
     </div>
 
     <!-- How It Works Section -->
-    <section class="max-w-4xl mx-auto px-4 py-12">
+    <section class="max-w-2xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-8 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-8 text-center"
         data-i18n="howItWorks.title"
       >
         How It Works
@@ -255,30 +256,30 @@
       <div class="space-y-6">
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             1
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:validateSignaturePdf.howItWorks.step1Title">
               Upload Your PDF
             </h3>
-            <p class="text-gray-400">
+            <p class="text-content-muted" data-i18n="tools:validateSignaturePdf.howItWorks.step1Desc">
               Select a digitally signed PDF file from your device
             </p>
           </div>
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             2
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:validateSignaturePdf.howItWorks.step2Title">
               Automatic Analysis
             </h3>
-            <p class="text-gray-400">
+            <p class="text-content-muted" data-i18n="tools:validateSignaturePdf.howItWorks.step2Desc">
               The tool extracts and parses all digital signatures in the
               document
             </p>
@@ -286,13 +287,13 @@
         </div>
         <div class="flex items-start gap-4">
           <div
-            class="flex-shrink-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold"
+            class="flex-shrink-0 w-10 h-10 bg-palm-600 rounded-full flex items-center justify-center text-white font-bold"
           >
             3
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-white mb-1">View Results</h3>
-            <p class="text-gray-400">
+            <h3 class="text-lg font-semibold text-content mb-1" data-i18n="tools:validateSignaturePdf.howItWorks.step3Title">View Results</h3>
+            <p class="text-content-muted" data-i18n="tools:validateSignaturePdf.howItWorks.step3Desc">
               See signer information, certificate validity, and signature status
             </p>
           </div>
@@ -303,32 +304,32 @@
     <!-- Related Tools Section -->
     <section class="max-w-6xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="relatedTools.title"
       >
         Related PDF Tools
       </h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a
           href="digital-sign-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Digital Signature</h3>
-          <p class="text-gray-400 text-sm">Add cryptographic signature</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:validateSignaturePdf.relatedTools.card1Name">Digital Signature</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:validateSignaturePdf.relatedTools.card1Desc">Add cryptographic signature</p>
         </a>
         <a
           href="encrypt-pdf.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">Encrypt PDF</h3>
-          <p class="text-gray-400 text-sm">Password protect PDF</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:validateSignaturePdf.relatedTools.card2Name">Encrypt PDF</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:validateSignaturePdf.relatedTools.card2Desc">Password protect PDF</p>
         </a>
         <a
           href="view-metadata.html"
-          class="block bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
+          class="block w-40 bg-surface-raised p-4 rounded-lg hover:bg-surface-muted transition-colors border border-line"
         >
-          <h3 class="text-white font-semibold mb-1">View Metadata</h3>
-          <p class="text-gray-400 text-sm">Inspect PDF properties</p>
+          <h3 class="text-content font-semibold mb-1" data-i18n="tools:validateSignaturePdf.relatedTools.card3Name">View Metadata</h3>
+          <p class="text-content-muted text-sm" data-i18n="tools:validateSignaturePdf.relatedTools.card3Desc">Inspect PDF properties</p>
         </a>
       </div>
     </section>
@@ -336,46 +337,46 @@
     <!-- FAQ Section -->
     <section class="max-w-4xl mx-auto px-4 py-12">
       <h2
-        class="text-2xl md:text-3xl font-bold text-white mb-6 text-center"
+        class="text-2xl md:text-3xl font-bold text-content mb-6 text-center"
         data-i18n="faq.sectionTitle"
       >
         Frequently Asked Questions
       </h2>
       <div class="space-y-4">
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            What types of signatures can be validated?
+            <span data-i18n="tools:validateSignaturePdf.faq.q1">What types of signatures can be validated?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:validateSignaturePdf.faq.a1">
             This tool validates PKCS#7 digital signatures created with X.509
             certificates, the standard format used by most PDF signing tools and
             certificate authorities.
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            What does "Self-Signed Certificate" mean?
+            <span data-i18n="tools:validateSignaturePdf.faq.q2">What does "Self-Signed Certificate" mean?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:validateSignaturePdf.faq.a2">
             A self-signed certificate is one where the issuer and subject are
             the same. While the signature is technically valid, it means the
             certificate wasn't issued by a trusted Certificate Authority (CA).
           </p>
         </details>
-        <details class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+        <details class="bg-surface-raised p-5 rounded-lg border border-line">
           <summary
-            class="cursor-pointer font-semibold text-white flex items-center justify-between"
+            class="cursor-pointer font-semibold text-content flex items-center justify-between"
           >
-            Is my PDF uploaded to a server?
+            <span data-i18n="tools:validateSignaturePdf.faq.q3">Is my PDF uploaded to a server?</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </summary>
-          <p class="mt-3 text-gray-400">
+          <p class="mt-3 text-content-muted" data-i18n="tools:validateSignaturePdf.faq.a3">
             No, all processing happens entirely in your browser. Your PDF files
             never leave your device, ensuring complete privacy and security.
           </p>

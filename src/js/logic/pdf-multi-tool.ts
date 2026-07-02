@@ -353,10 +353,10 @@ function showDragOverlay() {
   if (dragOverlay) return;
   dragOverlay = document.createElement('div');
   dragOverlay.className =
-    'fixed inset-0 bg-indigo-900/40 border-4 border-dashed border-indigo-400 z-40 pointer-events-none flex items-center justify-center';
+    'fixed inset-0 bg-palm-900/40 border-4 border-dashed border-palm-400 z-40 pointer-events-none flex items-center justify-center';
   const inner = document.createElement('div');
   inner.className =
-    'text-white text-lg sm:text-xl font-semibold bg-gray-900/80 px-6 py-4 rounded-lg text-center';
+    'text-white text-lg sm:text-xl font-semibold bg-surface/80 px-6 py-4 rounded-lg text-center';
   inner.textContent = t('multiTool.dropToAdd');
   dragOverlay.appendChild(inner);
   document.body.appendChild(dragOverlay);
@@ -637,7 +637,7 @@ function createPageElement(
 
   const card = document.createElement('div');
   card.className =
-    'bg-gray-800 rounded-lg border-2 border-gray-700 p-2 relative group cursor-move';
+    'bg-surface-raised rounded-lg border-2 border-line p-2 relative group cursor-move';
   card.dataset.pageIndex = index.toString();
   card.dataset.pageId = pageData.id; // Set ID for reconciliation
 
@@ -651,7 +651,7 @@ function createPageElement(
   }
 
   if (selectedPages.has(index)) {
-    card.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500');
+    card.classList.add('border-palm-500', 'ring-2', 'ring-palm-500');
   }
 
   const preview = document.createElement('div');
@@ -669,7 +669,7 @@ function createPageElement(
     // Show loading placeholder if canvas is null
     const loading = document.createElement('div');
     loading.className =
-      'flex flex-col items-center justify-center text-gray-400';
+      'flex flex-col items-center justify-center text-content-muted';
     const loadingIcon = document.createElement('i');
     loadingIcon.dataset.lucide = 'loader';
     loadingIcon.className = 'w-8 h-8 animate-spin mb-2';
@@ -678,12 +678,12 @@ function createPageElement(
     loadingLabel.textContent = t('common.loading');
     loading.append(loadingIcon, loadingLabel);
     preview.appendChild(loading);
-    preview.classList.add('bg-gray-700'); // Darker background for loading
+    preview.classList.add('bg-surface-muted'); // Darker background for loading
   }
 
   // Page info
   const info = document.createElement('div');
-  info.className = 'text-xs text-gray-400 text-center mb-2';
+  info.className = 'text-xs text-content-muted text-center mb-2';
   info.textContent = `${t('common.page')} ${index + 1}`;
 
   // Actions toolbar
@@ -693,20 +693,20 @@ function createPageElement(
 
   const actionsInner = document.createElement('div');
   actionsInner.className =
-    'flex items-center gap-1 bg-gray-900/90 rounded px-2 py-1';
+    'flex items-center gap-1 bg-surface/90 rounded px-2 py-1';
   actions.appendChild(actionsInner);
 
   // Select checkbox
   const selectBtn = document.createElement('button');
   selectBtn.className =
-    'absolute top-2 right-2 p-1 rounded bg-gray-900/70 hover:bg-gray-800 z-10';
+    'absolute top-2 right-2 p-1 rounded bg-surface/70 hover:bg-surface-raised z-10';
   const selectIcon = document.createElement('i');
   if (selectedPages.has(index)) {
     selectIcon.dataset.lucide = 'check-square';
-    selectIcon.className = 'w-4 h-4 text-indigo-400';
+    selectIcon.className = 'w-4 h-4 text-palm-400';
   } else {
     selectIcon.dataset.lucide = 'square';
-    selectIcon.className = 'w-4 h-4 text-gray-200';
+    selectIcon.className = 'w-4 h-4 text-content';
   }
   selectBtn.appendChild(selectIcon);
   selectBtn.onclick = (e) => {
@@ -716,17 +716,17 @@ function createPageElement(
 
   // Rotate button
   const rotateBtn = document.createElement('button');
-  rotateBtn.className = 'p-1 rounded hover:bg-gray-700';
+  rotateBtn.className = 'p-1 rounded hover:bg-surface-muted';
   rotateBtn.innerHTML =
-    '<i data-lucide="rotate-cw" class="w-4 h-4 text-gray-300"></i>';
+    '<i data-lucide="rotate-cw" class="w-4 h-4 text-content-muted"></i>';
   rotateBtn.onclick = (e) => {
     e.stopPropagation();
     rotatePage(index, 90);
   };
   const rotateLeftBtn = document.createElement('button');
-  rotateLeftBtn.className = 'p-1 rounded hover:bg-gray-700';
+  rotateLeftBtn.className = 'p-1 rounded hover:bg-surface-muted';
   rotateLeftBtn.innerHTML =
-    '<i data-lucide="rotate-ccw" class="w-4 h-4 text-gray-300"></i>';
+    '<i data-lucide="rotate-ccw" class="w-4 h-4 text-content-muted"></i>';
   rotateLeftBtn.onclick = (e) => {
     e.stopPropagation();
     rotatePage(index, -90);
@@ -734,9 +734,9 @@ function createPageElement(
 
   // Duplicate button
   const duplicateBtn = document.createElement('button');
-  duplicateBtn.className = 'p-1 rounded hover:bg-gray-700';
+  duplicateBtn.className = 'p-1 rounded hover:bg-surface-muted';
   duplicateBtn.innerHTML =
-    '<i data-lucide="copy" class="w-4 h-4 text-gray-300"></i>';
+    '<i data-lucide="copy" class="w-4 h-4 text-content-muted"></i>';
   duplicateBtn.title = t('multiTool.actions.duplicatePage');
   duplicateBtn.onclick = (e) => {
     e.stopPropagation();
@@ -746,7 +746,7 @@ function createPageElement(
 
   // Delete button
   const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'p-1 rounded hover:bg-gray-700';
+  deleteBtn.className = 'p-1 rounded hover:bg-surface-muted';
   deleteBtn.innerHTML =
     '<i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>';
   deleteBtn.title = t('multiTool.actions.deletePage');
@@ -758,9 +758,9 @@ function createPageElement(
 
   // Insert PDF button
   const insertBtn = document.createElement('button');
-  insertBtn.className = 'p-1 rounded hover:bg-gray-700';
+  insertBtn.className = 'p-1 rounded hover:bg-surface-muted';
   insertBtn.innerHTML =
-    '<i data-lucide="file-plus" class="w-4 h-4 text-gray-300"></i>';
+    '<i data-lucide="file-plus" class="w-4 h-4 text-content-muted"></i>';
   insertBtn.title = t('multiTool.actions.insertPdf');
   insertBtn.onclick = (e) => {
     e.stopPropagation();
@@ -770,9 +770,9 @@ function createPageElement(
 
   // Split button
   const splitBtn = document.createElement('button');
-  splitBtn.className = 'p-1 rounded hover:bg-gray-700';
+  splitBtn.className = 'p-1 rounded hover:bg-surface-muted';
   splitBtn.innerHTML =
-    '<i data-lucide="scissors" class="w-4 h-4 text-gray-300"></i>';
+    '<i data-lucide="scissors" class="w-4 h-4 text-content-muted"></i>';
   splitBtn.title = t('multiTool.actions.toggleSplit');
   splitBtn.onclick = (e) => {
     e.stopPropagation();
@@ -855,13 +855,13 @@ function toggleSelectOptimized(index: number) {
   if (!selectBtn) return;
 
   if (selectedPages.has(index)) {
-    card.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500');
+    card.classList.add('border-palm-500', 'ring-2', 'ring-palm-500');
     selectBtn.innerHTML =
-      '<i data-lucide="check-square" class="w-4 h-4 text-indigo-400"></i>';
+      '<i data-lucide="check-square" class="w-4 h-4 text-palm-400"></i>';
   } else {
-    card.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-500');
+    card.classList.remove('border-palm-500', 'ring-2', 'ring-palm-500');
     selectBtn.innerHTML =
-      '<i data-lucide="square" class="w-4 h-4 text-gray-200"></i>';
+      '<i data-lucide="square" class="w-4 h-4 text-content"></i>';
   }
 
   createIcons({ icons });
@@ -1009,7 +1009,7 @@ async function handleInsertPdf(e: Event) {
         );
         if (card) {
           const preview =
-            card.querySelector('.bg-gray-700') ||
+            card.querySelector('.bg-surface-muted') ||
             card.querySelector('.bg-white');
           if (preview) {
             // Re-create the preview content
@@ -1402,7 +1402,7 @@ function updatePageDisplay() {
       // Update index-dependent attributes
       card.dataset.pageIndex = index.toString();
       const info = card.querySelector(
-        '.text-xs.text-gray-400.text-center.mb-2'
+        '.text-xs.text-content-muted.text-center.mb-2'
       );
       if (info) info.textContent = `Page ${index + 1} `;
 
@@ -1412,17 +1412,17 @@ function updatePageDisplay() {
       );
       if (selectBtn) {
         if (selectedPages.has(index)) {
-          card.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500');
+          card.classList.add('border-palm-500', 'ring-2', 'ring-palm-500');
           selectBtn.innerHTML =
-            '<i data-lucide="check-square" class="w-4 h-4 text-indigo-400"></i>';
+            '<i data-lucide="check-square" class="w-4 h-4 text-palm-400"></i>';
         } else {
           card.classList.remove(
-            'border-indigo-500',
+            'border-palm-500',
             'ring-2',
-            'ring-indigo-500'
+            'ring-palm-500'
           );
           selectBtn.innerHTML =
-            '<i data-lucide="square" class="w-4 h-4 text-gray-200"></i>';
+            '<i data-lucide="square" class="w-4 h-4 text-content"></i>';
         }
         // Update click handler to use new index
         (selectBtn as HTMLElement).onclick = (e) => {
@@ -1439,7 +1439,7 @@ function updatePageDisplay() {
 
       // Update action buttons
       const actionsInner = card.querySelector(
-        '.flex.items-center.gap-1.bg-gray-900\\/90'
+        '.flex.items-center.gap-1.bg-surface\\/90'
       );
       if (actionsInner) {
         const buttons = actionsInner.querySelectorAll('button');
@@ -1510,7 +1510,7 @@ function updatePageNumbers() {
     card.dataset.pageIndex = index.toString();
 
     // Update visible page number text
-    const info = card.querySelector('.text-xs.text-gray-400.text-center.mb-2');
+    const info = card.querySelector('.text-xs.text-content-muted.text-center.mb-2');
     if (info) {
       info.textContent = `Page ${index + 1} `;
     }
@@ -1530,7 +1530,7 @@ function updatePageNumbers() {
     }
 
     const actionsInner = card.querySelector(
-      '.flex.items-center.gap-1.bg-gray-900\\/90'
+      '.flex.items-center.gap-1.bg-surface\\/90'
     );
     if (actionsInner) {
       const buttons = actionsInner.querySelectorAll('button');

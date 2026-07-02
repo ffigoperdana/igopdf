@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="id">
   <head>
+    <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - igo</title>
@@ -17,7 +18,7 @@
       <div class="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
           <p class="text-sm font-semibold uppercase text-vibrant-palm">Admin</p>
-          <h1 class="text-3xl font-bold text-deep-forest">Manajemen Pengguna</h1>
+          <h1 class="text-3xl font-bold text-deep-forest dark:text-content">Manajemen Pengguna</h1>
         </div>
         <p class="max-w-2xl text-sm text-on-surface-variant">
           Import CSV dapat memakai satu kolom <code>Email</code>. Jika password kosong atau kolom password tidak ada, default password adalah <strong>SawitItuBaik</strong>.
@@ -29,30 +30,30 @@
       <section class="mb-8 grid gap-4 md:grid-cols-5">
         <div class="rounded border border-outline-variant bg-white p-4">
           <p class="text-sm text-on-surface-variant">Total user</p>
-          <p id="stat-total" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+          <p id="stat-total" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
         <div class="rounded border border-outline-variant bg-white p-4">
           <p class="text-sm text-on-surface-variant">Aktif</p>
-          <p id="stat-active" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+          <p id="stat-active" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
         <div class="rounded border border-outline-variant bg-white p-4">
           <p class="text-sm text-on-surface-variant">Nonaktif</p>
-          <p id="stat-inactive" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+          <p id="stat-inactive" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
         <div class="rounded border border-outline-variant bg-white p-4">
           <p class="text-sm text-on-surface-variant">Admin</p>
-          <p id="stat-admin" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+          <p id="stat-admin" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
         <div class="rounded border border-outline-variant bg-white p-4">
           <p class="text-sm text-on-surface-variant">User</p>
-          <p id="stat-user" class="mt-2 text-2xl font-bold text-deep-forest">-</p>
+          <p id="stat-user" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
       </section>
 
       <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
         <aside class="space-y-6">
           <section class="rounded border border-outline-variant bg-white p-5">
-            <h2 class="mb-4 text-lg font-bold text-ink-slate">Tambah user</h2>
+            <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Tambah user</h2>
             <form id="create-user-form" class="space-y-4">
               <div>
                 <label for="new-username" class="mb-1 block text-sm font-medium">Username atau email</label>
@@ -74,12 +75,12 @@
           </section>
 
           <section class="rounded border border-outline-variant bg-white p-5">
-            <h2 class="mb-4 text-lg font-bold text-ink-slate">Bulk import</h2>
+            <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Bulk import</h2>
             <div class="space-y-4">
               <input id="import-file" type="file" accept=".csv,.txt,text/csv,text/plain" class="w-full text-sm" />
               <textarea id="import-content" rows="8" class="w-full rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Email&#10;nama@bpdp.or.id"></textarea>
               <div class="flex gap-2">
-                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest hover:bg-green-50" type="button">Preview</button>
+                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50" type="button">Preview</button>
                 <button id="run-import-btn" class="rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white hover:bg-orange-600" type="button">Import</button>
               </div>
               <pre id="import-preview" class="max-h-56 overflow-auto rounded bg-surface-gray p-3 text-xs text-on-surface"></pre>
@@ -89,7 +90,7 @@
 
         <section class="rounded border border-outline-variant bg-white">
           <div class="flex flex-col gap-3 border-b border-outline-variant p-4 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-lg font-bold text-ink-slate">Daftar user</h2>
+            <h2 class="text-lg font-bold text-ink-slate dark:text-content">Daftar user</h2>
             <div class="flex flex-wrap gap-2">
               <input id="user-search" class="rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Cari username" />
               <select id="role-filter" class="rounded border border-outline-variant px-3 py-2 text-sm">
@@ -97,7 +98,7 @@
                 <option value="admin">admin</option>
                 <option value="user">user</option>
               </select>
-              <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest hover:bg-green-50" type="button">Refresh</button>
+              <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50" type="button">Refresh</button>
             </div>
           </div>
           <div class="overflow-x-auto">
@@ -190,7 +191,7 @@
         for (const user of result.data) {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td class="px-4 py-3 font-medium text-ink-slate"></td>
+            <td class="px-4 py-3 font-medium text-ink-slate dark:text-content"></td>
             <td class="px-4 py-3"></td>
             <td class="px-4 py-3"></td>
             <td class="px-4 py-3"></td>
