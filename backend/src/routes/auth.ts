@@ -16,7 +16,9 @@ const router = Router();
 
 const loginSchema = z.object({
   username: z.string().min(3).max(150),
-  password: z.string().min(8),
+  // 6, not 8: AD/WiFi passwords set by the domain policy can be shorter than
+  // the local-account policy; login must accept whatever the directory allows.
+  password: z.string().min(6),
   captchaToken: z.string().uuid(),
   captchaAnswer: z.string().min(1),
 });

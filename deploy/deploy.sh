@@ -17,4 +17,10 @@ if [ "${1:-}" = "--seed-admin" ]; then
 fi
 
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" up -d
+
+# nginx resolves the backend/frontend upstream IPs once at startup; when
+# `up -d` recreates those containers they get new IPs and nginx serves 502s
+# until it re-resolves. Restart it whenever it wasn't itself recreated.
+docker compose --env-file .env.prod -f "$COMPOSE_FILE" restart nginx
+
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" ps

@@ -15,7 +15,7 @@ import { logger } from './utils/logger.js';
 
 const app = express();
 
-app.set('trust proxy', 1);
+app.set('trust proxy', config.trustProxyHops);
 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },

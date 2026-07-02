@@ -46,17 +46,20 @@
           <span class="inline-flex h-14 items-center text-white">{{> logo }}</span>
         </div>
 
-        <div class="relative max-w-md">
-          <h1 class="text-5xl font-extrabold leading-tight tracking-tight">
-            Internal<br />Government<br />Operation
-          </h1>
-          <p class="mt-5 text-base leading-relaxed text-white/70">
-            Sign in with your company account to process and manage PDF
-            documents.
-          </p>
-        </div>
+        <!-- EXPERIMENTAL: heading + subtitle moved down next to the info boxes
+             so the photo's faces (center of the image) stay uncovered. -->
+        <div class="relative">
+          <div class="max-w-md">
+            <h1 class="text-5xl font-extrabold leading-tight tracking-tight">
+              Internal<br />Government<br />Operation
+            </h1>
+            <p class="mt-5 text-base leading-relaxed text-white/70">
+              Sign in with your company account to process and manage PDF
+              documents.
+            </p>
+          </div>
 
-        <div class="relative flex flex-col gap-3 sm:flex-row">
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <div
             class="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 backdrop-blur"
           >
@@ -80,6 +83,7 @@
             </div>
           </div>
         </div>
+        </div>
       </aside>
 
       <!-- Right: sign-in form (theme-aware) -->
@@ -94,8 +98,23 @@
 
           <h2 class="text-3xl font-bold tracking-tight">Sign in</h2>
           <p class="mt-2 text-sm text-content-muted">
-            Use the account provided by your igo administrator.
+            Gunakan username &amp; password yang sama dengan akun WiFi /
+            laptop kantor Anda.
           </p>
+
+          <div
+            class="mt-4 rounded-lg border border-vibrant-palm/30 bg-vibrant-palm/10 px-4 py-3 text-xs leading-relaxed text-content-muted"
+          >
+            <p class="font-semibold text-content">Contoh:</p>
+            <p class="mt-1">
+              username&nbsp;:
+              <span class="font-mono font-semibold text-content">figo.putra</span>
+            </p>
+            <p>
+              password&nbsp;: <span class="font-mono">••••••</span>
+              <span class="italic">(password WiFi / laptop kantor Anda)</span>
+            </p>
+          </div>
 
           <form id="login-form" class="mt-8 space-y-5">
             <div>
@@ -111,7 +130,7 @@
                 maxlength="150"
                 autocomplete="username"
                 class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
-                placeholder="your username"
+                placeholder="cth: figo.putra"
               />
             </div>
 
@@ -125,7 +144,7 @@
                   id="password"
                   name="password"
                   required
-                  minlength="8"
+                  minlength="6"
                   autocomplete="current-password"
                   class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 pr-11 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
                   placeholder="Enter your password"

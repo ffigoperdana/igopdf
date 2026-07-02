@@ -53,6 +53,18 @@ export const config = {
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
   },
 
+  // Reverse-proxy hops in front of this app (compose nginx = 1; WAF + nginx = 2).
+  // Drives Express `trust proxy`, which resolves req.ip from X-Forwarded-For.
+  // If this is lower than the real hop count (or the proxy doesn't send XFF),
+  // every user resolves to the proxy's IP and all per-IP rate limits pool into
+  // one shared bucket — one person's failures then block the whole office.
+  // Guarded: a typo'd value would parse to NaN, which Express treats as
+  // "trust nothing" — silently reintroducing exactly that pooling bug.
+  trustProxyHops: (() => {
+    const hops = parseInt(process.env.TRUST_PROXY_HOPS || '1', 10);
+    return Number.isInteger(hops) && hops >= 0 ? hops : 1;
+  })(),
+
   captcha: {
     expiryMinutes: parseInt(process.env.CAPTCHA_EXPIRY_MINUTES || '5', 10),
     width: 150,
