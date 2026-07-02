@@ -186,7 +186,11 @@ describe('XSS replay — WASM provider localStorage poisoning', () => {
 
     const got = WasmProvider.getUrl('pymupdf');
     expect(got).not.toContain('attacker.test');
-    expect(got).toMatch(/cdn\.jsdelivr\.net|^https?:\/\/[^/]+\//);
+    // The WASM modules are self-hosted now, so the trusted default is the
+    // same-origin path (e.g. "/wasm/pymupdf/"); it may instead be a jsdelivr /
+    // absolute URL if an external CDN is set via env. Either way it must be a
+    // trusted default, never the attacker's poisoned URL.
+    expect(got).toMatch(/^\/wasm\/|cdn\.jsdelivr\.net|^https?:\/\/[^/]+\//);
 
     const remaining = JSON.parse(
       localStorage.getItem('igo:wasm-providers') || '{}'
