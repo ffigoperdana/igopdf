@@ -5,7 +5,11 @@
  * Version: 1.0.0
  */
 
-const CACHE_VERSION = 'igo-v2';
+// Bump this whenever non-hashed static files change bytes at the same URL
+// (icons, manifest, config) — activate() below deletes every older cache, so
+// clients stop serving stale copies (e.g. the old PWA icon on Add to Home
+// Screen). Hashed /assets/* don't need this; their filenames change instead.
+const CACHE_VERSION = 'igo-v3';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
 const LEGACY_CACHE_PREFIX = 'bento' + 'pdf-';
 const WASM_PACKAGE_SCOPE = '@' + 'bento' + 'pdf';
@@ -111,7 +115,16 @@ self.addEventListener('fetch', (event) => {
 
   if (isLocal && isNavigationRequest(event.request, url)) {
     event.respondWith(networkOnlyNavigation(event.request));
-  } else if (isLocal && url.pathname.includes('/locales/')) {
+  } else if (
+    isLocal &&
+    (url.pathname.includes('/locales/') ||
+      // Mutable same-URL files: brand icons/images, PWA manifest, runtime
+      // config. Cache-first would pin their OLD bytes forever (stale home
+      // screen icon); network-first keeps them fresh with an offline fallback.
+      url.pathname.includes('/images/') ||
+      url.pathname.endsWith('/site.webmanifest') ||
+      url.pathname.endsWith('/config.json'))
+  ) {
     event.respondWith(networkFirstStrategy(event.request));
   } else if (shouldCache(url.pathname, isCDN)) {
     event.respondWith(cacheFirstStrategyWithDedup(event.request, isCDN));

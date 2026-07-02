@@ -32,6 +32,10 @@
   --color-content-muted: #4b5563;
   --color-line: #d7dbd2;
 
+  /* Status/success accent: current light-mode green; flips to the reference's
+     Spotify-like Accent Green (#1DB954) in dark (see .dark below). */
+  --color-accent-green: #1F5630;
+
   /* Vibrant Palm — the single accent color, replacing the old indigo/purple.
      palm-600 is the brand Vibrant Palm (#E67E22). The rest is a tuned ramp so
      hover/focus/tint shades (palm-400..900) read well on the dark tool UI. */
@@ -48,26 +52,39 @@
 }
 
 /* ── Dark theme (applied when <html class="dark">) ──────────────────────────
-   Values ≈ the app's previous hardcoded grays, so dark mode looks essentially
-   unchanged; LIGHT mode is the new addition. Brand colors (deep-forest,
-   vibrant-palm, palm-*) stay constant across themes. */
+   "Deep Green" palette (2026-07 redesign): dark mode is a green-on-green theme
+   — Primary Dark #0D1F17 surfaces, Secondary Green #112E20 cards, orange
+   #FF8A00 accent, #1DB954 status green. LIGHT mode is untouched; deep-forest
+   stays constant, but vibrant-palm/palm-* warm up slightly in dark. */
 .dark {
-  --color-surface: #0f172a;
-  --color-surface-raised: #1e293b;
-  --color-surface-sunken: #0b1220;
-  --color-surface-muted: #374151;
-  --color-content: #f1f5f9;
-  --color-content-muted: #94a3b8;
-  --color-line: #334155;
+  --color-surface: #0d1f17;
+  --color-surface-raised: #112e20;
+  --color-surface-sunken: #0a1a12;
+  --color-surface-muted: #234936;
+  --color-content: #eaf7ef;
+  --color-content-muted: #a7c5b6;
+  --color-line: #2f4a3d;
 
-  --color-background: #0f172a;
-  --color-on-background: #e2e8f0;
-  --color-on-surface: #e2e8f0;
-  --color-on-surface-variant: #94a3b8;
-  --color-paper-white: #1e293b;
-  --color-surface-gray: #0b1220;
-  --color-outline-variant: #334155;
-  --color-outline: #475569;
+  --color-background: #0d1f17;
+  --color-on-background: #eaf7ef;
+  --color-on-surface: #eaf7ef;
+  --color-on-surface-variant: #a7c5b6;
+  --color-paper-white: #112e20;
+  --color-surface-gray: #0a1a12;
+  --color-outline-variant: #2f4a3d;
+  --color-outline: #3f5d4d;
+
+  /* Accent Orange (#FF8A00) + Light Orange (#FFB347) from the dark design
+     reference. Only the commonly used stops are overridden; light mode keeps
+     the original #E67E22 ramp. */
+  --color-vibrant-palm: #ff8a00;
+  --color-palm-300: #ffc98a;
+  --color-palm-400: #ffb347;
+  --color-palm-500: #ff9c26;
+  --color-palm-600: #ff8a00;
+  --color-palm-700: #e07500;
+
+  --color-accent-green: #1db954;
 }
 
 @layer base {

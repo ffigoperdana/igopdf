@@ -7,7 +7,8 @@
     <title>Sign in - igo</title>
     <meta name="description" content="Sign in to igo - Internal PDF Tools Workspace" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#0f172a" />
+    <!-- theme.ts keeps this in sync with the active theme (green/dark-green) -->
+    <meta name="theme-color" content="#1F5630" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
     <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
@@ -38,7 +39,7 @@
           aria-hidden="true"
         ></div>
         <div
-          class="absolute inset-0 bg-gradient-to-br from-ink-slate/95 via-ink-slate/80 to-deep-forest/70"
+          class="absolute inset-0 bg-gradient-to-br from-ink-slate/95 via-ink-slate/80 to-deep-forest/70 dark:from-surface/95 dark:via-surface/85 dark:to-deep-forest/60"
           aria-hidden="true"
         ></div>
 
@@ -219,9 +220,20 @@
 
         <a
           href="/health"
-          class="absolute bottom-4 right-6 text-xs text-content-muted hover:text-content"
-          >Service status</a
+          id="service-status"
+          class="absolute bottom-4 right-6 inline-flex items-center gap-2 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs text-content-muted transition-colors hover:border-accent-green/60"
         >
+          <span
+            id="service-status-dot"
+            class="h-2 w-2 rounded-full bg-content-muted"
+          ></span>
+          <span
+            >Service status:
+            <span id="service-status-text" class="font-semibold text-content"
+              >Checking…</span
+            ></span
+          >
+        </a>
       </main>
     </div>
 
@@ -301,6 +313,36 @@
         });
 
       loadCaptcha();
+
+      // Service status pill (reference design): ping /health and color the
+      // dot + label. Green = healthy, orange = slow/degraded, red = down.
+      (async () => {
+        const dot = document.getElementById('service-status-dot');
+        const txt = document.getElementById('service-status-text');
+        if (!dot || !txt) return;
+        const set = (dotCls, txtCls, label) => {
+          dot.className = `h-2 w-2 rounded-full ${dotCls}`;
+          txt.className = `font-semibold ${txtCls}`;
+          txt.textContent = label;
+        };
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 5000);
+          const t0 = performance.now();
+          const res = await fetch('/health', {
+            signal: ctrl.signal,
+            cache: 'no-store',
+          });
+          clearTimeout(timer);
+          const slow = performance.now() - t0 > 2000;
+          if (res.ok && !slow)
+            set('bg-accent-green', 'text-accent-green', 'Operational');
+          else if (res.ok) set('bg-vibrant-palm', 'text-vibrant-palm', 'Warning');
+          else set('bg-red-500', 'text-red-500', 'Error');
+        } catch {
+          set('bg-red-500', 'text-red-500', 'Error');
+        }
+      })();
     </script>
   </body>
 </html>

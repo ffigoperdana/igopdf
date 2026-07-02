@@ -1026,14 +1026,14 @@ const init = async () => {
         const input = document.createElement('input');
         input.type = 'text';
         input.className =
-          'shortcut-input w-32 bg-surface-raised border border-line text-white text-center text-sm rounded px-2 py-1 focus:ring-2 focus:ring-palm-500 focus:border-transparent outline-none transition-all';
+          'shortcut-input w-32 bg-surface-raised border border-line text-content placeholder-content-muted text-center text-sm rounded px-2 py-1 focus:ring-2 focus:ring-palm-500 focus:border-transparent outline-none transition-all';
         input.placeholder = t('settings.clickToSet');
         input.value = formatShortcutDisplay(currentShortcut, isMac);
         input.readOnly = true;
 
         const clearBtn = document.createElement('button');
         clearBtn.className =
-          'absolute -right-2 -top-2 bg-surface-muted hover:bg-red-600 text-white rounded-full p-0.5 hidden group-hover:block shadow-sm';
+          'absolute -right-2 -top-2 bg-surface-muted hover:bg-red-600 text-content hover:text-white rounded-full p-0.5 hidden group-hover:block shadow-sm';
         clearBtn.innerHTML = '<i data-lucide="x" class="w-3 h-3"></i>';
         if (currentShortcut) {
           right.classList.add('group');

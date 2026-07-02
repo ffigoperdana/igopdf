@@ -23,9 +23,9 @@ export function currentTheme(): Theme {
 
 function applyTheme(theme: Theme): void {
   document.documentElement.classList.toggle('dark', theme === 'dark');
-  // Keep the mobile browser chrome in sync (green nav in light, navy in dark).
+  // Keep the mobile browser chrome in sync (green in light, deep green in dark).
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0f172a' : '#1F5630');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0d1f17' : '#1F5630');
 }
 
 export function initTheme(): void {
