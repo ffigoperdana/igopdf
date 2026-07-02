@@ -88,7 +88,7 @@
       </aside>
 
       <!-- Right: sign-in form (theme-aware) -->
-      <main class="relative flex items-center justify-center px-6 py-12 sm:px-10">
+      <main class="relative flex min-w-0 items-center justify-center px-6 py-12 sm:px-10">
         <div class="absolute right-4 top-4 z-10 flex items-center gap-1">
           <button
             id="lang-toggle"
@@ -105,7 +105,7 @@
           <div id="theme-toggle-container"></div>
         </div>
 
-        <div class="w-full max-w-sm">
+        <div class="w-full min-w-0 max-w-sm">
           <!-- Compact logo for mobile (hero hidden there) -->
           <div class="mb-8 lg:hidden">
             <span class="inline-flex h-10 items-center text-content">{{> logo }}</span>
@@ -187,10 +187,10 @@
               <label class="mb-1.5 block text-sm font-semibold"
                 ><span data-i18n="login.verificationCode">Verification code</span> <span class="text-vibrant-palm">*</span></label
               >
-              <div class="flex items-center gap-3">
+              <div class="flex flex-wrap items-center gap-3">
                 <div
                   id="captcha-image"
-                  class="flex h-12 w-[150px] items-center justify-center overflow-hidden rounded-lg border border-line bg-white"
+                  class="flex h-12 w-[150px] max-w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-white"
                 ></div>
                 <button
                   type="button"
