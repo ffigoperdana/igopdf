@@ -22,7 +22,7 @@
         </div>
 
         <div class="grid gap-6 md:grid-cols-[1fr_1.2fr]">
-          <section class="rounded border border-outline-variant bg-white p-6">
+          <section class="rounded border border-outline-variant bg-paper-white p-6">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Informasi sesi</h2>
             <dl class="space-y-3 text-sm">
               <div>
@@ -36,7 +36,8 @@
             </dl>
           </section>
 
-          <section class="rounded border border-outline-variant bg-white p-6">
+          <!-- Hanya untuk akun lokal; user AD/LDAP melihat kartu info di bawah -->
+          <section id="password-card" class="rounded border border-outline-variant bg-paper-white p-6">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Ubah password</h2>
             <form id="change-password-form" class="space-y-4">
               <div>
@@ -53,6 +54,29 @@
                 Simpan password
               </button>
             </form>
+          </section>
+
+          <!-- Pengganti form password untuk akun AD/LDAP (password dikelola di AD) -->
+          <section id="ldap-info-card" class="hidden rounded border border-outline-variant bg-paper-white p-6">
+            <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Password akun AD</h2>
+            <p class="text-sm text-on-surface-variant">
+              Akun Anda menggunakan SSO Active Directory — password sama dengan
+              akun WiFi / laptop kantor dan dikelola dari AD, tidak dapat
+              diganti melalui website ini.
+            </p>
+            <p class="mt-3 text-sm text-on-surface-variant">
+              Untuk reset atau ganti password, hubungi administrator:
+            </p>
+            <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-6">
+              <a href="mailto:figo.putra@bpdp.or.id" class="inline-flex items-center gap-2 text-sm font-semibold text-content hover:text-vibrant-palm">
+                <i data-lucide="mail" class="h-4 w-4"></i>
+                figo.putra@bpdp.or.id
+              </a>
+              <a href="https://wa.me/6281216195308" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-content hover:text-vibrant-palm">
+                <i data-lucide="message-circle" class="h-4 w-4"></i>
+                081216195308
+              </a>
+            </div>
           </section>
         </div>
       </section>
@@ -71,6 +95,11 @@
       if (user) {
         document.getElementById('profile-username').textContent = user.username;
         document.getElementById('profile-role').textContent = user.role;
+        // Password akun AD dikelola dari Active Directory, bukan dari sini.
+        if (user.authSource === 'ldap') {
+          document.getElementById('password-card').classList.add('hidden');
+          document.getElementById('ldap-info-card').classList.remove('hidden');
+        }
       }
 
       const form = document.getElementById('change-password-form');

@@ -45,10 +45,11 @@ function updateUI(): void {
 
   if (currentUser) {
     const adminLinkDesktop = isAdmin(currentUser)
-      ? `<a href="/admin.html" class="${linkCls}">Admin</a>`
+      ? `<a href="/report.html" class="${linkCls}">Report</a>
+         <a href="/admin.html" class="${linkCls}">Admin</a>`
       : '';
     const adminLinkMobile = isAdmin(currentUser)
-      ? '<a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a>'
+      ? '<a href="/report.html" class="block px-3 py-2 hover:text-vibrant-palm">Report</a><a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a>'
       : '';
 
     const desktopHTML = `

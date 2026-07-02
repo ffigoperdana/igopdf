@@ -102,6 +102,24 @@ const migrations = [
         ON users (LOWER(username));
     `,
   },
+  {
+    name: '005_usage_events',
+    // Lightweight usage analytics for the admin Reports dashboard: one row per
+    // tool-page visit (beaconed from the frontend). username is denormalized
+    // so reports survive user deletion; user_id nulls out via ON DELETE.
+    sql: `
+      CREATE TABLE IF NOT EXISTS usage_events (
+        id BIGSERIAL PRIMARY KEY,
+        user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        username VARCHAR(150) NOT NULL,
+        feature VARCHAR(100) NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_usage_events_created ON usage_events(created_at);
+      CREATE INDEX IF NOT EXISTS idx_usage_events_feature ON usage_events(feature);
+      CREATE INDEX IF NOT EXISTS idx_usage_events_username ON usage_events(username);
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {

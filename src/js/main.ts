@@ -110,6 +110,23 @@ const init = async () => {
   // Logged in → offer the one-time "install as app" prompt (shows once, ever).
   initPwaInstallPrompt();
 
+  // Usage beacon for the admin Reports dashboard: record which tool page this
+  // authed user opened. Shell pages are skipped; fire-and-forget.
+  const nonToolPages = [
+    'index', 'login', 'about', 'licensing', 'privacy', 'profile', 'admin',
+    'report', '404', 'simple-index',
+  ];
+  const feature = (location.pathname.split('/').pop() || 'index')
+    .replace(/\.html$/, '') || 'index';
+  if (!nonToolPages.includes(feature) && /^[a-z0-9-]+$/.test(feature)) {
+    void fetch('/api/usage/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ feature }),
+    }).catch(() => {});
+  }
+
   if (isCurrentPageDisabled()) {
     document.title = t('disabledTool.title') || 'Tool Unavailable';
     const main = document.querySelector('main') || document.body;

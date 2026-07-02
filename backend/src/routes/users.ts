@@ -71,6 +71,17 @@ router.put('/profile', async (req, res) => {
 
 router.post('/change-password', async (req, res) => {
   try {
+    // AD/LDAP passwords are managed in Active Directory, never here. The
+    // profile UI hides the form for LDAP users; this guards the API itself.
+    if (req.user!.authSource === 'ldap') {
+      res.status(400).json({
+        success: false,
+        error:
+          'Password akun AD dikelola melalui Active Directory, tidak dapat diganti dari sini.',
+      });
+      return;
+    }
+
     const validation = changePasswordSchema.safeParse(req.body);
     if (!validation.success) {
       res.status(400).json({

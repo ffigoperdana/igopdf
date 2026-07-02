@@ -28,23 +28,23 @@
       <section id="admin-message" class="mb-4 hidden rounded px-4 py-3 text-sm"></section>
 
       <section class="mb-8 grid gap-4 md:grid-cols-5">
-        <div class="rounded border border-outline-variant bg-white p-4">
+        <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">Total user</p>
           <p id="stat-total" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
-        <div class="rounded border border-outline-variant bg-white p-4">
+        <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">Aktif</p>
           <p id="stat-active" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
-        <div class="rounded border border-outline-variant bg-white p-4">
+        <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">Nonaktif</p>
           <p id="stat-inactive" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
-        <div class="rounded border border-outline-variant bg-white p-4">
+        <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">Admin</p>
           <p id="stat-admin" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
-        <div class="rounded border border-outline-variant bg-white p-4">
+        <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">User</p>
           <p id="stat-user" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p>
         </div>
@@ -52,7 +52,7 @@
 
       <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
         <aside class="space-y-6">
-          <section class="rounded border border-outline-variant bg-white p-5">
+          <section class="rounded border border-outline-variant bg-paper-white p-5">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Tambah user</h2>
             <form id="create-user-form" class="space-y-4">
               <div>
@@ -74,13 +74,13 @@
             </form>
           </section>
 
-          <section class="rounded border border-outline-variant bg-white p-5">
+          <section class="rounded border border-outline-variant bg-paper-white p-5">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Bulk import</h2>
             <div class="space-y-4">
               <input id="import-file" type="file" accept=".csv,.txt,text/csv,text/plain" class="w-full text-sm" />
               <textarea id="import-content" rows="8" class="w-full rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Email&#10;nama@bpdp.or.id"></textarea>
               <div class="flex gap-2">
-                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50" type="button">Preview</button>
+                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50 dark:hover:bg-deep-forest/40" type="button">Preview</button>
                 <button id="run-import-btn" class="rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white hover:bg-orange-600" type="button">Import</button>
               </div>
               <pre id="import-preview" class="max-h-56 overflow-auto rounded bg-surface-gray p-3 text-xs text-on-surface"></pre>
@@ -88,7 +88,7 @@
           </section>
         </aside>
 
-        <section class="rounded border border-outline-variant bg-white">
+        <section class="rounded border border-outline-variant bg-paper-white">
           <div class="flex flex-col gap-3 border-b border-outline-variant p-4 md:flex-row md:items-center md:justify-between">
             <h2 class="text-lg font-bold text-ink-slate dark:text-content">Daftar user</h2>
             <div class="flex flex-wrap gap-2">
@@ -98,7 +98,7 @@
                 <option value="admin">admin</option>
                 <option value="user">user</option>
               </select>
-              <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50" type="button">Refresh</button>
+              <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50 dark:hover:bg-deep-forest/40" type="button">Refresh</button>
             </div>
           </div>
           <div class="overflow-x-auto">
@@ -200,7 +200,7 @@
                 <button data-action="role" class="rounded border border-outline-variant px-2 py-1 text-xs">Toggle role</button>
                 <button data-action="status" class="rounded border border-outline-variant px-2 py-1 text-xs">Aktif/nonaktif</button>
                 <button data-action="reset" class="rounded border border-outline-variant px-2 py-1 text-xs">Reset password</button>
-                <button data-action="delete" class="rounded border border-red-300 px-2 py-1 text-xs text-red-700">Hapus</button>
+                <button data-action="delete" class="rounded border border-red-300 px-2 py-1 text-xs text-red-700 dark:border-red-500/50 dark:text-red-400">Hapus</button>
               </div>
             </td>
           `;

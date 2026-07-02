@@ -9,6 +9,8 @@ import authRoutes from './routes/auth.js';
 import captchaRoutes from './routes/captcha.js';
 import userRoutes from './routes/users.js';
 import adminRoutes from './routes/admin.js';
+import usageRoutes from './routes/usage.js';
+import reportRoutes from './routes/reports.js';
 import { cleanupExpiredSessions } from './services/authService.js';
 import { cleanupExpiredCaptchas } from './services/captchaService.js';
 import { logger } from './utils/logger.js';
@@ -36,6 +38,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/usage', usageRoutes);
+app.use('/api/admin/reports', reportRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({

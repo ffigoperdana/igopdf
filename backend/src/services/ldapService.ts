@@ -6,6 +6,11 @@ import { logger } from '../utils/logger.js';
 export interface LdapAuthResult {
   success: boolean;
   error?: string;
+  // 'unreachable' = the DC couldn't be contacted at all (timeout/refused/
+  // reset) — a network/topology condition, not a credential failure. Lets the
+  // login flow show a "connect to the office network" hint instead of
+  // "wrong password", and skip the account-lockout counter.
+  code?: 'unreachable';
 }
 
 /**
@@ -240,7 +245,11 @@ export async function authenticateLdap(
     logger.error('LDAP authentication error', {
       message: err instanceof Error ? err.message : String(err),
     });
-    return { success: false, error: 'Directory server unavailable' };
+    return {
+      success: false,
+      error: 'Directory server unavailable',
+      code: 'unreachable',
+    };
   } finally {
     unbindQuietly(searchClient);
   }

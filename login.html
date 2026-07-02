@@ -27,7 +27,7 @@
   </head>
   <body>
     <div
-      class="login-shell grid min-h-screen bg-surface text-content lg:grid-cols-[1.05fr_0.95fr]"
+      class="login-shell grid min-h-screen w-full overflow-x-hidden bg-surface text-content lg:grid-cols-[1.05fr_0.95fr]"
     >
       <!-- Left hero: photo panel — always dark w/ white text, in both themes -->
       <aside
@@ -54,7 +54,7 @@
             <h1 class="text-5xl font-extrabold leading-tight tracking-tight">
               Internal<br />Government<br />Operation
             </h1>
-            <p class="mt-5 text-base leading-relaxed text-white/70">
+            <p class="mt-5 text-base leading-relaxed text-white/70" data-i18n="login.heroSubtitle">
               Sign in with your company account to process and manage PDF
               documents.
             </p>
@@ -89,7 +89,21 @@
 
       <!-- Right: sign-in form (theme-aware) -->
       <main class="relative flex items-center justify-center px-6 py-12 sm:px-10">
-        <div id="theme-toggle-container" class="absolute right-4 top-4 z-10"></div>
+        <div class="absolute right-4 top-4 z-10 flex items-center gap-1">
+          <button
+            id="lang-toggle"
+            type="button"
+            aria-label="Ganti bahasa / Switch language"
+            title="ID / EN"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors text-content-muted hover:text-content hover:bg-content/5"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9" />
+              <path stroke-linecap="round" d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z" />
+            </svg>
+          </button>
+          <div id="theme-toggle-container"></div>
+        </div>
 
         <div class="w-full max-w-sm">
           <!-- Compact logo for mobile (hero hidden there) -->
@@ -97,8 +111,8 @@
             <span class="inline-flex h-10 items-center text-content">{{> logo }}</span>
           </div>
 
-          <h2 class="text-3xl font-bold tracking-tight">Sign in</h2>
-          <p class="mt-2 text-sm text-content-muted">
+          <h2 class="text-3xl font-bold tracking-tight" data-i18n="login.title">Sign in</h2>
+          <p class="mt-2 text-sm text-content-muted" data-i18n="login.subtitle">
             Gunakan username &amp; password yang sama dengan akun WiFi /
             laptop kantor Anda.
           </p>
@@ -106,14 +120,14 @@
           <div
             class="mt-4 rounded-lg border border-vibrant-palm/30 bg-vibrant-palm/10 px-4 py-3 text-xs leading-relaxed text-content-muted"
           >
-            <p class="font-semibold text-content">Contoh:</p>
+            <p class="font-semibold text-content" data-i18n="login.exampleLabel">Contoh:</p>
             <p class="mt-1">
               username&nbsp;:
               <span class="font-mono font-semibold text-content">figo.putra</span>
             </p>
             <p>
               password&nbsp;: <span class="font-mono">••••••</span>
-              <span class="italic">(password WiFi / laptop kantor Anda)</span>
+              <span class="italic" data-i18n="login.examplePasswordNote">(password WiFi / laptop kantor Anda)</span>
             </p>
           </div>
 
@@ -132,6 +146,7 @@
                 autocomplete="username"
                 class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
                 placeholder="cth: figo.putra"
+                data-i18n-placeholder="login.usernamePlaceholder"
               />
             </div>
 
@@ -149,6 +164,7 @@
                   autocomplete="current-password"
                   class="w-full rounded-lg border border-line bg-surface-raised px-4 py-3 pr-11 text-content placeholder-content-muted transition focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/50"
                   placeholder="Enter your password"
+                  data-i18n-placeholder="login.passwordPlaceholder"
                 />
                 <button
                   type="button"
@@ -169,7 +185,7 @@
 
             <div>
               <label class="mb-1.5 block text-sm font-semibold"
-                >Verification code <span class="text-vibrant-palm">*</span></label
+                ><span data-i18n="login.verificationCode">Verification code</span> <span class="text-vibrant-palm">*</span></label
               >
               <div class="flex items-center gap-3">
                 <div
@@ -208,6 +224,7 @@
               type="submit"
               id="login-button"
               class="w-full rounded-lg bg-vibrant-palm py-3 px-4 font-semibold text-white transition-colors duration-200 hover:bg-palm-700 focus:outline-none focus:ring-2 focus:ring-vibrant-palm/60 focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-60"
+              data-i18n="login.submit"
             >
               Sign in
             </button>
@@ -240,8 +257,24 @@
     <script type="module">
       import { login, getCaptcha } from './src/js/auth/session.js';
       import { initTheme, createThemeToggle } from './src/js/theme.js';
+      import {
+        initI18n,
+        applyTranslations,
+        changeLanguage,
+        t,
+      } from './src/js/i18n/index.js';
 
       initTheme();
+
+      // Login-page i18n: translate static texts, then wire the globe button to
+      // hot-swap ID <-> EN (changeLanguage re-runs applyTranslations itself).
+      await initI18n();
+      applyTranslations();
+      document.getElementById('lang-toggle')?.addEventListener('click', () => {
+        const next =
+          (localStorage.getItem('i18nextLng') || 'id') === 'id' ? 'en' : 'id';
+        void changeLanguage(next);
+      });
       const tc = document.getElementById('theme-toggle-container');
       if (tc)
         tc.appendChild(
@@ -292,7 +325,7 @@
 
           errorDiv.classList.add('hidden');
           loginBtn.disabled = true;
-          loginBtn.textContent = 'Signing in...';
+          loginBtn.textContent = t('login.submitting');
 
           const result = await login(
             username,
@@ -304,10 +337,16 @@
           if (result.success) {
             window.location.href = '/index.html';
           } else {
-            errorDiv.textContent = result.error || 'Login failed';
+            // AD unreachable = the deployment can't reach the office network
+            // right now — show the "connect to the office network" hint
+            // instead of a generic credentials error.
+            errorDiv.textContent =
+              result.code === 'LDAP_UNREACHABLE'
+                ? t('login.networkError')
+                : result.error || t('login.failed');
             errorDiv.classList.remove('hidden');
             loginBtn.disabled = false;
-            loginBtn.textContent = 'Sign in';
+            loginBtn.textContent = t('login.submit');
             loadCaptcha();
           }
         });

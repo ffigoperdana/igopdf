@@ -1,4 +1,18 @@
 {
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use the same username & password as your office WiFi / laptop account.",
+    "heroSubtitle": "Sign in with your company account to process and manage PDF documents.",
+    "exampleLabel": "Example:",
+    "examplePasswordNote": "(your office WiFi / laptop password)",
+    "verificationCode": "Verification code",
+    "usernamePlaceholder": "e.g. figo.putra",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "failed": "Login failed",
+    "networkError": "You appear to be outside the office network. AD sign-in requires the internal network — please connect this device to the office network/WiFi first, then try again."
+  },
   "nav": {
     "home": "Home",
     "about": "About",

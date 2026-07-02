@@ -71,9 +71,12 @@ router.post('/login', loginLimiter, async (req, res) => {
     const result = await login(username, password, ipAddress, userAgent);
 
     if (!result.success || !result.session) {
-      res.status(401).json({
+      // 503 when AD can't be reached (network/topology issue, not bad creds);
+      // the login page maps this code to a "connect to the office network" hint.
+      res.status(result.code === 'LDAP_UNREACHABLE' ? 503 : 401).json({
         success: false,
         error: result.error || 'Login failed',
+        code: result.code,
       });
       return;
     }

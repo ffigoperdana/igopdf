@@ -12,6 +12,7 @@ interface LoginResult {
   user?: Omit<User, 'passwordHash'>;
   session?: Session;
   error?: string;
+  code?: string;
 }
 
 interface AuthenticatedSession {
@@ -19,6 +20,7 @@ interface AuthenticatedSession {
   user_id: string;
   username: string;
   role: string;
+  auth_source: string;
 }
 
 const USER_FIELDS = `
@@ -94,6 +96,15 @@ export async function login(
 
     const ldapResult = await authenticateLdap(typedUsername, password);
     if (!ldapResult.success) {
+      // AD unreachable is a NETWORK condition, not a wrong password: don't
+      // count it toward the account lockout, and tell the client what's up.
+      if (ldapResult.code === 'unreachable') {
+        return {
+          success: false,
+          error: 'Directory server unreachable',
+          code: 'LDAP_UNREACHABLE',
+        };
+      }
       await recordLoginAttempt(typedUsername, ipAddress, false);
       return { success: false, error: 'Invalid username or password' };
     }
@@ -122,12 +133,23 @@ export async function login(
   // Hybrid auth: users with auth_source='ldap' are verified live against
   // Active Directory; everyone else (including the local admin account) keeps
   // using the locally stored argon2 hash exactly as before.
-  const passwordValid =
-    user.authSource === 'ldap'
-      ? (await authenticateLdap(typedUsername, password)).success
-      : user.passwordHash
-        ? await verifyPassword(password, user.passwordHash)
-        : false;
+  let passwordValid: boolean;
+  if (user.authSource === 'ldap') {
+    const ldapResult = await authenticateLdap(typedUsername, password);
+    if (!ldapResult.success && ldapResult.code === 'unreachable') {
+      // Network condition, not a credential failure — skip the lockout counter.
+      return {
+        success: false,
+        error: 'Directory server unreachable',
+        code: 'LDAP_UNREACHABLE',
+      };
+    }
+    passwordValid = ldapResult.success;
+  } else {
+    passwordValid = user.passwordHash
+      ? await verifyPassword(password, user.passwordHash)
+      : false;
+  }
 
   if (!passwordValid) {
     await recordLoginAttempt(typedUsername, ipAddress, false);
@@ -180,7 +202,7 @@ export async function getSession(
   const tokenHash = hashToken(token);
 
   const result = await pool.query(
-    `SELECT s.*, u.id as user_id, u.role, u.username
+    `SELECT s.*, u.id as user_id, u.role, u.username, u.auth_source
      FROM sessions s
      JOIN users u ON s.user_id = u.id
      WHERE s.token_hash = $1 AND s.expires_at > NOW() AND u.is_active = true`,

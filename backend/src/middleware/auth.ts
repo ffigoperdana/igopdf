@@ -11,6 +11,7 @@ declare global {
         id: string;
         username: string;
         role: string;
+        authSource?: string;
       };
       sessionId?: string;
     }
@@ -50,6 +51,7 @@ export async function authMiddleware(
       id: session.user_id,
       username: session.username,
       role: session.role,
+      authSource: session.auth_source,
     };
     req.sessionId = session.id;
 

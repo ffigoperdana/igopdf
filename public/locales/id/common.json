@@ -1,4 +1,18 @@
 {
+  "login": {
+    "title": "Masuk",
+    "subtitle": "Gunakan username & password yang sama dengan akun WiFi / laptop kantor Anda.",
+    "heroSubtitle": "Masuk dengan akun perusahaan Anda untuk memproses dan mengelola dokumen PDF.",
+    "exampleLabel": "Contoh:",
+    "examplePasswordNote": "(password WiFi / laptop kantor Anda)",
+    "verificationCode": "Kode verifikasi",
+    "usernamePlaceholder": "cth: figo.putra",
+    "passwordPlaceholder": "Masukkan password Anda",
+    "submit": "Masuk",
+    "submitting": "Sedang masuk...",
+    "failed": "Login gagal",
+    "networkError": "Anda tampaknya berada di luar jaringan kantor. Login akun AD memerlukan koneksi ke jaringan internal — silakan sambungkan perangkat ke jaringan/WiFi kantor terlebih dahulu, lalu coba lagi."
+  },
   "nav": {
     "home": "Beranda",
     "about": "Tentang",
