@@ -1,4 +1,5 @@
 import { getCurrentUser, logout, isAdmin } from './session.js';
+import { escapeHtml } from '../utils/helpers-light.js';
 
 let currentUser: { id: string; username: string; role: string } | null = null;
 let authPromise: Promise<void> | null = null;
@@ -52,9 +53,10 @@ function updateUI(): void {
       ? '<a href="/report.html" class="block px-3 py-2 hover:text-vibrant-palm">Report</a><a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a>'
       : '';
 
+    const safeName = escapeHtml(currentUser.username);
     const desktopHTML = `
       ${adminLinkDesktop}
-      <a href="/profile.html" class="${linkCls}">Hello, ${currentUser.username}</a>
+      <a href="/profile.html" class="${linkCls}">Hello, ${safeName}</a>
       <button id="logout-btn" class="${btnCls}">Logout</button>
     `;
 
@@ -66,7 +68,7 @@ function updateUI(): void {
 
     if (authArea) authArea.innerHTML = desktopHTML;
     if (authAreaMobile)
-      authAreaMobile.innerHTML = `<span class="text-sm text-white">${currentUser.username}</span>`;
+      authAreaMobile.innerHTML = `<span class="text-sm text-white">${safeName}</span>`;
     if (mobileAuthMenu) mobileAuthMenu.innerHTML = mobileHTML;
 
     document.getElementById('logout-btn')?.addEventListener('click', () => logout());

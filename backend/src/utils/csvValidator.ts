@@ -80,6 +80,18 @@ export function validateCsvContent(content: string): ValidationResult {
     };
   }
 
+  if (parsed.length > 5000) {
+    // Each row triggers a sequential argon2 hash inside one DB transaction;
+    // reject clearly-abusive sizes before hashing to bound CPU/lock time.
+    return {
+      valid: false,
+      errors: [
+        `Too many rows: ${parsed.length}. Split the import into batches of 5000 or fewer.`,
+      ],
+      warnings: [],
+      records: [],
+    };
+  }
   if (parsed.length > 1000) {
     warnings.push(`Large file: ${parsed.length} rows. Processing may take time.`);
   }

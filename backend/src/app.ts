@@ -42,11 +42,9 @@ app.use('/api/usage', usageRoutes);
 app.use('/api/admin/reports', reportRoutes);
 
 app.get('/health', (_req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+  // Minimal liveness only. Don't leak uptime/timestamp (reveals last
+  // restart/deploy) to unauthenticated callers.
+  res.json({ status: 'ok' });
 });
 
 app.use((_req, res) => {

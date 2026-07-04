@@ -17,6 +17,12 @@ dist-ssr
 .env.local
 .env.localtest
 deploy/.env.localtest
+# Production secrets live ONLY on the deploy host. The real file is named
+# `.env.prod` (NOT `.env.production`) — ignore it explicitly so a stray
+# `git add -A` on the deploy host can never commit AD/DB/session secrets.
+.env.prod
+*.env.prod
+deploy/.env.prod
 
 # Editor directories and files
 .vscode/*

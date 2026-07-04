@@ -94,7 +94,8 @@ const docsDirectives = [
 const csp = directives.join('; ');
 const docsCsp = docsDirectives.join('; ');
 
-const commonHeaders = `add_header X-Frame-Options "SAMEORIGIN" always;
+const commonHeaders = `add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
 add_header X-Content-Type-Options "nosniff" always;
 add_header X-XSS-Protection "1; mode=block" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
