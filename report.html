@@ -4,8 +4,8 @@
     <script>try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laporan - igo</title>
-    <meta name="description" content="Analitik penggunaan igo untuk administrator." />
+    <title>Laporan - Internal Government Operation</title>
+    <meta name="description" content="Analitik penggunaan Internal Government Operation untuk administrator BPDP." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
@@ -44,19 +44,47 @@
       </section>
 
       <section class="mb-8 rounded border border-outline-variant bg-paper-white p-5">
-        <div class="mb-4 flex items-center justify-between">
+        <div class="mb-4 flex items-center justify-between gap-4">
           <h2 class="text-lg font-bold text-ink-slate dark:text-content">Penggunaan harian (14 hari)</h2>
-          <span class="text-xs text-on-surface-variant"><span class="mr-3"><span class="mr-1 inline-block h-2 w-2 rounded-full bg-vibrant-palm"></span>Aktivitas</span><span><span class="mr-1 inline-block h-2 w-2 rounded-full bg-accent-green"></span>Pengguna</span></span>
+          <span class="text-xs text-on-surface-variant">
+            <span class="mr-3"><span class="mr-1 inline-block h-2 w-2 rounded-full bg-vibrant-palm"></span>Aktivitas</span>
+            <span><span class="mr-1 inline-block h-2 w-2 rounded-full bg-accent-green"></span>Pengguna</span>
+          </span>
         </div>
         <div id="daily-chart" class="flex h-48 items-end gap-1 sm:gap-2">
-          <p class="text-sm text-on-surface-variant">Memuat…</p>
+          <p class="text-sm text-on-surface-variant">Memuat...</p>
         </div>
       </section>
 
       <section class="rounded border border-outline-variant bg-paper-white p-5">
-        <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Fitur terpopuler (30 hari)</h2>
+        <div class="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-ink-slate dark:text-content">Fitur terpopuler (30 hari)</h2>
+            <p class="mt-1 text-sm text-on-surface-variant">Report bulanan tersedia mengikuti bulan yang sudah memiliki aktivitas.</p>
+          </div>
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label for="report-month-select" class="sr-only">Bulan laporan</label>
+            <select
+              id="report-month-select"
+              class="h-10 rounded border border-outline-variant bg-background px-3 text-sm text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20"
+              disabled
+            >
+              <option>Memuat bulan...</option>
+            </select>
+            <button
+              id="download-monthly-report"
+              type="button"
+              class="inline-flex h-10 items-center justify-center gap-2 rounded bg-vibrant-palm px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-vibrant-palm/30 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled
+            >
+              <i data-lucide="download" class="h-4 w-4"></i>
+              <span>Download report bulanan</span>
+            </button>
+          </div>
+        </div>
+        <p id="monthly-report-status" class="mb-4 text-sm text-on-surface-variant"></p>
         <div id="feature-list" class="space-y-3">
-          <p class="text-sm text-on-surface-variant">Memuat…</p>
+          <p class="text-sm text-on-surface-variant">Memuat...</p>
         </div>
       </section>
     </main>
@@ -67,82 +95,6 @@
     <script type="module" src="src/js/mobileMenu.ts"></script>
     <script type="module" src="src/js/main.ts"></script>
     <script type="module" src="src/js/sw-register.ts"></script>
-    <script type="module">
-      import { getCurrentUser } from './src/js/auth/session.js';
-
-      const user = await getCurrentUser();
-      if (!user) {
-        window.location.href = '/login.html';
-      } else if (user.role !== 'admin') {
-        window.location.href = '/index.html';
-      }
-
-      const j = async (url) => {
-        const r = await fetch(url, { credentials: 'include' });
-        const body = await r.json();
-        if (!body.success) throw new Error(body.error || 'Request failed');
-        return body.data;
-      };
-
-      try {
-        const s = await j('/api/admin/reports/summary');
-        document.getElementById('stat-users').textContent = s.totalUsers;
-        document.getElementById('stat-today').textContent = s.activeToday;
-        document.getElementById('stat-week').textContent = s.active7d;
-        document.getElementById('stat-events').textContent = s.eventsToday;
-      } catch (e) {
-        console.error('summary failed', e);
-      }
-
-      try {
-        const days = await j('/api/admin/reports/daily?days=14');
-        const chart = document.getElementById('daily-chart');
-        chart.textContent = '';
-        const max = Math.max(1, ...days.map((d) => d.events));
-        for (const d of days) {
-          const col = document.createElement('div');
-          col.className = 'flex h-full flex-1 flex-col items-center justify-end gap-1';
-          const eventPct = Math.round((d.events / max) * 88);
-          const userPct = Math.round((d.activeUsers / max) * 88);
-          const label = d.date.slice(8) + '/' + d.date.slice(5, 7);
-          col.innerHTML =
-            '<div class="flex w-full flex-1 items-end justify-center gap-0.5" title="' +
-            d.date + ' — ' + d.events + ' aktivitas, ' + d.activeUsers + ' pengguna">' +
-            '<div class="w-2/5 rounded-t bg-vibrant-palm" style="height:' + Math.max(d.events ? 4 : 1, eventPct) + '%"></div>' +
-            '<div class="w-2/5 rounded-t bg-accent-green" style="height:' + Math.max(d.activeUsers ? 4 : 1, userPct) + '%"></div>' +
-            '</div>' +
-            '<span class="text-[10px] text-on-surface-variant">' + label + '</span>';
-          chart.appendChild(col);
-        }
-        if (!days.some((d) => d.events)) {
-          chart.innerHTML = '<p class="text-sm text-on-surface-variant">Belum ada data penggunaan.</p>';
-        }
-      } catch (e) {
-        console.error('daily failed', e);
-      }
-
-      try {
-        const feats = await j('/api/admin/reports/features?days=30');
-        const list = document.getElementById('feature-list');
-        list.textContent = '';
-        if (!feats.length) {
-          list.innerHTML = '<p class="text-sm text-on-surface-variant">Belum ada fitur yang diakses.</p>';
-        }
-        const max = Math.max(1, ...feats.map((f) => f.count));
-        for (const f of feats) {
-          const row = document.createElement('div');
-          const pct = Math.max(2, Math.round((f.count / max) * 100));
-          row.innerHTML =
-            '<div class="mb-1 flex items-center justify-between text-sm">' +
-            '<span class="font-medium text-content">' + f.feature + '</span>' +
-            '<span class="text-on-surface-variant">' + f.count + '× · ' + f.users + ' pengguna</span>' +
-            '</div>' +
-            '<div class="h-2 w-full rounded bg-surface-muted"><div class="h-2 rounded bg-accent-green" style="width:' + pct + '%"></div></div>';
-          list.appendChild(row);
-        }
-      } catch (e) {
-        console.error('features failed', e);
-      }
-    </script>
+    <script type="module" src="src/js/report-page.ts"></script>
   </body>
 </html>

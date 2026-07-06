@@ -30,8 +30,6 @@ function uniq(values) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
-const DEFAULT_CORS_PROXY_ORIGIN =
-  'https://bentopdf-cors-proxy.bentopdf.workers.dev';
 const DEFAULT_OCR_FONT_CDN_ORIGIN = 'https://rawcdn.githack.com';
 
 // WASM modules are self-hosted (same-origin) by default — see wasm-provider.ts.
@@ -49,7 +47,7 @@ const tesseractOrigins = uniq([
 ]);
 
 const corsProxyOrigin =
-  originOf(process.env.VITE_CORS_PROXY_URL) || DEFAULT_CORS_PROXY_ORIGIN;
+  originOf(process.env.VITE_CORS_PROXY_URL);
 
 const ocrFontOrigin =
   originOf(process.env.VITE_OCR_FONT_BASE_URL) || DEFAULT_OCR_FONT_CDN_ORIGIN;

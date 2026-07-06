@@ -235,10 +235,11 @@
           </p>
         </div>
 
-        <a
-          href="/health"
+        <div
           id="service-status"
-          class="absolute bottom-4 right-6 inline-flex items-center gap-2 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs text-content-muted transition-colors hover:border-accent-green/60"
+          role="status"
+          aria-live="polite"
+          class="absolute bottom-4 right-6 inline-flex cursor-default select-none items-center gap-2 rounded-lg border border-line bg-surface-raised px-3 py-1.5 text-xs text-content-muted"
         >
           <span
             id="service-status-dot"
@@ -250,7 +251,7 @@
               >Checking…</span
             ></span
           >
-        </a>
+        </div>
       </main>
     </div>
 
