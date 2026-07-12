@@ -2,7 +2,9 @@
   "login": {
     "title": "Masuk",
     "subtitle": "Gunakan username & password yang sama dengan akun WiFi / laptop kantor Anda.",
-    "heroSubtitle": "Masuk dengan akun perusahaan Anda untuk memproses dan mengelola dokumen PDF.",
+    "heroSubtitle": "Aplikasi Pengolahan Dokumen PDF yang disediakan untuk mendukung pelaksanaan tugas dan kebutuhan administrasi internal Pegawai Badan Pengelola Dana Perkebunan (BPDP).",
+    "heroManagement": "Pengelolaan aplikasi dilaksanakan oleh Divisi Komunikasi dan Layanan Informasi BPDP.",
+    "copyright": "© 2026 Badan Pengelola Dana Perkebunan. All Rights Reserved",
     "exampleLabel": "Contoh:",
     "examplePasswordNote": "(password WiFi / laptop kantor Anda)",
     "verificationCode": "Kode verifikasi",

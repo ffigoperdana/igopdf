@@ -2,7 +2,9 @@
   "login": {
     "title": "Sign in",
     "subtitle": "Use the same username & password as your office WiFi / laptop account.",
-    "heroSubtitle": "Sign in with your company account to process and manage PDF documents.",
+    "heroSubtitle": "This PDF Document Processing Application supports the work and internal administrative needs of Badan Pengelola Dana Perkebunan (BPDP) employees.",
+    "heroManagement": "The application is managed by BPDP's Communications and Information Services Division.",
+    "copyright": "© 2026 Badan Pengelola Dana Perkebunan. All Rights Reserved",
     "exampleLabel": "Example:",
     "examplePasswordNote": "(your office WiFi / laptop password)",
     "verificationCode": "Verification code",

@@ -81,7 +81,11 @@ export interface PyMuPDFDocument {
   isEncrypted: boolean;
   authenticate(password: string): boolean;
   getPage(index: number): PyMuPDFPage;
-  save(): Uint8Array;
+  save(options?: {
+    garbage?: number;
+    deflate?: boolean;
+    clean?: boolean;
+  }): Uint8Array;
   close(): void;
   getLayerConfig?(): unknown[];
   addLayer?(name: string): { number: number; xref: number };
@@ -116,6 +120,16 @@ export interface PyMuPDFPage {
   searchFor(text: string): unknown[];
   addRedaction(rect: unknown, text: string, fill: unknown): void;
   applyRedactions(): void;
+  insertText(
+    point: { x: number; y: number },
+    text: string,
+    options?: {
+      fontsize?: number;
+      fontname?: string;
+      color?: { r: number; g: number; b: number };
+      rotate?: number;
+    }
+  ): void;
 }
 
 export interface PyMuPDFTextToPdfOptions {
