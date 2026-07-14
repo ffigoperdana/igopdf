@@ -24,6 +24,16 @@
         </p>
       </div>
 
+      <div class="mb-8 border-b border-outline-variant" role="tablist" aria-label="Tampilan laporan">
+        <button id="report-tab-activity" type="button" role="tab" aria-selected="true" aria-controls="report-panel-activity" class="border-b-2 border-vibrant-palm px-4 py-3 text-sm font-semibold text-vibrant-palm">
+          Aktivitas
+        </button>
+        <button id="report-tab-users" type="button" role="tab" aria-selected="false" aria-controls="report-panel-users" class="border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-on-surface-variant transition hover:text-on-background">
+          Pengguna
+        </button>
+      </div>
+
+      <div id="report-panel-activity" role="tabpanel" aria-labelledby="report-tab-activity">
       <section class="mb-8 grid gap-4 md:grid-cols-4">
         <div class="rounded border border-outline-variant bg-paper-white p-4">
           <p class="text-sm text-on-surface-variant">Total user aktif</p>
@@ -85,6 +95,64 @@
         <p id="monthly-report-status" class="mb-4 text-sm text-on-surface-variant"></p>
         <div id="feature-list" class="space-y-3">
           <p class="text-sm text-on-surface-variant">Memuat...</p>
+        </div>
+      </section>
+      </div>
+
+      <section id="report-panel-users" role="tabpanel" aria-labelledby="report-tab-users" class="hidden">
+        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-ink-slate dark:text-content">Aktivitas Pengguna</h2>
+            <p class="mt-1 text-sm text-on-surface-variant">Login berhasil dan penggunaan fitur berdasarkan periode yang dipilih.</p>
+          </div>
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label for="user-report-month-select" class="sr-only">Bulan laporan pengguna</label>
+            <select id="user-report-month-select" class="h-10 rounded border border-outline-variant bg-background px-3 text-sm text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" disabled>
+              <option>Memuat bulan...</option>
+            </select>
+            <button id="download-user-report" type="button" class="inline-flex h-10 items-center justify-center gap-2 rounded bg-vibrant-palm px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-vibrant-palm/30 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+              <i data-lucide="download" class="h-4 w-4"></i>
+              <span>Download report pengguna</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-6 grid gap-4 md:grid-cols-4">
+          <div class="rounded border border-outline-variant bg-paper-white p-4"><p class="text-sm text-on-surface-variant">Pengguna LDAP</p><p id="user-stat-ldap" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p></div>
+          <div class="rounded border border-outline-variant bg-paper-white p-4"><p class="text-sm text-on-surface-variant">Berhasil masuk</p><p id="user-stat-login" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p></div>
+          <div class="rounded border border-outline-variant bg-paper-white p-4"><p class="text-sm text-on-surface-variant">Memakai fitur</p><p id="user-stat-active" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p></div>
+          <div class="rounded border border-outline-variant bg-paper-white p-4"><p class="text-sm text-on-surface-variant">Total aktivitas</p><p id="user-stat-activities" class="mt-2 text-2xl font-bold text-deep-forest dark:text-content">-</p></div>
+        </div>
+
+        <div class="rounded border border-outline-variant bg-paper-white p-5">
+          <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <p id="user-report-status" class="text-sm text-on-surface-variant">Pilih periode untuk melihat pengguna.</p>
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <label for="user-source-filter" class="sr-only">Sumber akun</label>
+              <select id="user-source-filter" class="h-10 rounded border border-outline-variant bg-background px-3 text-sm text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20">
+                <option value="ldap">LDAP</option>
+                <option value="all">Semua akun</option>
+                <option value="local">Lokal</option>
+              </select>
+              <label for="user-search" class="sr-only">Cari username</label>
+              <input id="user-search" type="search" placeholder="Cari username" class="h-10 rounded border border-outline-variant bg-background px-3 text-sm text-on-background placeholder:text-on-surface-variant focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" />
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[760px] text-left text-sm">
+              <thead class="border-b border-outline-variant text-on-surface-variant">
+                <tr><th class="px-3 py-3 font-medium">Username</th><th class="px-3 py-3 font-medium">Sumber</th><th class="px-3 py-3 font-medium">Terakhir masuk</th><th class="px-3 py-3 font-medium">Terakhir aktivitas</th><th class="px-3 py-3 text-right font-medium">Aktivitas</th><th class="px-3 py-3 font-medium">Fitur teratas</th></tr>
+              </thead>
+              <tbody id="user-list"><tr><td colspan="6" class="px-3 py-6 text-center text-on-surface-variant">Memuat...</td></tr></tbody>
+            </table>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-3">
+            <p id="user-pagination-status" class="text-sm text-on-surface-variant"></p>
+            <div class="flex gap-2">
+              <button id="user-page-prev" type="button" class="h-9 rounded border border-outline-variant px-3 text-sm font-medium text-on-background disabled:cursor-not-allowed disabled:opacity-50" disabled>Sebelumnya</button>
+              <button id="user-page-next" type="button" class="h-9 rounded border border-outline-variant px-3 text-sm font-medium text-on-background disabled:cursor-not-allowed disabled:opacity-50">Berikutnya</button>
+            </div>
+          </div>
         </div>
       </section>
     </main>

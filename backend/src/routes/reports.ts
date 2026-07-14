@@ -25,6 +25,21 @@ function parseMonth(raw: unknown): string | null {
   return value;
 }
 
+function parsePage(raw: unknown): number {
+  const value = parseInt(String(raw ?? ''), 10);
+  return Number.isInteger(value) ? Math.min(1000, Math.max(1, value)) : 1;
+}
+
+function parsePageSize(raw: unknown): number {
+  const value = parseInt(String(raw ?? ''), 10);
+  return Number.isInteger(value) ? Math.min(100, Math.max(10, value)) : 25;
+}
+
+function parseAuthSource(raw: unknown): 'all' | 'ldap' | 'local' {
+  const value = String(raw ?? 'ldap');
+  return value === 'all' || value === 'ldap' || value === 'local' ? value : 'ldap';
+}
+
 function formatMonthLabel(month: string): string {
   const [year, monthNum] = month.split('-').map(Number);
   return new Intl.DateTimeFormat('id-ID', {
@@ -126,12 +141,21 @@ router.get('/months', async (_req, res) => {
   try {
     const result = await pool.query(
       `SELECT to_char(month_start, 'YYYY-MM') AS month,
-              COUNT(*)::int AS events,
+              SUM(events)::int AS events,
               COUNT(DISTINCT username)::int AS "activeUsers"
        FROM (
          SELECT date_trunc('month', created_at AT TIME ZONE $1)::date AS month_start,
-                username
+                LOWER(username) AS username,
+                COUNT(*)::int AS events
          FROM usage_events
+         GROUP BY 1, 2
+         UNION ALL
+         SELECT date_trunc('month', attempted_at AT TIME ZONE $1)::date AS month_start,
+                LOWER(username) AS username,
+                0::int AS events
+         FROM login_attempts
+         WHERE success = true
+         GROUP BY 1, 2
        ) monthly_events
        GROUP BY month_start
        ORDER BY month_start DESC`,
@@ -147,6 +171,104 @@ router.get('/months', async (_req, res) => {
     });
   } catch (err) {
     logger.error('Reports months error', err);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+router.get('/users', async (req, res) => {
+  try {
+    const month = parseMonth(req.query.month);
+    if (!month) {
+      res.status(400).json({ success: false, error: 'Invalid month. Use YYYY-MM format.' });
+      return;
+    }
+
+    const source = parseAuthSource(req.query.source);
+    const search = String(req.query.q ?? '').trim().slice(0, 150);
+    const page = parsePage(req.query.page);
+    const pageSize = parsePageSize(req.query.pageSize);
+    const offset = (page - 1) * pageSize;
+    const monthStart = `${month}-01`;
+
+    const baseQuery = `
+      WITH bounds AS (
+        SELECT $1::date AS start_date, ($1::date + INTERVAL '1 month') AS end_date
+      ),
+      monthly_logins AS (
+        SELECT LOWER(username) AS username, MAX(attempted_at) AS last_login, COUNT(*)::int AS login_count
+        FROM login_attempts, bounds
+        WHERE success = true
+          AND attempted_at AT TIME ZONE $2 >= bounds.start_date
+          AND attempted_at AT TIME ZONE $2 < bounds.end_date
+        GROUP BY LOWER(username)
+      ),
+      usage_with_counts AS (
+        SELECT username, feature, created_at,
+               COUNT(*) OVER (PARTITION BY LOWER(username), feature) AS feature_total
+        FROM usage_events, bounds
+        WHERE created_at AT TIME ZONE $2 >= bounds.start_date
+          AND created_at AT TIME ZONE $2 < bounds.end_date
+      ),
+      monthly_usage AS (
+        SELECT LOWER(username) AS username,
+               MAX(created_at) AS last_activity,
+               COUNT(*)::int AS activity_count,
+               COUNT(DISTINCT feature)::int AS feature_count,
+               (ARRAY_AGG(feature ORDER BY feature_total DESC, feature ASC))[1] AS top_feature
+        FROM usage_with_counts
+        GROUP BY LOWER(username)
+      ),
+      report_users AS (
+        SELECT u.username,
+               u.auth_source AS "authSource",
+               logins.last_login AS "lastLogin",
+               usage.last_activity AS "lastActivity",
+               COALESCE(logins.login_count, 0)::int AS "loginCount",
+               COALESCE(usage.activity_count, 0)::int AS "activityCount",
+               COALESCE(usage.feature_count, 0)::int AS "featureCount",
+               usage.top_feature AS "topFeature"
+        FROM users u
+        LEFT JOIN monthly_logins logins ON LOWER(u.username) = logins.username
+        LEFT JOIN monthly_usage usage ON LOWER(u.username) = usage.username
+        WHERE (logins.username IS NOT NULL OR usage.username IS NOT NULL)
+          AND ($3 = 'all' OR u.auth_source = $3)
+          AND ($4 = '' OR LOWER(u.username) LIKE '%' || LOWER($4) || '%')
+      )`;
+
+    const params = [monthStart, REPORT_TIME_ZONE, source, search];
+    const [summary, count, users] = await Promise.all([
+      pool.query(
+        `${baseQuery}
+         SELECT COUNT(*) FILTER (WHERE "authSource" = 'ldap')::int AS "ldapUsers",
+                COUNT(*)::int AS "accessedUsers",
+                COUNT(*) FILTER (WHERE "lastLogin" IS NOT NULL)::int AS "loggedInUsers",
+                COUNT(*) FILTER (WHERE "lastActivity" IS NOT NULL)::int AS "activeUsers",
+                COALESCE(SUM("activityCount"), 0)::int AS "totalActivities"
+         FROM report_users`,
+        params
+      ),
+      pool.query(`${baseQuery} SELECT COUNT(*)::int AS total FROM report_users`, params),
+      pool.query(
+        `${baseQuery}
+         SELECT * FROM report_users
+         ORDER BY "activityCount" DESC, "lastLogin" DESC NULLS LAST, username ASC
+         LIMIT $5 OFFSET $6`,
+        [...params, pageSize, offset]
+      ),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        month,
+        label: formatMonthLabel(month),
+        summary: summary.rows[0],
+        users: users.rows,
+        pagination: { page, pageSize, total: Number(count.rows[0].total || 0) },
+      },
+    });
+  } catch (err) {
+    logger.error('Reports users error', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

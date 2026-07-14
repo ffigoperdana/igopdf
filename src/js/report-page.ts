@@ -60,6 +60,35 @@ interface MonthlyReport {
   features: FeatureRow[];
 }
 
+interface UserReportRow {
+  username: string;
+  authSource: 'ldap' | 'local';
+  lastLogin: string | null;
+  lastActivity: string | null;
+  loginCount: number;
+  activityCount: number;
+  featureCount: number;
+  topFeature: string | null;
+}
+
+interface UserReportData {
+  month: string;
+  label: string;
+  summary: {
+    ldapUsers: number;
+    accessedUsers: number;
+    loggedInUsers: number;
+    activeUsers: number;
+    totalActivities: number;
+  };
+  users: UserReportRow[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
 type DocWithAutoTable = jsPDF & {
   lastAutoTable?: {
     finalY: number;
@@ -81,6 +110,9 @@ const chartColors = [
   '#7C3AED',
   '#DC2626',
 ];
+
+let currentUserPage = 1;
+let userSearchTimer: number | undefined;
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -126,6 +158,18 @@ function formatLongDate(date: string): string {
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function formatDateTime(value: string | null): string {
+  if (!value) return '-';
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Jakarta',
+  }).format(new Date(value));
 }
 
 function setText(id: string, value: string): void {
@@ -226,16 +270,22 @@ async function loadDashboard(): Promise<void> {
 
 async function loadReportMonths(): Promise<void> {
   const select = byId<HTMLSelectElement>('report-month-select');
+  const userSelect = byId<HTMLSelectElement>('user-report-month-select');
   const button = byId<HTMLButtonElement>('download-monthly-report');
+  const userButton = byId<HTMLButtonElement>('download-user-report');
   const months = await apiGet<ReportMonth[]>('/api/admin/reports/months');
 
   select.textContent = '';
+  userSelect.textContent = '';
   if (months.length === 0) {
     const option = createElement('option');
     option.textContent = 'Belum ada report';
     select.appendChild(option);
+    userSelect.appendChild(option.cloneNode(true));
     select.disabled = true;
+    userSelect.disabled = true;
     button.disabled = true;
+    userButton.disabled = true;
     setStatus('Belum ada aktivitas yang bisa dijadikan report bulanan.');
     return;
   }
@@ -245,11 +295,87 @@ async function loadReportMonths(): Promise<void> {
     option.value = month.month;
     option.textContent = `${month.label} - ${formatNumber(month.events)} aktivitas`;
     select.appendChild(option);
+    userSelect.appendChild(option.cloneNode(true));
   }
 
   select.disabled = false;
+  userSelect.disabled = false;
   button.disabled = false;
+  userButton.disabled = false;
   setStatus(`${months.length} bulan report tersedia.`);
+}
+
+function renderUsers(users: UserReportRow[]): void {
+  const list = byId<HTMLTableSectionElement>('user-list');
+  list.textContent = '';
+
+  if (users.length === 0) {
+    const row = createElement('tr');
+    const cell = createElement('td', 'px-3 py-6 text-center text-on-surface-variant');
+    cell.colSpan = 6;
+    cell.textContent = 'Tidak ada pengguna pada periode dan filter ini.';
+    row.appendChild(cell);
+    list.appendChild(row);
+    return;
+  }
+
+  for (const user of users) {
+    const row = createElement('tr', 'border-b border-outline-variant/60 last:border-0');
+    const username = createElement('td', 'px-3 py-3 font-medium text-on-background');
+    username.textContent = user.username;
+    const source = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    source.textContent = user.authSource === 'ldap' ? 'LDAP' : 'Lokal';
+    const login = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    login.textContent = formatDateTime(user.lastLogin);
+    const activity = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    activity.textContent = formatDateTime(user.lastActivity);
+    const count = createElement('td', 'px-3 py-3 text-right font-medium text-on-background');
+    count.textContent = formatNumber(Number(user.activityCount || 0));
+    const feature = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    feature.textContent = user.topFeature || '-';
+    row.append(username, source, login, activity, count, feature);
+    list.appendChild(row);
+  }
+}
+
+async function loadUsers(page = 1): Promise<UserReportData | null> {
+  const month = byId<HTMLSelectElement>('user-report-month-select').value;
+  if (!month) return null;
+
+  const source = byId<HTMLSelectElement>('user-source-filter').value;
+  const search = byId<HTMLInputElement>('user-search').value.trim();
+  const status = byId('user-report-status');
+  status.textContent = 'Memuat pengguna...';
+
+  try {
+    const params = new URLSearchParams({
+      month,
+      source,
+      q: search,
+      page: String(page),
+      pageSize: '25',
+    });
+    const report = await apiGet<UserReportData>(`/api/admin/reports/users?${params}`);
+    currentUserPage = report.pagination.page;
+    setText('user-stat-ldap', formatNumber(Number(report.summary.ldapUsers || 0)));
+    setText('user-stat-login', formatNumber(Number(report.summary.loggedInUsers || 0)));
+    setText('user-stat-active', formatNumber(Number(report.summary.activeUsers || 0)));
+    setText('user-stat-activities', formatNumber(Number(report.summary.totalActivities || 0)));
+    renderUsers(report.users);
+
+    const from = report.pagination.total === 0 ? 0 : (report.pagination.page - 1) * report.pagination.pageSize + 1;
+    const to = Math.min(report.pagination.page * report.pagination.pageSize, report.pagination.total);
+    status.textContent = `${report.label}: ${formatNumber(Number(report.summary.accessedUsers || 0))} pengguna mengakses.`;
+    setText('user-pagination-status', `${formatNumber(from)}-${formatNumber(to)} dari ${formatNumber(report.pagination.total)} pengguna`);
+    byId<HTMLButtonElement>('user-page-prev').disabled = report.pagination.page <= 1;
+    byId<HTMLButtonElement>('user-page-next').disabled = to >= report.pagination.total;
+    return report;
+  } catch (err) {
+    console.error('user report failed', err);
+    status.textContent = 'Data pengguna gagal dimuat.';
+    renderUsers([]);
+    return null;
+  }
 }
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -484,7 +610,7 @@ function addPdfFooter(doc: jsPDF): void {
   }
 }
 
-function generateMonthlyPdf(report: MonthlyReport): void {
+function generateMonthlyPdf(report: MonthlyReport, topUsers: UserReportRow[]): void {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -550,6 +676,29 @@ function generateMonthlyPdf(report: MonthlyReport): void {
   });
 
   let nextY = ((doc as DocWithAutoTable).lastAutoTable?.finalY || 31) + 8;
+  if (nextY > 125) {
+    doc.addPage();
+    addPageHeader(doc, `Pengguna Aktif - ${report.label}`);
+    nextY = 31;
+  }
+
+  autoTable(doc, {
+    head: [['Top pengguna', 'Sumber', 'Aktivitas', 'Fitur teratas', 'Terakhir masuk']],
+    body: topUsers.map((user) => [
+      user.username,
+      user.authSource === 'ldap' ? 'LDAP' : 'Lokal',
+      formatNumber(Number(user.activityCount || 0)),
+      user.topFeature || '-',
+      formatDateTime(user.lastLogin),
+    ]),
+    startY: nextY,
+    margin: { left: 14, right: 14 },
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [31, 86, 48], textColor: 255 },
+    alternateRowStyles: { fillColor: [240, 248, 244] },
+  });
+
+  nextY = ((doc as DocWithAutoTable).lastAutoTable?.finalY || nextY) + 8;
   if (nextY > 150) {
     doc.addPage();
     addPageHeader(doc, `Detail Laporan - ${report.label}`);
@@ -605,10 +754,12 @@ async function downloadSelectedMonthlyReport(): Promise<void> {
   setStatus('Report bulanan sedang dibuat.');
 
   try {
-    const report = await apiGet<MonthlyReport>(
-      `/api/admin/reports/monthly?month=${encodeURIComponent(select.value)}`
-    );
-    generateMonthlyPdf(report);
+    const month = encodeURIComponent(select.value);
+    const [report, users] = await Promise.all([
+      apiGet<MonthlyReport>(`/api/admin/reports/monthly?month=${month}`),
+      apiGet<UserReportData>(`/api/admin/reports/users?month=${month}&source=all&page=1&pageSize=20`),
+    ]);
+    generateMonthlyPdf(report, users.users);
     setStatus(`Report ${report.label} berhasil dibuat.`);
   } catch (err) {
     console.error('monthly report failed', err);
@@ -616,6 +767,30 @@ async function downloadSelectedMonthlyReport(): Promise<void> {
   } finally {
     button.disabled = false;
     setDownloadButtonLabel('Download report bulanan');
+  }
+}
+
+async function downloadUserReport(): Promise<void> {
+  const button = byId<HTMLButtonElement>('download-user-report');
+  const month = byId<HTMLSelectElement>('user-report-month-select').value;
+  if (!month) return;
+
+  button.disabled = true;
+  const label = button.querySelector('span');
+  if (label) label.textContent = 'Menyiapkan report...';
+  try {
+    const [report, users] = await Promise.all([
+      apiGet<MonthlyReport>(`/api/admin/reports/monthly?month=${encodeURIComponent(month)}`),
+      apiGet<UserReportData>(`/api/admin/reports/users?month=${encodeURIComponent(month)}&source=all&page=1&pageSize=20`),
+    ]);
+    generateMonthlyPdf(report, users.users);
+    byId('user-report-status').textContent = `Report pengguna ${report.label} berhasil dibuat.`;
+  } catch (err) {
+    console.error('user monthly report failed', err);
+    byId('user-report-status').textContent = 'Report pengguna gagal dibuat.';
+  } finally {
+    button.disabled = false;
+    if (label) label.textContent = 'Download report pengguna';
   }
 }
 
@@ -632,6 +807,51 @@ async function initReportPage(): Promise<void> {
 
   byId<HTMLButtonElement>('download-monthly-report').addEventListener('click', () => {
     void downloadSelectedMonthlyReport();
+  });
+  byId<HTMLButtonElement>('download-user-report').addEventListener('click', () => {
+    void downloadUserReport();
+  });
+
+  const activityTab = byId<HTMLButtonElement>('report-tab-activity');
+  const usersTab = byId<HTMLButtonElement>('report-tab-users');
+  const activityPanel = byId('report-panel-activity');
+  const usersPanel = byId('report-panel-users');
+  const setTab = (tab: 'activity' | 'users') => {
+    const usersActive = tab === 'users';
+    activityPanel.classList.toggle('hidden', usersActive);
+    usersPanel.classList.toggle('hidden', !usersActive);
+    activityTab.setAttribute('aria-selected', String(!usersActive));
+    usersTab.setAttribute('aria-selected', String(usersActive));
+    activityTab.classList.toggle('border-vibrant-palm', !usersActive);
+    activityTab.classList.toggle('text-vibrant-palm', !usersActive);
+    activityTab.classList.toggle('border-transparent', usersActive);
+    activityTab.classList.toggle('text-on-surface-variant', usersActive);
+    usersTab.classList.toggle('border-vibrant-palm', usersActive);
+    usersTab.classList.toggle('text-vibrant-palm', usersActive);
+    usersTab.classList.toggle('border-transparent', !usersActive);
+    usersTab.classList.toggle('text-on-surface-variant', !usersActive);
+    if (usersActive) void loadUsers(1);
+  };
+  activityTab.addEventListener('click', () => setTab('activity'));
+  usersTab.addEventListener('click', () => setTab('users'));
+
+  byId<HTMLSelectElement>('user-report-month-select').addEventListener('change', () => {
+    void loadUsers(1);
+  });
+  byId<HTMLSelectElement>('user-source-filter').addEventListener('change', () => {
+    void loadUsers(1);
+  });
+  byId<HTMLInputElement>('user-search').addEventListener('input', () => {
+    window.clearTimeout(userSearchTimer);
+    userSearchTimer = window.setTimeout((): void => {
+      void loadUsers(1);
+    }, 250);
+  });
+  byId<HTMLButtonElement>('user-page-prev').addEventListener('click', () => {
+    void loadUsers(currentUserPage - 1);
+  });
+  byId<HTMLButtonElement>('user-page-next').addEventListener('click', () => {
+    void loadUsers(currentUserPage + 1);
   });
 
   try {
