@@ -11,10 +11,10 @@
     <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
     <link href="src/css/styles.css" rel="stylesheet" />
   </head>
-  <body class="antialiased bg-background text-on-background">
+  <body class="overflow-x-clip antialiased bg-background text-on-background">
     {{> navbar }}
 
-    <main class="container mx-auto min-h-screen px-4 py-8">
+    <main class="container mx-auto min-h-screen w-full max-w-full overflow-x-clip px-4 py-8">
       <div class="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
           <p class="text-sm font-semibold uppercase text-vibrant-palm">Admin</p>
@@ -50,8 +50,8 @@
         </div>
       </section>
 
-      <div class="grid gap-6 lg:grid-cols-[360px_1fr]">
-        <aside class="space-y-6">
+      <div class="grid min-w-0 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <aside class="min-w-0 space-y-6">
           <section class="rounded border border-outline-variant bg-paper-white p-5">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Tambah user</h2>
             <form id="create-user-form" class="space-y-4">
@@ -79,21 +79,21 @@
             <div class="space-y-4">
               <input id="import-file" type="file" accept=".csv,.txt,text/csv,text/plain" class="w-full text-sm" />
               <textarea id="import-content" rows="8" class="w-full rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Email&#10;nama@bpdp.or.id"></textarea>
-              <div class="flex gap-2">
-                <button id="preview-import-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50 dark:hover:bg-deep-forest/40" type="button">Preview</button>
-                <button id="run-import-btn" class="rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white hover:bg-orange-600" type="button">Import</button>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="preview-import-btn" class="min-w-0 rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50 dark:hover:bg-deep-forest/40" type="button">Preview</button>
+                <button id="run-import-btn" class="min-w-0 rounded bg-vibrant-palm px-3 py-2 text-sm font-semibold text-white hover:bg-orange-600" type="button">Import</button>
               </div>
               <pre id="import-preview" class="max-h-56 overflow-auto rounded bg-surface-gray p-3 text-xs text-on-surface"></pre>
             </div>
           </section>
         </aside>
 
-        <section class="rounded border border-outline-variant bg-paper-white">
+        <section class="min-w-0 max-w-full overflow-hidden rounded border border-outline-variant bg-paper-white">
           <div class="flex flex-col gap-3 border-b border-outline-variant p-4 md:flex-row md:items-center md:justify-between">
             <h2 class="text-lg font-bold text-ink-slate dark:text-content">Daftar user</h2>
-            <div class="flex flex-wrap gap-2">
-              <input id="user-search" class="rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Cari username" />
-              <select id="role-filter" class="rounded border border-outline-variant px-3 py-2 text-sm">
+            <div class="grid w-full min-w-0 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+              <input id="user-search" class="min-w-0 rounded border border-outline-variant px-3 py-2 text-sm sm:flex-1" placeholder="Cari username" />
+              <select id="role-filter" class="min-w-0 rounded border border-outline-variant px-3 py-2 text-sm">
                 <option value="">Semua role</option>
                 <option value="admin">admin</option>
                 <option value="user">user</option>
@@ -101,8 +101,8 @@
               <button id="refresh-users-btn" class="rounded border border-deep-forest px-3 py-2 text-sm font-semibold text-deep-forest dark:text-content hover:bg-green-50 dark:hover:bg-deep-forest/40" type="button">Refresh</button>
             </div>
           </div>
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-outline-variant text-sm">
+          <div class="max-w-full overflow-x-auto">
+            <table class="admin-users-table min-w-full divide-y divide-outline-variant text-sm">
               <thead class="bg-surface-gray text-left text-on-surface-variant">
                 <tr>
                   <th class="px-4 py-3 font-semibold">Username</th>
@@ -115,9 +115,9 @@
               <tbody id="users-body" class="divide-y divide-outline-variant"></tbody>
             </table>
           </div>
-          <div class="flex items-center justify-between border-t border-outline-variant p-4 text-sm">
+          <div class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-t border-outline-variant p-4 text-sm">
             <button id="prev-page-btn" class="rounded border border-outline-variant px-3 py-2 disabled:opacity-40" type="button">Sebelumnya</button>
-            <span id="page-label">Halaman 1</span>
+            <span id="page-label" class="min-w-0 text-center">Halaman 1</span>
             <button id="next-page-btn" class="rounded border border-outline-variant px-3 py-2 disabled:opacity-40" type="button">Berikutnya</button>
           </div>
         </section>
@@ -191,12 +191,12 @@
         for (const user of result.data) {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td class="px-4 py-3 font-medium text-ink-slate dark:text-content"></td>
-            <td class="px-4 py-3"></td>
-            <td class="px-4 py-3"></td>
-            <td class="px-4 py-3"></td>
-            <td class="px-4 py-3">
-              <div class="flex flex-wrap gap-2">
+            <td data-label="Username" class="px-4 py-3 font-medium text-ink-slate dark:text-content"></td>
+            <td data-label="Role" class="px-4 py-3"></td>
+            <td data-label="Status" class="px-4 py-3"></td>
+            <td data-label="Last login" class="px-4 py-3"></td>
+            <td data-label="Aksi" class="px-4 py-3">
+              <div data-user-actions class="flex flex-wrap gap-2">
                 <button data-action="role" class="rounded border border-outline-variant px-2 py-1 text-xs">Toggle role</button>
                 <button data-action="status" class="rounded border border-outline-variant px-2 py-1 text-xs">Aktif/nonaktif</button>
                 <button data-action="reset" class="rounded border border-outline-variant px-2 py-1 text-xs">Reset password</button>

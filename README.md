@@ -31,6 +31,10 @@
 | Backend | Node.js + Express, PostgreSQL (`pg`), argon2, `ldapjs` |
 | Deploy | Docker (image `igov2-frontend` / `igov2-backend`), nginx |
 
+## Struktur repositori
+
+File HTML dan konfigurasi build tetap berada di root karena igo memakai Vite multi-page. Dokumentasi, panduan deployment, referensi desain, dan template tambahan dikelompokkan di dalam `docs/` serta `deploy/`. Lihat [peta struktur repositori](docs/repository-structure.md) sebelum memindahkan entrypoint atau konfigurasi runtime.
+
 ## Menjalankan secara lokal
 
 **Frontend**

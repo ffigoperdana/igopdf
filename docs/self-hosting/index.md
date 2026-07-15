@@ -112,7 +112,7 @@ docker run -p 3000:8080 ghcr.io/alam00000/bentopdf-simple:latest
 SIMPLE_MODE=true npm run build
 ```
 
-See [SIMPLE_MODE.md](https://github.com/alam00000/bentopdf/blob/main/SIMPLE_MODE.md) for full details.
+See the [Simple Mode guide](./simple-mode.md) for full details.
 
 ### Commercial build (public-facing deployments with your own brand)
 

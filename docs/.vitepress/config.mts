@@ -191,6 +191,8 @@ export default defineConfig({
                     text: 'Self-Hosting Guide',
                     items: [
                         { text: 'Overview', link: '/self-hosting/' },
+                        { text: 'Simple Mode', link: '/self-hosting/simple-mode' },
+                        { text: 'Static Hosting', link: '/self-hosting/static-hosting' },
                         { text: 'Docker', link: '/self-hosting/docker' },
                         { text: 'Vercel', link: '/self-hosting/vercel' },
                         { text: 'Netlify', link: '/self-hosting/netlify' },
@@ -207,6 +209,7 @@ export default defineConfig({
                     text: 'Guide',
                     items: [
                         { text: 'Getting Started', link: '/getting-started' },
+                        { text: 'Repository Structure', link: '/repository-structure' },
                         { text: 'Tools Reference', link: '/tools/' },
                         { text: 'Self-Hosting', link: '/self-hosting/' },
                         { text: 'Contributing', link: '/contributing' },

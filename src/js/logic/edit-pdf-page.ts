@@ -16,6 +16,7 @@ import type {
   AnnotationCapability,
   CommandsCapability,
   InteractionManagerCapability,
+  MenuCommandItem,
   SelectionCapability,
   TabItem,
   TabGroupItem,
@@ -23,6 +24,7 @@ import type {
   UICapability,
 } from 'embedpdf-snippet';
 import type {
+  PdfAnnotationObject,
   PdfFreeTextAnnoObject,
   PdfGlyphObject,
   PdfPageObject,
@@ -80,7 +82,7 @@ type TextEditSelection = {
 };
 
 type AnnotationClipboard = {
-  annotation: PdfFreeTextAnnoObject;
+  annotations: PdfAnnotationObject[];
   pasteCount: number;
 };
 
@@ -147,10 +149,10 @@ function isEditableEventTarget(event: KeyboardEvent): boolean {
   });
 }
 
-function cloneFreeTextAnnotation(
-  annotation: PdfFreeTextAnnoObject,
+function cloneAnnotation(
+  annotation: PdfAnnotationObject,
   offset: number
-): PdfFreeTextAnnoObject {
+): PdfAnnotationObject {
   const clone = structuredClone(annotation);
   clone.id = makeAnnotationId();
   clone.created = new Date();
@@ -166,6 +168,28 @@ function cloneFreeTextAnnotation(
     },
   };
   return clone;
+}
+
+const SELECTABLE_ANNOTATION_TYPES = new Set([3, 4, 5, 6, 7, 8, 13, 15]);
+
+function isSelectableAnnotation(annotation: PdfAnnotationObject): boolean {
+  return SELECTABLE_ANNOTATION_TYPES.has(annotation.type);
+}
+
+function getSelectableAnnotations(
+  scope: ReturnType<AnnotationCapability['forDocument']>
+): Array<{ pageIndex: number; id: string; annotation: PdfAnnotationObject }> {
+  const state = scope.getState();
+  return Object.values(state.byUid)
+    .filter(
+      ({ object, commitState }) =>
+        commitState !== 'deleted' && isSelectableAnnotation(object)
+    )
+    .map(({ object }) => ({
+      pageIndex: object.pageIndex,
+      id: object.id,
+      annotation: object,
+    }));
 }
 
 function colorToHex(color: PdfTextRun['color']): string {
@@ -320,6 +344,56 @@ function getViewerCanvases(): HTMLCanvasElement[] {
       (left, right) =>
         left.getBoundingClientRect().top - right.getBoundingClientRect().top
     );
+}
+
+function getCompactModeButton(): HTMLButtonElement | null {
+  const container = document.getElementById('embed-pdf-container');
+  if (!container) return null;
+
+  const roots: Array<Document | ShadowRoot | HTMLElement> = [container];
+  const seenRoots = new Set<Node>();
+  while (roots.length > 0) {
+    const root = roots.pop()!;
+    if (seenRoots.has(root)) continue;
+    seenRoots.add(root);
+
+    const compactButton = Array.from(root.querySelectorAll('button')).find(
+      (button) => {
+        const wrapper = button.parentElement;
+        return (
+          wrapper?.style.width === '100px' &&
+          wrapper.style.maxWidth === '100px'
+        );
+      }
+    );
+    if (compactButton) return compactButton;
+
+    root.querySelectorAll('*').forEach((element) => {
+      if (element.shadowRoot) roots.push(element.shadowRoot);
+    });
+  }
+
+  return null;
+}
+
+function syncCompactModeLabel(toolbarId: string | null): void {
+  const label = isTextEditToolbar(toolbarId)
+    ? 'Edit Text'
+    : toolbarId === 'annotation-toolbar'
+      ? 'Annotate'
+      : toolbarId === 'shapes-toolbar'
+        ? 'Shapes'
+        : toolbarId === 'redaction-toolbar'
+          ? 'Redact'
+          : 'View';
+
+  // The built-in compact selector only knows its four default modes.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const labelElement = getCompactModeButton()?.querySelector('span');
+      if (labelElement) labelElement.textContent = label;
+    });
+  });
 }
 
 function showTextEditSnapGuide(
@@ -814,16 +888,25 @@ function installTextEditMode(registry: PluginRegistry) {
     action: ({ documentId }) => activateTextEdit(documentId, 'phrase'),
   });
 
+  commands.registerCommand({
+    id: 'annotation:select-all',
+    label: 'Select annotations',
+    icon: 'marqueeSelect',
+    categories: ['annotation', 'annotation-selection'],
+    action: ({ documentId }) => {
+      if (!annotationPlugin) return;
+      const scope = annotationPlugin.forDocument(documentId);
+      const annotations = getSelectableAnnotations(scope);
+      scope.setSelection(annotations.map(({ id }) => id));
+    },
+  });
+
   textEditToolbarCleanup?.();
   textEditToolbarCleanup = ui.onToolbarChanged(
     ({ documentId, placement, slot, toolbarId }) => {
-      if (
-        placement !== 'top' ||
-        slot !== 'secondary' ||
-        isTextEditToolbar(toolbarId)
-      ) {
-        return;
-      }
+      if (placement !== 'top' || slot !== 'secondary') return;
+      syncCompactModeLabel(toolbarId);
+      if (isTextEditToolbar(toolbarId)) return;
 
       const documentInteraction = interaction.forDocument(documentId);
       if (documentInteraction.getActiveMode() === TEXT_EDIT_MODE) {
@@ -855,7 +938,7 @@ function installTextEditMode(registry: PluginRegistry) {
       id: 'mode-edit-text',
       commandId: 'mode:edit-text',
       variant: 'text',
-      categories: ['text-edit'],
+      categories: ['mode', 'text-edit'],
     };
     const overflowIndex = tabGroup.tabs.findIndex(
       (tab) => tab.commandId === 'tabs:overflow-menu'
@@ -867,9 +950,68 @@ function installTextEditMode(registry: PluginRegistry) {
       tabs,
     };
   });
+
+  items.push({
+    type: 'command-button',
+    id: 'annotation-select-all',
+    commandId: 'annotation:select-all',
+    variant: 'icon',
+    categories: ['annotation', 'annotation-selection'],
+  });
+
+  const modeMenu = schema.menus['mode-tabs-overflow-menu'];
+  const editTextMenuItem: MenuCommandItem = {
+    type: 'command',
+    id: 'mode:edit-text',
+    commandId: 'mode:edit-text',
+    categories: ['mode', 'text-edit'],
+  };
+  const modeMenuItems = modeMenu
+    ? modeMenu.items.some((item) => item.id === editTextMenuItem.id)
+      ? modeMenu.items
+      : [...modeMenu.items, editTextMenuItem]
+    : [];
+  const modeMenuResponsive = modeMenu?.responsive
+    ? {
+        ...modeMenu.responsive,
+        breakpoints: Object.fromEntries(
+          Object.entries(modeMenu.responsive.breakpoints).map(
+            ([breakpoint, rule]) => [
+              breakpoint,
+              {
+                ...rule,
+                ...(rule.show
+                  ? {
+                      show: Array.from(
+                        new Set([...rule.show, editTextMenuItem.id])
+                      ),
+                    }
+                  : {}),
+              },
+            ]
+          )
+        ),
+      }
+    : undefined;
+
+  const responsive = {
+    ...(toolbar.responsive ?? {}),
+    breakpoints: {
+      ...(toolbar.responsive?.breakpoints ?? {}),
+      'igo-edit-text-compact': {
+        maxWidth: 1023,
+        hide: ['mode-edit-text'],
+      },
+      'igo-edit-text-wide': {
+        minWidth: 1024,
+        show: ['mode-edit-text'],
+      },
+    },
+  };
+
   ui.mergeSchema({
     toolbars: {
-      [toolbar.id]: { ...toolbar, items },
+      [toolbar.id]: { ...toolbar, items, responsive },
       [TEXT_EDIT_WORD_TOOLBAR]: createTextEditToolbar(
         TEXT_EDIT_WORD_TOOLBAR
       ),
@@ -877,6 +1019,17 @@ function installTextEditMode(registry: PluginRegistry) {
         TEXT_EDIT_PHRASE_TOOLBAR
       ),
     },
+    ...(modeMenu
+      ? {
+          menus: {
+            [modeMenu.id]: {
+              ...modeMenu,
+              items: modeMenuItems,
+              responsive: modeMenuResponsive,
+            },
+          },
+        }
+      : {}),
   });
 }
 
@@ -975,13 +1128,7 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
 
 function setupAnnotationClipboard(pdfContainer: HTMLElement) {
   pdfContainer.addEventListener('keydown', (event) => {
-    if (
-      (!event.ctrlKey && !event.metaKey) ||
-      event.altKey ||
-      isEditableEventTarget(event) ||
-      !annotationPlugin ||
-      !docManagerPlugin
-    ) {
+    if (event.altKey || isEditableEventTarget(event) || !annotationPlugin || !docManagerPlugin) {
       return;
     }
 
@@ -989,18 +1136,32 @@ function setupAnnotationClipboard(pdfContainer: HTMLElement) {
     if (!documentId) return;
 
     const annotationScope = annotationPlugin.forDocument(documentId);
-    const selected = annotationScope.getSelectedAnnotation();
+    const selected = annotationScope
+      .getSelectedAnnotations()
+      .filter(({ object }) => isSelectableAnnotation(object));
+
+    if (event.key === 'Delete') {
+      if (selected.length === 0) return;
+
+      annotationScope.deleteAnnotations(
+        selected.map(({ object }) => ({
+          pageIndex: object.pageIndex,
+          id: object.id,
+        }))
+      );
+      event.preventDefault();
+      return;
+    }
+
+    if ((!event.ctrlKey && !event.metaKey) || !annotationPlugin) return;
 
     if (event.key.toLowerCase() === 'c') {
-      if (
-        !selected ||
-        selected.object.type !== FREE_TEXT_ANNOTATION_TYPE
-      ) {
-        return;
-      }
+      if (selected.length === 0) return;
 
       annotationClipboard = {
-        annotation: structuredClone(selected.object) as PdfFreeTextAnnoObject,
+        annotations: selected.map(({ object }) =>
+          structuredClone(object)
+        ),
         pasteCount: 0,
       };
       event.preventDefault();
@@ -1010,12 +1171,14 @@ function setupAnnotationClipboard(pdfContainer: HTMLElement) {
     if (event.key.toLowerCase() !== 'v' || !annotationClipboard) return;
 
     annotationClipboard.pasteCount += 1;
-    const duplicate = cloneFreeTextAnnotation(
-      annotationClipboard.annotation,
-      annotationClipboard.pasteCount * 12
+    const offset = annotationClipboard.pasteCount * 12;
+    const duplicates = annotationClipboard.annotations.map((annotation) =>
+      cloneAnnotation(annotation, offset)
     );
-    annotationScope.createAnnotation(duplicate.pageIndex, duplicate);
-    annotationScope.selectAnnotation(duplicate.pageIndex, duplicate.id);
+    duplicates.forEach((duplicate) => {
+      annotationScope.createAnnotation(duplicate.pageIndex, duplicate);
+    });
+    annotationScope.setSelection(duplicates.map(({ id }) => id));
     event.preventDefault();
   });
 }

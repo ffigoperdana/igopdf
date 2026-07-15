@@ -112,7 +112,7 @@ Add entries to all locale files in `public/locales/`:
 
 ## Translation
 
-See [TRANSLATION.md](https://github.com/alam00000/bentopdf/blob/main/TRANSLATION.md) for adding new languages.
+See the [translation guide](./development/translation.md) for adding new languages.
 
 ## Contributor License Agreement
 

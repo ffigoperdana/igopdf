@@ -200,7 +200,7 @@ function renderDailyChart(days: DailyRow[]): void {
   for (const day of days) {
     const col = createElement(
       'div',
-      'flex h-full flex-1 flex-col items-center justify-end gap-1'
+      'flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1'
     );
     const bars = createElement(
       'div',
@@ -214,7 +214,10 @@ function renderDailyChart(days: DailyRow[]): void {
     const userBar = createElement('div', 'w-2/5 rounded-t bg-accent-green');
     userBar.style.height = `${Math.max(day.activeUsers ? 4 : 1, Math.round((day.activeUsers / max) * 88))}%`;
 
-    const label = createElement('span', 'text-[10px] text-on-surface-variant');
+    const label = createElement(
+      'span',
+      'whitespace-nowrap text-[10px] text-on-surface-variant'
+    );
     label.textContent = formatShortDate(day.date);
 
     bars.append(eventBar, userBar);
@@ -237,8 +240,8 @@ function renderFeatures(features: FeatureRow[]): void {
   const max = Math.max(1, ...features.map((feature) => feature.count));
   for (const feature of features) {
     const row = createElement('div');
-    const header = createElement('div', 'mb-1 flex items-center justify-between gap-3 text-sm');
-    const name = createElement('span', 'font-medium text-content');
+    const header = createElement('div', 'mb-1 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm');
+    const name = createElement('span', 'min-w-0 break-words font-medium text-content');
     name.textContent = feature.feature;
     const value = createElement('span', 'shrink-0 text-on-surface-variant');
     value.textContent = `${formatNumber(feature.count)}x - ${formatNumber(feature.users)} pengguna`;
@@ -322,16 +325,22 @@ function renderUsers(users: UserReportRow[]): void {
   for (const user of users) {
     const row = createElement('tr', 'border-b border-outline-variant/60 last:border-0');
     const username = createElement('td', 'px-3 py-3 font-medium text-on-background');
+    username.dataset.label = 'Username';
     username.textContent = user.username;
     const source = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    source.dataset.label = 'Sumber';
     source.textContent = user.authSource === 'ldap' ? 'LDAP' : 'Lokal';
     const login = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    login.dataset.label = 'Terakhir masuk';
     login.textContent = formatDateTime(user.lastLogin);
     const activity = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    activity.dataset.label = 'Terakhir aktivitas';
     activity.textContent = formatDateTime(user.lastActivity);
     const count = createElement('td', 'px-3 py-3 text-right font-medium text-on-background');
+    count.dataset.label = 'Aktivitas';
     count.textContent = formatNumber(Number(user.activityCount || 0));
     const feature = createElement('td', 'px-3 py-3 text-on-surface-variant');
+    feature.dataset.label = 'Fitur teratas';
     feature.textContent = user.topFeature || '-';
     row.append(username, source, login, activity, count, feature);
     list.appendChild(row);

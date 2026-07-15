@@ -431,9 +431,9 @@ Remove unnecessary public marketing translations if appropriate.
 DESIGN SYSTEM
 ==================================================
 
-I already have a folder
+I already have a design reference folder at
 
-stitch_bentopdf_bpdp_redesign
+docs/archive/igo-redesign-reference
 
 Inspect it.
 
