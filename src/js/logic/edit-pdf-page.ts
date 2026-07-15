@@ -19,6 +19,7 @@ import type {
   SelectionCapability,
   TabItem,
   TabGroupItem,
+  ToolbarSchema,
   UICapability,
 } from 'embedpdf-snippet';
 import type {
@@ -32,6 +33,8 @@ import type { DocManagerPlugin } from '@/types';
 
 const FREE_TEXT_ANNOTATION_TYPE = 3 as const;
 const TEXT_EDIT_MODE = 'igo-edit-text';
+const TEXT_EDIT_WORD_TOOLBAR = 'edit-text-word-toolbar';
+const TEXT_EDIT_PHRASE_TOOLBAR = 'edit-text-phrase-toolbar';
 const STANDARD_FONT_HELVETICA = 4 as const;
 const STANDARD_FONT_HELVETICA_BOLD = 5 as const;
 const STANDARD_FONT_HELVETICA_ITALIC = 7 as const;
@@ -44,12 +47,12 @@ let viewerInstance: EmbedPdfContainer | null = null;
 let docManagerPlugin: DocManagerPlugin | null = null;
 let annotationPlugin: AnnotationCapability | null = null;
 let textEditRegistry: PluginRegistry | null = null;
-let textEditSelection: SelectionCapability | null = null;
 let textEditInteraction: InteractionManagerCapability | null = null;
 let isViewerInitialized = false;
 let currentFileName = 'document.pdf';
 const fileEntryMap = new Map<string, HTMLElement>();
-const textEditSessions = new Map<string, () => void>();
+const textEditHandlerCleanups = new Map<string, () => void>();
+let textEditToolbarCleanup: (() => void) | null = null;
 
 type PendingTextReplacement = {
   annotationId: string;
@@ -84,12 +87,52 @@ type AnnotationClipboard = {
 let annotationClipboard: AnnotationClipboard | null = null;
 let activeTextEdit: ActiveTextEdit | null = null;
 const pendingTextReplacements: PendingTextReplacement[] = [];
-let textEditScope: TextEditScope = 'word';
+const textEditScopes = new Map<string, TextEditScope>();
 const pageTextRunCache = new Map<string, PdfTextRun[]>();
 let snapGuideTimer: number | null = null;
 
 function makeAnnotationId(): string {
   return crypto.randomUUID?.() ?? `annotation-${Date.now()}-${Math.random()}`;
+}
+
+function blurDeepActiveElement(): void {
+  let activeElement: Element | null = document.activeElement;
+  while (activeElement?.shadowRoot?.activeElement) {
+    activeElement = activeElement.shadowRoot.activeElement;
+  }
+  if (activeElement instanceof HTMLElement) activeElement.blur();
+}
+
+function waitForAnimationFrames(count = 2): Promise<void> {
+  return new Promise((resolve) => {
+    const wait = (remaining: number) => {
+      if (remaining <= 0) {
+        resolve();
+        return;
+      }
+      requestAnimationFrame(() => wait(remaining - 1));
+    };
+    wait(count);
+  });
+}
+
+async function flushAnnotationChanges(documentId: string): Promise<void> {
+  if (!annotationPlugin) return;
+
+  const scope = annotationPlugin.forDocument(documentId);
+  blurDeepActiveElement();
+  scope.deselectAnnotation();
+  await waitForAnimationFrames();
+
+  const deadline = Date.now() + 10000;
+  while (scope.getState().hasPendingChanges) {
+    await scope.commit().toPromise();
+    if (!scope.getState().hasPendingChanges) return;
+    if (Date.now() >= deadline) {
+      throw new Error('Timed out while saving PDF annotations');
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 25));
+  }
 }
 
 function isEditableEventTarget(event: KeyboardEvent): boolean {
@@ -180,11 +223,56 @@ function pageTextRunCacheKey(documentId: string, pageIndex: number): string {
   return `${documentId}:${pageIndex}`;
 }
 
-function setTextEditScopeControlVisible(visible: boolean) {
-  const control = document.getElementById('text-edit-scope-control');
-  if (!control) return;
-  control.classList.toggle('hidden', !visible);
-  control.classList.toggle('flex', visible);
+function getTextEditScope(documentId: string): TextEditScope {
+  return textEditScopes.get(documentId) ?? 'word';
+}
+
+function getTextEditToolbar(scope: TextEditScope): string {
+  return scope === 'phrase'
+    ? TEXT_EDIT_PHRASE_TOOLBAR
+    : TEXT_EDIT_WORD_TOOLBAR;
+}
+
+function isTextEditToolbar(toolbarId: string | null): boolean {
+  return (
+    toolbarId === TEXT_EDIT_WORD_TOOLBAR ||
+    toolbarId === TEXT_EDIT_PHRASE_TOOLBAR
+  );
+}
+
+function createTextEditToolbar(id: string): ToolbarSchema {
+  return {
+    id,
+    position: { placement: 'top', slot: 'secondary', order: 0 },
+    permanent: false,
+    categories: ['text-edit'],
+    items: [
+      { type: 'spacer', id: `${id}-spacer-start`, flex: true },
+      {
+        type: 'group',
+        id: `${id}-scope-tools`,
+        alignment: 'center',
+        gap: 2,
+        items: [
+          {
+            type: 'command-button',
+            id: `${id}-scope-word`,
+            commandId: 'text-edit:scope-word',
+            variant: 'tab',
+            categories: ['text-edit'],
+          },
+          {
+            type: 'command-button',
+            id: `${id}-scope-phrase`,
+            commandId: 'text-edit:scope-phrase',
+            variant: 'tab',
+            categories: ['text-edit'],
+          },
+        ],
+      },
+      { type: 'spacer', id: `${id}-spacer-end`, flex: true },
+    ],
+  };
 }
 
 function getTextEditSnapGuide(): HTMLElement {
@@ -671,39 +759,79 @@ function installTextEditMode(registry: PluginRegistry) {
   if (!commands || !ui || !selection || !interaction) return;
 
   textEditRegistry = registry;
-  textEditSelection = selection;
   textEditInteraction = interaction;
   interaction.registerMode({
     id: TEXT_EDIT_MODE,
     scope: 'page',
-    exclusive: false,
+    exclusive: true,
     cursor: 'text',
   });
+
+  const activateTextEdit = (documentId: string, scope: TextEditScope) => {
+    textEditScopes.set(documentId, scope);
+    selection.enableForMode(
+      TEXT_EDIT_MODE,
+      { enableSelection: true, showSelectionRects: true },
+      documentId
+    );
+    ui
+      .forDocument(documentId)
+      .setActiveToolbar('top', 'secondary', getTextEditToolbar(scope));
+    interaction.forDocument(documentId).activate(TEXT_EDIT_MODE);
+  };
 
   commands.registerCommand({
     id: 'mode:edit-text',
     label: 'Edit Text',
     icon: 'replace-text',
     categories: ['text-edit'],
-    active: ({ documentId }) => textEditSessions.has(documentId),
+    active: ({ documentId }) =>
+      isTextEditToolbar(
+        ui.forDocument(documentId).getActiveToolbar('top', 'secondary')
+      ),
     action: ({ documentId }) => {
-      if (textEditSessions.has(documentId)) {
-        textEditInteraction?.forDocument(documentId).activateDefaultMode();
-        textEditSessions.delete(documentId);
-        setTextEditScopeControlVisible(false);
+      activateTextEdit(documentId, getTextEditScope(documentId));
+    },
+  });
+
+  commands.registerCommand({
+    id: 'text-edit:scope-word',
+    label: 'Word',
+    categories: ['text-edit'],
+    active: ({ documentId }) =>
+      ui.forDocument(documentId).getActiveToolbar('top', 'secondary') ===
+      TEXT_EDIT_WORD_TOOLBAR,
+    action: ({ documentId }) => activateTextEdit(documentId, 'word'),
+  });
+
+  commands.registerCommand({
+    id: 'text-edit:scope-phrase',
+    label: 'Phrase',
+    categories: ['text-edit'],
+    active: ({ documentId }) =>
+      ui.forDocument(documentId).getActiveToolbar('top', 'secondary') ===
+      TEXT_EDIT_PHRASE_TOOLBAR,
+    action: ({ documentId }) => activateTextEdit(documentId, 'phrase'),
+  });
+
+  textEditToolbarCleanup?.();
+  textEditToolbarCleanup = ui.onToolbarChanged(
+    ({ documentId, placement, slot, toolbarId }) => {
+      if (
+        placement !== 'top' ||
+        slot !== 'secondary' ||
+        isTextEditToolbar(toolbarId)
+      ) {
         return;
       }
 
-      textEditSelection?.enableForMode(
-        TEXT_EDIT_MODE,
-        { enableSelection: true, showSelectionRects: true },
-        documentId
-      );
-      textEditInteraction?.forDocument(documentId).activate(TEXT_EDIT_MODE);
-      textEditSessions.set(documentId, () => undefined);
-      setTextEditScopeControlVisible(true);
-    },
-  });
+      const documentInteraction = interaction.forDocument(documentId);
+      if (documentInteraction.getActiveMode() === TEXT_EDIT_MODE) {
+        documentInteraction.activateDefaultMode();
+      }
+      if (activeTextEdit?.documentId === documentId) closeTextEditor();
+    }
+  );
 
   const schema = ui.getSchema();
   const toolbar = Object.values(schema.toolbars).find((candidate) =>
@@ -729,12 +857,27 @@ function installTextEditMode(registry: PluginRegistry) {
       variant: 'text',
       categories: ['text-edit'],
     };
+    const overflowIndex = tabGroup.tabs.findIndex(
+      (tab) => tab.commandId === 'tabs:overflow-menu'
+    );
+    const tabs = [...tabGroup.tabs];
+    tabs.splice(overflowIndex >= 0 ? overflowIndex : tabs.length, 0, editTextTab);
     return {
       ...tabGroup,
-      tabs: [...tabGroup.tabs, editTextTab],
+      tabs,
     };
   });
-  ui.mergeSchema({ toolbars: { [toolbar.id]: { ...toolbar, items } } });
+  ui.mergeSchema({
+    toolbars: {
+      [toolbar.id]: { ...toolbar, items },
+      [TEXT_EDIT_WORD_TOOLBAR]: createTextEditToolbar(
+        TEXT_EDIT_WORD_TOOLBAR
+      ),
+      [TEXT_EDIT_PHRASE_TOOLBAR]: createTextEditToolbar(
+        TEXT_EDIT_PHRASE_TOOLBAR
+      ),
+    },
+  });
 }
 
 function registerTextEditHandlers(documentId: string, attempts = 0) {
@@ -742,7 +885,7 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
     !textEditRegistry ||
     !textEditInteraction ||
     !docManagerPlugin ||
-    textEditSessions.has(`${documentId}:handlers`)
+    textEditHandlerCleanups.has(documentId)
   ) {
     return;
   }
@@ -777,7 +920,7 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
             if (!run) return;
 
             const selection =
-              textEditScope === 'phrase'
+              getTextEditScope(documentId) === 'phrase'
                 ? await selectPhraseFromRuns(document, page, run, textRuns.runs)
                 : selectWordFromRun(
                     run,
@@ -802,7 +945,7 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
     })
   );
 
-  textEditSessions.set(`${documentId}:handlers`, () => {
+  textEditHandlerCleanups.set(documentId, () => {
     unregister.forEach((remove) => remove());
   });
   annotationPlugin?.forDocument(documentId).onAnnotationEvent((event) => {
@@ -892,7 +1035,6 @@ function resetViewer() {
   docManagerPlugin = null;
   annotationPlugin = null;
   textEditRegistry = null;
-  textEditSelection = null;
   textEditInteraction = null;
   annotationClipboard = null;
   activeTextEdit = null;
@@ -901,9 +1043,11 @@ function resetViewer() {
   if (snapGuideTimer !== null) window.clearTimeout(snapGuideTimer);
   snapGuideTimer = null;
   document.getElementById('text-edit-snap-guide')?.remove();
-  setTextEditScopeControlVisible(false);
-  textEditSessions.forEach((cleanup) => cleanup());
-  textEditSessions.clear();
+  textEditToolbarCleanup?.();
+  textEditToolbarCleanup = null;
+  textEditHandlerCleanups.forEach((cleanup) => cleanup());
+  textEditHandlerCleanups.clear();
+  textEditScopes.clear();
   isViewerInitialized = false;
   fileEntryMap.clear();
 }
@@ -976,15 +1120,6 @@ function initializePage() {
       applyTextReplacement();
     });
 
-  const scopeSelect = document.getElementById(
-    'text-edit-scope'
-  ) as HTMLSelectElement | null;
-  if (scopeSelect) {
-    scopeSelect.value = textEditScope;
-    scopeSelect.addEventListener('change', () => {
-      textEditScope = scopeSelect.value === 'phrase' ? 'phrase' : 'word';
-    });
-  }
 }
 
 async function handleFileUpload(e: Event) {
@@ -1058,10 +1193,9 @@ async function handleFiles(files: FileList) {
 
       docManagerPlugin.onDocumentClosed((data: { id?: string }) => {
         const docId = data?.id || '';
-        textEditSessions.get(docId)?.();
-        textEditSessions.delete(docId);
-        textEditSessions.get(`${docId}:handlers`)?.();
-        textEditSessions.delete(`${docId}:handlers`);
+        textEditHandlerCleanups.get(docId)?.();
+        textEditHandlerCleanups.delete(docId);
+        textEditScopes.delete(docId);
         pageTextRunCache.forEach((_, key) => {
           if (key.startsWith(`${docId}:`)) pageTextRunCache.delete(key);
         });
@@ -1122,19 +1256,25 @@ async function handleFiles(files: FileList) {
       downloadBtn.classList.remove('hidden');
 
       downloadBtn.onclick = async () => {
+        const originalLabel = downloadBtn.textContent;
+        downloadBtn.setAttribute('disabled', 'true');
+        downloadBtn.textContent = 'Saving annotations...';
         try {
           const documentId = docManagerPlugin?.getActiveDocumentId();
+          if (documentId) await flushAnnotationChanges(documentId);
+
           const exportPlugin = registry.getPlugin('export').provides();
           const arrayBuffer = documentId
             ? await exportPlugin.forDocument(documentId).saveAsCopy().toPromise()
             : await exportPlugin.saveAsCopy().toPromise();
-          // FreeText previews are standard printable PDF annotations. Export them
-          // unchanged so the downloaded document matches the editor exactly.
           const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
           downloadFile(blob, currentFileName);
         } catch (err) {
           console.error('Error downloading PDF:', err);
           showAlert('Error', 'Failed to download the edited PDF.');
+        } finally {
+          downloadBtn.removeAttribute('disabled');
+          downloadBtn.textContent = originalLabel;
         }
       };
 
