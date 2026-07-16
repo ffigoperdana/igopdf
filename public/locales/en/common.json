@@ -405,6 +405,10 @@
     "postNativeWarning": "Review fonts, tables, spacing, and complex layout in the DOCX.",
     "postImageWarning": "Some checked pages had no usable text layer. Review missing words and layout; use OCR PDF first for scanned documents."
   },
+  "compressionUpload": {
+    "interruptedTitle": "Upload interrupted",
+    "interruptedMessage": "The upload connection was interrupted before the server received the PDF. Please retry once. If the same issue continues, contact your administrator and include the time of the attempt."
+  },
   "simpleMode": {
     "title": "PDF Tools",
     "subtitle": "Select a tool to get started"

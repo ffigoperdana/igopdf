@@ -11,6 +11,7 @@ import { PDFDocument } from 'pdf-lib';
 import { createIcons, icons } from 'lucide';
 import { showWasmRequiredDialog } from '../utils/wasm-provider.js';
 import { loadPyMuPDF, isPyMuPDFAvailable } from '../utils/pymupdf-loader.js';
+import { t } from '../i18n/i18n.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
@@ -70,6 +71,7 @@ const DEFAULT_SERVER_COMPRESSION_CONFIG: ServerCompressionConfig = {
 };
 
 const PYMUDF_MEMORY_ERROR = /memoryerror|out of memory|fzerror.*memory/i;
+const UPLOAD_CONNECTION_INTERRUPTED = 'UPLOAD_CONNECTION_INTERRUPTED';
 
 function isPyMuPdfMemoryError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
@@ -556,11 +558,21 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadFile(result, outputName);
   };
 
-  const createServerCompressionJob = (
+  type CreatedServerJob = {
+    job: ServerCompressionJob;
+    queuePosition: number | null;
+  };
+
+  const createServerCompressionJobWithXhr = (
     formData: FormData
-  ): Promise<{ job: ServerCompressionJob; queuePosition: number | null }> =>
+  ): Promise<{
+    result: CreatedServerJob;
+    uploadComplete: boolean;
+    transportFailure: boolean;
+  }> =>
     new Promise((resolve, reject) => {
       const request = new XMLHttpRequest();
+      let uploadComplete = false;
       request.open('POST', '/api/compression/jobs');
       request.withCredentials = true;
       request.responseType = 'text';
@@ -571,6 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         const progress = (event.loaded / event.total) * 100;
+        uploadComplete = event.loaded >= event.total;
         setServerStatus(
           `Uploading PDF to the protected server queue (${Math.round(progress)}%)...`,
           false,
@@ -579,7 +592,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       request.addEventListener('error', () => {
-        reject(new Error('The upload to the server queue failed'));
+        reject({
+          error: new Error('The upload to the server queue failed'),
+          uploadComplete,
+          transportFailure: true,
+        });
       });
 
       request.addEventListener('load', () => {
@@ -594,22 +611,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (request.status < 200 || request.status >= 300) {
-          reject(
-            new Error(payload.error || 'Server compression could not be started')
-          );
+          reject({
+            error: new Error(payload.error || 'Server compression could not be started'),
+            uploadComplete,
+            transportFailure: false,
+          });
           return;
         }
 
         const job = payload.data?.job;
         if (!job) {
-          reject(new Error('Server did not create a compression job'));
+          reject({
+            error: new Error('Server did not create a compression job'),
+            uploadComplete,
+            transportFailure: false,
+          });
           return;
         }
-        resolve({ job, queuePosition: payload.data?.queuePosition ?? null });
+        resolve({
+          result: { job, queuePosition: payload.data?.queuePosition ?? null },
+          uploadComplete,
+          transportFailure: false,
+        });
       });
 
       request.send(formData);
     });
+
+  const createServerCompressionJob = async (
+    formData: FormData
+  ): Promise<CreatedServerJob> => {
+    try {
+      const { result } = await createServerCompressionJobWithXhr(formData);
+      return result;
+    } catch (failure: unknown) {
+      const uploadFailure = failure as {
+        error?: Error;
+        uploadComplete?: boolean;
+        transportFailure?: boolean;
+      };
+      if (!uploadFailure.transportFailure) {
+        throw uploadFailure.error || new Error('Server compression could not be started');
+      }
+      // Do not retry automatically. A dropped browser connection can still
+      // leave a completed upload on the server, so an automatic retry could
+      // create a duplicate long-running job.
+      throw new Error(UPLOAD_CONNECTION_INTERRUPTED);
+    }
+  };
 
   const runServerCompression = async (file: File) => {
     if (!serverConfig.enabled) {
@@ -903,6 +952,13 @@ document.addEventListener('DOMContentLoaded', () => {
         showAlert(
           'PDF terlalu besar atau kompleks untuk Condense',
           'PDF tidak diubah. Pilih Photon untuk memproses dokumen ini dengan kebutuhan memori yang lebih stabil. Photon mengubah setiap halaman menjadi gambar, sehingga teks dan tautan tidak lagi dapat dipilih.'
+        );
+        return;
+      }
+      if (e instanceof Error && e.message === UPLOAD_CONNECTION_INTERRUPTED) {
+        showAlert(
+          t('compressionUpload.interruptedTitle'),
+          t('compressionUpload.interruptedMessage')
         );
         return;
       }

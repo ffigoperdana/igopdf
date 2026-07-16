@@ -405,6 +405,10 @@
     "postNativeWarning": "Periksa kembali font, tabel, spasi, dan tata letak kompleks pada DOCX.",
     "postImageWarning": "Sebagian halaman yang diperiksa tidak memiliki text layer yang dapat digunakan. Periksa kata yang hilang dan tata letak; gunakan OCR PDF terlebih dahulu untuk dokumen hasil scan."
   },
+  "compressionUpload": {
+    "interruptedTitle": "Unggahan terputus",
+    "interruptedMessage": "Koneksi unggahan terputus sebelum server menerima PDF. Silakan coba ulangi satu kali. Jika masalah yang sama tetap terjadi, hubungi administrator dan sertakan waktu percobaan Anda."
+  },
   "simpleMode": {
     "title": "Alat PDF",
     "subtitle": "Pilih alat untuk memulai"
