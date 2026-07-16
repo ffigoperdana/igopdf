@@ -136,7 +136,7 @@
       "q2": "Which compression level should I use?",
       "a2": "Balanced (recommended) offers great size reduction with minimal quality loss. Use Light to preserve maximum quality, Aggressive for smaller files, or Extreme for maximum compression.",
       "q3": "Are there file size limits?",
-      "a3": "No limits! Compress as many PDFs as you need, of any size, completely free."
+      "a3": "Browser compression is used up to 100 MB. Larger PDFs use the private server queue, with a maximum size of 1 GB per PDF."
     }
   },
   "pdfEditor": {

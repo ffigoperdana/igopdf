@@ -136,7 +136,7 @@
       "q2": "Tingkat kompresi mana yang sebaiknya saya gunakan?",
       "a2": "Balanced (disarankan) menawarkan pengurangan ukuran yang besar dengan kehilangan kualitas minimal. Gunakan Light untuk mempertahankan kualitas maksimal, Aggressive untuk berkas yang lebih kecil, atau Extreme untuk kompresi maksimal.",
       "q3": "Apakah ada batasan ukuran berkas?",
-      "a3": "Tidak ada batasan! Kompres sebanyak apa pun PDF yang Anda butuhkan, dengan ukuran berapa pun, sepenuhnya gratis."
+      "a3": "Kompresi di browser digunakan hingga 100 MB. PDF yang lebih besar memakai antrean server privat, dengan batas maksimum 1 GB per PDF."
     }
   },
   "pdfEditor": {

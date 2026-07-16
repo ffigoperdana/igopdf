@@ -129,6 +129,26 @@ export const config = {
       process.env.SERVER_COMPRESSION_MAX_BYTES,
       1024 * 1024 * 1024
     ),
+    uploadChunkBytes: positiveInteger(
+      process.env.COMPRESSION_UPLOAD_CHUNK_BYTES,
+      25 * 1024 * 1024
+    ),
+    uploadIdleTimeoutMs: positiveInteger(
+      process.env.COMPRESSION_UPLOAD_IDLE_TIMEOUT_MS,
+      30 * 60 * 1000
+    ),
+    uploadMaxAgeMs: positiveInteger(
+      process.env.COMPRESSION_UPLOAD_MAX_AGE_MS,
+      3 * 60 * 60 * 1000
+    ),
+    diskHeadroomMultiplier: positiveInteger(
+      process.env.COMPRESSION_DISK_HEADROOM_MULTIPLIER,
+      3
+    ),
+    diskMinimumFreeBytes: positiveInteger(
+      process.env.COMPRESSION_DISK_MINIMUM_FREE_BYTES,
+      1024 * 1024 * 1024
+    ),
     jobTimeoutMs: positiveInteger(
       process.env.COMPRESSION_JOB_TIMEOUT_MS,
       45 * 60 * 1000
@@ -137,10 +157,7 @@ export const config = {
       process.env.COMPRESSION_RETENTION_MS,
       15 * 60 * 1000
     ),
-    workerPollMs: positiveInteger(
-      process.env.COMPRESSION_WORKER_POLL_MS,
-      2000
-    ),
+    workerPollMs: positiveInteger(process.env.COMPRESSION_WORKER_POLL_MS, 2000),
   },
 } as const;
 

@@ -146,11 +146,60 @@ const migrations = [
         ON compression_jobs (expires_at);
     `,
   },
+  {
+    name: '007_compression_upload_slots',
+    sql: `
+      CREATE TABLE IF NOT EXISTS compression_upload_slots (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        mode VARCHAR(20) NOT NULL CHECK (mode IN ('lossless', 'balanced')),
+        status VARCHAR(20) NOT NULL DEFAULT 'waiting'
+          CHECK (status IN ('waiting', 'ready', 'uploading', 'processing')),
+        job_id UUID REFERENCES compression_jobs(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_compression_upload_slots_queue
+        ON compression_upload_slots (created_at);
+      CREATE INDEX IF NOT EXISTS idx_compression_upload_slots_expiry
+        ON compression_upload_slots (expires_at);
+    `,
+  },
+  {
+    name: '008_resumable_compression_uploads',
+    sql: `
+      ALTER TABLE compression_upload_slots
+        ADD COLUMN IF NOT EXISTS input_bytes BIGINT,
+        ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+      UPDATE compression_upload_slots slots
+      SET input_bytes = jobs.input_bytes
+      FROM compression_jobs jobs
+      WHERE slots.job_id = jobs.id AND slots.input_bytes IS NULL;
+
+      -- Pre-resumable waiting/uploading rows cannot be resumed because their
+      -- expected byte length was never recorded. They are safe to discard.
+      DELETE FROM compression_upload_slots WHERE input_bytes IS NULL;
+      ALTER TABLE compression_upload_slots ALTER COLUMN input_bytes SET NOT NULL;
+
+      -- Earlier builds did not enforce one active upload per user. Keep the
+      -- oldest reservation if such rows exist before adding the constraint.
+      DELETE FROM compression_upload_slots newer
+      USING compression_upload_slots older
+      WHERE newer.user_id = older.user_id
+        AND (newer.created_at, newer.id) > (older.created_at, older.id);
+
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_compression_upload_slots_user
+        ON compression_upload_slots (user_id);
+      CREATE INDEX IF NOT EXISTS idx_compression_upload_slots_activity
+        ON compression_upload_slots (last_activity_at);
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {
   const client = await pool.connect();
-  
+
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS _migrations (
@@ -164,7 +213,7 @@ async function runMigrations(rollback: boolean = false) {
       const result = await client.query(
         'SELECT name FROM _migrations ORDER BY id DESC LIMIT 1'
       );
-      
+
       if (result.rows.length === 0) {
         logger.info('No migrations to rollback');
         return;
@@ -172,8 +221,10 @@ async function runMigrations(rollback: boolean = false) {
 
       const lastMigration = result.rows[0].name;
       logger.info(`Rolling back migration: ${lastMigration}`);
-      
-      await client.query('DELETE FROM _migrations WHERE name = $1', [lastMigration]);
+
+      await client.query('DELETE FROM _migrations WHERE name = $1', [
+        lastMigration,
+      ]);
       logger.info(`Rolled back: ${lastMigration}`);
       return;
     }
@@ -190,14 +241,13 @@ async function runMigrations(rollback: boolean = false) {
       }
 
       logger.info(`Applying migration: ${migration.name}`);
-      
+
       await client.query('BEGIN');
       try {
         await client.query(migration.sql);
-        await client.query(
-          'INSERT INTO _migrations (name) VALUES ($1)',
-          [migration.name]
-        );
+        await client.query('INSERT INTO _migrations (name) VALUES ($1)', [
+          migration.name,
+        ]);
         await client.query('COMMIT');
         logger.info(`Applied: ${migration.name}`);
       } catch (err) {

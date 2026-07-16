@@ -4,7 +4,11 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { config } from './config/index.js';
 import { testConnection, closePool } from './config/database.js';
-import { apiLimiter } from './middleware/rateLimiter.js';
+import { authMiddleware } from './middleware/auth.js';
+import {
+  apiLimiter,
+  compressionUploadLimiter,
+} from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.js';
 import captchaRoutes from './routes/captcha.js';
 import userRoutes from './routes/users.js';
@@ -12,6 +16,7 @@ import adminRoutes from './routes/admin.js';
 import usageRoutes from './routes/usage.js';
 import reportRoutes from './routes/reports.js';
 import compressionRoutes from './routes/compression.js';
+import { compressionTusServer } from './services/compressionTusService.js';
 import { cleanupExpiredSessions } from './services/authService.js';
 import { cleanupExpiredCaptchas } from './services/captchaService.js';
 import { logger } from './utils/logger.js';
@@ -20,18 +25,36 @@ const app = express();
 
 app.set('trust proxy', config.trustProxyHops);
 
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
 
-app.use(cors({
-  origin: config.cors.origin,
-  credentials: config.cors.credentials,
-}));
+app.use(
+  cors({
+    origin: config.cors.origin,
+    credentials: config.cors.credentials,
+  })
+);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.all(
+  ['/api/compression/uploads', '/api/compression/uploads/*'],
+  authMiddleware,
+  compressionUploadLimiter,
+  (req, res, next) => {
+    void compressionTusServer.handle(req, res).catch(next);
+  }
+);
+
+// Compression control/status polling has its own authenticated limiter. Keep
+// it outside the general API bucket so a long-running job cannot exhaust the
+// user's normal API allowance.
+app.use('/api/compression', compressionRoutes);
 
 app.use('/api', apiLimiter);
 
@@ -41,7 +64,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/usage', usageRoutes);
 app.use('/api/admin/reports', reportRoutes);
-app.use('/api/compression', compressionRoutes);
 
 app.get('/health', (_req, res) => {
   // Minimal liveness only. Don't leak uptime/timestamp (reveals last
@@ -56,22 +78,32 @@ app.use((_req, res) => {
   });
 });
 
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  logger.error('Unhandled error', err);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-  });
-});
-
-const cleanupInterval = setInterval(async () => {
-  try {
-    await cleanupExpiredSessions();
-    await cleanupExpiredCaptchas();
-  } catch (err) {
-    logger.error('Cleanup error', err);
+app.use(
+  (
+    err: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction
+  ) => {
+    logger.error('Unhandled error', err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
   }
-}, 60 * 60 * 1000);
+);
+
+const cleanupInterval = setInterval(
+  async () => {
+    try {
+      await cleanupExpiredSessions();
+      await cleanupExpiredCaptchas();
+    } catch (err) {
+      logger.error('Cleanup error', err);
+    }
+  },
+  60 * 60 * 1000
+);
 
 async function start() {
   const connected = await testConnection();

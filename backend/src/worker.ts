@@ -5,6 +5,7 @@ import { closePool } from './config/database.js';
 import {
   claimNextJob,
   cleanupExpiredJobs,
+  cleanupExpiredUploadSlots,
   ensureCompressionStorage,
   getJobInputPath,
   getJobOutputPath,
@@ -23,7 +24,10 @@ interface ManagedChildProcess {
   kill(signal?: NodeJS.Signals): boolean;
   stderr: NodeJS.ReadableStream | null;
   on(event: 'error', listener: (error: NodeJS.ErrnoException) => void): void;
-  on(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
+  on(
+    event: 'close',
+    listener: (code: number | null, signal: NodeJS.Signals | null) => void
+  ): void;
 }
 
 async function oomKillCount(): Promise<number | null> {
@@ -36,7 +40,10 @@ async function oomKillCount(): Promise<number | null> {
   }
 }
 
-function commandFor(job: CompressionJob): { executable: string; args: string[] } {
+function commandFor(job: CompressionJob): {
+  executable: string;
+  args: string[];
+} {
   const input = getJobInputPath(job.id);
   const output = getJobOutputPath(job.id);
 
@@ -83,7 +90,9 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
   await rm(outputPath, { force: true });
 
   await new Promise<void>((resolve, reject) => {
-    const child = spawn(executable, args, { stdio: ['ignore', 'ignore', 'pipe'] }) as unknown as ManagedChildProcess;
+    const child = spawn(executable, args, {
+      stdio: ['ignore', 'ignore', 'pipe'],
+    }) as unknown as ManagedChildProcess;
     let errorCode = 'PROCESS_FAILED';
     let settled = false;
 
@@ -111,7 +120,11 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
     }, 1500);
 
     child.on('error', (error: NodeJS.ErrnoException) => {
-      settle(new Error(error.code === 'ENOENT' ? 'ENGINE_UNAVAILABLE' : 'PROCESS_FAILED'));
+      settle(
+        new Error(
+          error.code === 'ENOENT' ? 'ENGINE_UNAVAILABLE' : 'PROCESS_FAILED'
+        )
+      );
     });
     child.stderr?.on('data', () => {
       // Do not retain document paths or contents in application logs.
@@ -120,11 +133,12 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
       if (code === 0 && errorCode === 'PROCESS_FAILED') {
         settle();
       } else {
-        const processError = errorCode === 'PROCESS_FAILED'
-          ? signal
-            ? `ENGINE_SIGNAL_${signal}`
-            : `ENGINE_EXIT_${code ?? 'UNKNOWN'}`
-          : errorCode;
+        const processError =
+          errorCode === 'PROCESS_FAILED'
+            ? signal
+              ? `ENGINE_SIGNAL_${signal}`
+              : `ENGINE_EXIT_${code ?? 'UNKNOWN'}`
+            : errorCode;
         settle(new Error(processError));
       }
     });
@@ -156,9 +170,12 @@ async function processJob(job: CompressionJob): Promise<void> {
     await rm(getJobOutputPath(job.id), { force: true });
     await rm(getJobInputPath(job.id), { force: true });
     const oomKillsAfter = await oomKillCount();
-    const processError = error instanceof Error ? error.message : 'PROCESS_FAILED';
+    const processError =
+      error instanceof Error ? error.message : 'PROCESS_FAILED';
     const errorCode =
-      oomKillsBefore !== null && oomKillsAfter !== null && oomKillsAfter > oomKillsBefore
+      oomKillsBefore !== null &&
+      oomKillsAfter !== null &&
+      oomKillsAfter > oomKillsBefore
         ? 'MEMORY_LIMIT'
         : processError;
     await markJobFailed(job.id, errorCode);
@@ -170,11 +187,15 @@ async function tick(): Promise<void> {
   if (stopping || running) return;
   running = true;
   try {
+    await cleanupExpiredUploadSlots();
     await cleanupExpiredJobs();
     const job = await claimNextJob();
     if (job) await processJob(job);
   } catch (error) {
-    logger.error('Compression worker tick failed', error instanceof Error ? { message: error.message } : undefined);
+    logger.error(
+      'Compression worker tick failed',
+      error instanceof Error ? { message: error.message } : undefined
+    );
   } finally {
     running = false;
     if (stopping) {
@@ -188,6 +209,7 @@ async function tick(): Promise<void> {
 async function start(): Promise<void> {
   ensureCompressionStorage();
   await recoverInterruptedJobs();
+  await cleanupExpiredUploadSlots();
   await cleanupExpiredJobs();
   logger.info('Compression worker started', { concurrency: 1 });
   await tick();
@@ -204,6 +226,9 @@ process.on('SIGTERM', stop);
 process.on('SIGINT', stop);
 
 start().catch((error) => {
-  logger.error('Compression worker could not start', error instanceof Error ? { message: error.message } : undefined);
+  logger.error(
+    'Compression worker could not start',
+    error instanceof Error ? { message: error.message } : undefined
+  );
   process.exit(1);
 });

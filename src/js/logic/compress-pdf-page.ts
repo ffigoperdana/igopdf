@@ -11,9 +11,9 @@ import { PDFDocument } from 'pdf-lib';
 import { createIcons, icons } from 'lucide';
 import { showWasmRequiredDialog } from '../utils/wasm-provider.js';
 import { loadPyMuPDF, isPyMuPDFAvailable } from '../utils/pymupdf-loader.js';
-import { t } from '../i18n/i18n.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { Upload as TusUpload } from 'tus-js-client';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -55,6 +55,7 @@ interface ServerCompressionConfig {
   clientThresholdBytes: number;
   balancedMaxBytes: number;
   maxUploadBytes: number;
+  uploadChunkBytes: number;
 }
 
 interface ServerCompressionJob {
@@ -63,15 +64,25 @@ interface ServerCompressionJob {
   errorCode: string | null;
 }
 
+interface CompressionUploadSlot {
+  id: string;
+  status: 'waiting' | 'ready' | 'uploading' | 'processing';
+  jobId: string | null;
+  mode: 'lossless' | 'balanced';
+  inputBytes: number;
+  queuePosition: number;
+}
+
 const DEFAULT_SERVER_COMPRESSION_CONFIG: ServerCompressionConfig = {
   enabled: false,
   clientThresholdBytes: 100 * 1024 * 1024,
   balancedMaxBytes: 500 * 1024 * 1024,
   maxUploadBytes: 1024 * 1024 * 1024,
+  uploadChunkBytes: 25 * 1024 * 1024,
 };
 
 const PYMUDF_MEMORY_ERROR = /memoryerror|out of memory|fzerror.*memory/i;
-const UPLOAD_CONNECTION_INTERRUPTED = 'UPLOAD_CONNECTION_INTERRUPTED';
+const RESUMABLE_UPLOAD_INTERRUPTED = 'RESUMABLE_UPLOAD_INTERRUPTED';
 
 function isPyMuPdfMemoryError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
@@ -268,15 +279,39 @@ document.addEventListener('DOMContentLoaded', () => {
     'server-compression-progress-label'
   );
 
-  const clientAlgorithmOptions = algorithmSelect.innerHTML;
-  const clientLevelOptions = (
-    document.getElementById('compression-level') as HTMLSelectElement
-  ).innerHTML;
+  const compressionLevel = document.getElementById(
+    'compression-level'
+  ) as HTMLSelectElement;
+  const clientAlgorithmOptions = Array.from(algorithmSelect.options).map(
+    (option) => option.cloneNode(true) as HTMLOptionElement
+  );
+  const clientLevelOptions = Array.from(compressionLevel.options).map(
+    (option) => option.cloneNode(true) as HTMLOptionElement
+  );
   let serverConfig = { ...DEFAULT_SERVER_COMPRESSION_CONFIG };
   let activeServerJobId: string | null = null;
+  let activeServerUploadSlotId: string | null = null;
+  let activeTusUpload: TusUpload | null = null;
+  let rejectActiveTusUpload: ((error: Error) => void) | null = null;
   let serverJobCancelled = false;
 
   let useCustomSettings = false;
+
+  const replaceOptions = (
+    select: HTMLSelectElement,
+    options: ReadonlyArray<HTMLOptionElement>
+  ) => {
+    select.replaceChildren(...options.map((option) => option.cloneNode(true)));
+  };
+
+  const setOptions = (
+    select: HTMLSelectElement,
+    options: ReadonlyArray<{ value: string; label: string }>
+  ) => {
+    select.replaceChildren(
+      ...options.map(({ value, label }) => new Option(label, value))
+    );
+  };
 
   const getLargeFile = (): File | null => {
     if (state.files.length !== 1) return null;
@@ -317,6 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const clearServerStatus = () => {
     activeServerJobId = null;
+    activeServerUploadSlotId = null;
+    activeTusUpload = null;
+    rejectActiveTusUpload = null;
     serverJobCancelled = false;
     serverStatus?.classList.add('hidden');
     cancelServerCompressionBtn?.classList.add('hidden');
@@ -329,13 +367,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const updateCompressionControls = () => {
     const largeFile = getLargeFile();
-    const compressionLevel = document.getElementById(
-      'compression-level'
-    ) as HTMLSelectElement;
 
     if (!largeFile) {
-      algorithmSelect.innerHTML = clientAlgorithmOptions;
-      compressionLevel.innerHTML = clientLevelOptions;
+      replaceOptions(algorithmSelect, clientAlgorithmOptions);
+      replaceOptions(compressionLevel, clientLevelOptions);
       compressionLevel.disabled = false;
       grayscaleSettings?.classList.remove('hidden');
       advancedSettings?.classList.remove('hidden');
@@ -347,9 +382,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!serverConfig.enabled) {
-      algorithmSelect.innerHTML = '<option value="server-unavailable">Server queue unavailable</option>';
+      setOptions(algorithmSelect, [
+        {
+          value: 'server-unavailable',
+          label: 'Server queue unavailable',
+        },
+      ]);
       algorithmSelect.disabled = true;
-      compressionLevel.innerHTML = '<option>Unavailable</option>';
+      setOptions(compressionLevel, [
+        { value: 'unavailable', label: 'Unavailable' },
+      ]);
       compressionLevel.disabled = true;
       grayscaleSettings?.classList.add('hidden');
       advancedSettings?.classList.add('hidden');
@@ -361,11 +403,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const balancedAllowed = largeFile.size <= serverConfig.balancedMaxBytes;
-    algorithmSelect.innerHTML = balancedAllowed
-      ? '<option value="server-lossless">Lossless (Server)</option><option value="server-balanced">Balanced (Server)</option>'
-      : '<option value="server-lossless">Lossless (Server)</option>';
+    setOptions(algorithmSelect, [
+      { value: 'server-lossless', label: 'Lossless (Server)' },
+      ...(balancedAllowed
+        ? [{ value: 'server-balanced', label: 'Balanced (Server)' }]
+        : []),
+    ]);
     algorithmSelect.disabled = false;
-    compressionLevel.innerHTML = '<option value="light">Server-managed</option>';
+    setOptions(compressionLevel, [{ value: 'light', label: 'Server-managed' }]);
     compressionLevel.disabled = true;
     grayscaleSettings?.classList.add('hidden');
     advancedSettings?.classList.add('hidden');
@@ -449,8 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
           infoContainer.className = 'flex flex-col overflow-hidden';
 
           const nameSpan = document.createElement('div');
-          nameSpan.className =
-            'truncate font-medium text-content text-sm mb-1';
+          nameSpan.className = 'truncate font-medium text-content text-sm mb-1';
           nameSpan.textContent = file.name;
 
           const metaSpan = document.createElement('div');
@@ -558,106 +602,190 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadFile(result, outputName);
   };
 
-  type CreatedServerJob = {
-    job: ServerCompressionJob;
-    queuePosition: number | null;
+  const reserveServerUploadSlot = async (
+    mode: 'lossless' | 'balanced',
+    inputBytes: number
+  ) => {
+    const response = await fetch('/api/compression/upload-slots', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode, inputBytes }),
+    });
+    if (!response.ok) throw new Error(await readApiError(response));
+    const payload = (await response.json()) as {
+      data?: { slot?: CompressionUploadSlot };
+    };
+    if (!payload.data?.slot)
+      throw new Error('Server queue reservation is unavailable');
+    return payload.data.slot;
   };
 
-  const createServerCompressionJobWithXhr = (
-    formData: FormData
-  ): Promise<{
-    result: CreatedServerJob;
-    uploadComplete: boolean;
-    transportFailure: boolean;
-  }> =>
-    new Promise((resolve, reject) => {
-      const request = new XMLHttpRequest();
-      let uploadComplete = false;
-      request.open('POST', '/api/compression/jobs');
-      request.withCredentials = true;
-      request.responseType = 'text';
+  const fetchServerUploadSlot = async (slotId: string) => {
+    const response = await fetch(`/api/compression/upload-slots/${slotId}`, {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(await readApiError(response));
+    const payload = (await response.json()) as {
+      data?: { slot?: CompressionUploadSlot };
+    };
+    if (!payload.data?.slot)
+      throw new Error('Server queue reservation is unavailable');
+    return payload.data.slot;
+  };
 
-      request.upload.addEventListener('progress', (event) => {
-        if (!event.lengthComputable) {
-          setServerStatus('Uploading PDF to the protected server queue...', false, null);
-          return;
-        }
-        const progress = (event.loaded / event.total) * 100;
-        uploadComplete = event.loaded >= event.total;
-        setServerStatus(
-          `Uploading PDF to the protected server queue (${Math.round(progress)}%)...`,
-          false,
-          progress
-        );
+  const resetServerUpload = async (slotId: string) => {
+    const response = await fetch(
+      `/api/compression/upload-slots/${slotId}/reset`,
+      {
+        method: 'POST',
+        credentials: 'include',
+      }
+    );
+    if (!response.ok) throw new Error(await readApiError(response));
+    const payload = (await response.json()) as {
+      data?: { slot?: CompressionUploadSlot };
+    };
+    if (!payload.data?.slot)
+      throw new Error('The interrupted upload could not be restarted');
+    return payload.data.slot;
+  };
+
+  const releaseServerUploadSlot = async () => {
+    if (!activeServerUploadSlotId) return;
+    const slotId = activeServerUploadSlotId;
+    activeServerUploadSlotId = null;
+    await fetch(`/api/compression/upload-slots/${slotId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    }).catch((): undefined => undefined);
+  };
+
+  const waitForServerUploadTurn = async (
+    file: File,
+    mode: 'lossless' | 'balanced'
+  ) => {
+    const slot = await reserveServerUploadSlot(mode, file.size);
+    activeServerUploadSlotId = slot.id;
+    let current = slot;
+    while (current.status === 'waiting') {
+      if (serverJobCancelled)
+        throw new Error('Server compression was cancelled');
+      setServerStatus(
+        `Waiting in server upload queue. Position ${current.queuePosition}.`,
+        true,
+        null
+      );
+      await wait(2000);
+      if (serverJobCancelled)
+        throw new Error('Server compression was cancelled');
+      current = await fetchServerUploadSlot(slot.id);
+    }
+    if (serverJobCancelled) throw new Error('Server compression was cancelled');
+    if (current.status === 'processing') {
+      setServerStatus(
+        'Upload complete. Waiting for server processing...',
+        true,
+        null
+      );
+    } else if (current.status === 'uploading') {
+      setServerStatus('Resuming the interrupted PDF upload...', true, 0);
+    } else {
+      setServerStatus(
+        'Your server queue turn has started. Uploading PDF...',
+        true,
+        0
+      );
+    }
+    return current;
+  };
+
+  const uploadTusOnce = async (
+    file: File,
+    slot: CompressionUploadSlot,
+    mode: 'lossless' | 'balanced'
+  ): Promise<string> =>
+    new Promise<string>((resolve, reject) => {
+      const upload = new TusUpload(file, {
+        endpoint: '/api/compression/uploads',
+        uploadUrl:
+          slot.status === 'uploading'
+            ? `/api/compression/uploads/${slot.id}`
+            : null,
+        chunkSize: serverConfig.uploadChunkBytes,
+        retryDelays: [0, 1000, 3000, 5000, 10000, 20000],
+        parallelUploads: 1,
+        storeFingerprintForResuming: false,
+        removeFingerprintOnSuccess: true,
+        metadata: {
+          slotId: slot.id,
+          mode,
+          filename: file.name,
+          filetype: 'application/pdf',
+        },
+        onProgress: (bytesSent, bytesTotal) => {
+          if (serverJobCancelled || bytesTotal <= 0) return;
+          const progress = (bytesSent / bytesTotal) * 100;
+          setServerStatus(
+            `Uploading ${formatBytes(bytesSent)} of ${formatBytes(bytesTotal)}.`,
+            true,
+            progress
+          );
+        },
+        onSuccess: ({ lastResponse }) => {
+          if (activeTusUpload === upload) activeTusUpload = null;
+          rejectActiveTusUpload = null;
+          resolve(lastResponse.getHeader('Upload-Job-Id') || slot.id);
+        },
+        onError: (error) => {
+          if (activeTusUpload === upload) activeTusUpload = null;
+          rejectActiveTusUpload = null;
+          reject(
+            serverJobCancelled
+              ? new Error('Server compression was cancelled')
+              : error
+          );
+        },
       });
-
-      request.addEventListener('error', () => {
-        reject({
-          error: new Error('The upload to the server queue failed'),
-          uploadComplete,
-          transportFailure: true,
-        });
-      });
-
-      request.addEventListener('load', () => {
-        let payload: {
-          error?: string;
-          data?: { job?: ServerCompressionJob; queuePosition?: number | null };
-        } = {};
-        try {
-          payload = request.responseText ? JSON.parse(request.responseText) : {};
-        } catch {
-          // The generic server message below is more useful than a JSON error.
-        }
-
-        if (request.status < 200 || request.status >= 300) {
-          reject({
-            error: new Error(payload.error || 'Server compression could not be started'),
-            uploadComplete,
-            transportFailure: false,
-          });
-          return;
-        }
-
-        const job = payload.data?.job;
-        if (!job) {
-          reject({
-            error: new Error('Server did not create a compression job'),
-            uploadComplete,
-            transportFailure: false,
-          });
-          return;
-        }
-        resolve({
-          result: { job, queuePosition: payload.data?.queuePosition ?? null },
-          uploadComplete,
-          transportFailure: false,
-        });
-      });
-
-      request.send(formData);
+      activeTusUpload = upload;
+      rejectActiveTusUpload = reject;
+      upload.start();
     });
 
-  const createServerCompressionJob = async (
-    formData: FormData
-  ): Promise<CreatedServerJob> => {
-    try {
-      const { result } = await createServerCompressionJobWithXhr(formData);
-      return result;
-    } catch (failure: unknown) {
-      const uploadFailure = failure as {
-        error?: Error;
-        uploadComplete?: boolean;
-        transportFailure?: boolean;
-      };
-      if (!uploadFailure.transportFailure) {
-        throw uploadFailure.error || new Error('Server compression could not be started');
+  const uploadServerFile = async (
+    file: File,
+    initialSlot: CompressionUploadSlot,
+    mode: 'lossless' | 'balanced'
+  ): Promise<string> => {
+    let slot = initialSlot;
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (serverJobCancelled)
+        throw new Error('Server compression was cancelled');
+      if (slot.status === 'processing') return slot.jobId || slot.id;
+
+      try {
+        return await uploadTusOnce(file, slot, mode);
+      } catch (error) {
+        lastError = error;
+        if (serverJobCancelled) throw error;
+
+        // A proxy can drop the response after the backend has already accepted
+        // a chunk or even finalized the upload. Resolve the durable slot before
+        // deciding whether to resume, restart, or proceed to job polling.
+        slot = await fetchServerUploadSlot(slot.id);
+        if (slot.status === 'processing') return slot.jobId || slot.id;
+
+        if (slot.status === 'uploading' && attempt === 1) {
+          slot = await resetServerUpload(slot.id);
+        }
       }
-      // Do not retry automatically. A dropped browser connection can still
-      // leave a completed upload on the server, so an automatic retry could
-      // create a duplicate long-running job.
-      throw new Error(UPLOAD_CONNECTION_INTERRUPTED);
     }
+
+    console.warn('[CompressPDF] Resumable upload exhausted retries', lastError);
+    throw new Error(RESUMABLE_UPLOAD_INTERRUPTED);
   };
 
   const runServerCompression = async (file: File) => {
@@ -668,21 +796,21 @@ document.addEventListener('DOMContentLoaded', () => {
       throw new Error('Ukuran maksimum untuk kompresi adalah 1 GB');
     }
 
-    const mode = algorithmSelect.value === 'server-balanced' ? 'balanced' : 'lossless';
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('mode', mode);
-    setServerStatus('Preparing secure upload...', false, 0);
-    const { job } = await createServerCompressionJob(formData);
+    const mode =
+      algorithmSelect.value === 'server-balanced' ? 'balanced' : 'lossless';
+    const slot = await waitForServerUploadTurn(file, mode);
+    const jobId = await uploadServerFile(file, slot, mode);
 
-    activeServerJobId = job.id;
+    activeServerJobId = jobId;
+    activeServerUploadSlotId = null;
 
-    while (activeServerJobId === job.id && !serverJobCancelled) {
-      const statusResponse = await fetch(`/api/compression/jobs/${job.id}`, {
+    while (activeServerJobId === jobId && !serverJobCancelled) {
+      const statusResponse = await fetch(`/api/compression/jobs/${jobId}`, {
         credentials: 'include',
         cache: 'no-store',
       });
-      if (!statusResponse.ok) throw new Error(await readApiError(statusResponse));
+      if (!statusResponse.ok)
+        throw new Error(await readApiError(statusResponse));
       const statusPayload = (await statusResponse.json()) as {
         data?: { job?: ServerCompressionJob; queuePosition?: number | null };
       };
@@ -699,10 +827,14 @@ document.addEventListener('DOMContentLoaded', () => {
           null
         );
       } else if (current.status === 'processing') {
-        setServerStatus('Compressing on the server. Keep this page open.', true, null);
+        setServerStatus(
+          'Compressing on the server. Keep this page open.',
+          true,
+          null
+        );
       } else if (current.status === 'completed') {
         setServerStatus('Preparing secure download...', false, 100);
-        await downloadServerResult(job.id, file);
+        await downloadServerResult(jobId, file);
         clearServerStatus();
         showAlert(
           'Compression Complete',
@@ -714,11 +846,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (current.status === 'cancelled') {
         throw new Error('Server compression was cancelled');
       } else {
-        const detail = current.errorCode === 'TIMEOUT'
-          ? 'The server reached its processing time limit.'
-          : current.errorCode === 'MEMORY_LIMIT'
-            ? 'This image-heavy PDF exceeded the server memory limit. Retry with Lossless (Server).'
-            : 'The server could not compress this PDF.';
+        const detail =
+          current.errorCode === 'TIMEOUT'
+            ? 'The server reached its processing time limit.'
+            : current.errorCode === 'MEMORY_LIMIT'
+              ? 'This image-heavy PDF exceeded the server memory limit. Retry with Lossless (Server).'
+              : 'The server could not compress this PDF.';
         throw new Error(detail);
       }
       await wait(2000);
@@ -729,9 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const compress = async () => {
     const level = (
       document.getElementById('compression-level') as HTMLSelectElement
-    ).value;
-    const algorithm = (
-      document.getElementById('compression-algorithm') as HTMLSelectElement
     ).value;
     const convertToGrayscale =
       (document.getElementById('convert-to-grayscale') as HTMLInputElement)
@@ -943,8 +1073,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e: unknown) {
       hideLoader();
+      await releaseServerUploadSlot();
       clearServerStatus();
       console.error('[CompressPDF] Error:', e);
+      if (
+        e instanceof Error &&
+        e.message === 'Server compression was cancelled'
+      ) {
+        showAlert(
+          'Compression cancelled',
+          'The upload or server job was cancelled and its temporary files are being removed.',
+          'info'
+        );
+        return;
+      }
       if (
         e instanceof Error &&
         (e.message === 'CONDENSE_MEMORY_LIMIT' || isPyMuPdfMemoryError(e))
@@ -955,10 +1097,10 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         return;
       }
-      if (e instanceof Error && e.message === UPLOAD_CONNECTION_INTERRUPTED) {
+      if (e instanceof Error && e.message === RESUMABLE_UPLOAD_INTERRUPTED) {
         showAlert(
-          t('compressionUpload.interruptedTitle'),
-          t('compressionUpload.interruptedMessage')
+          'Upload could not be resumed',
+          'The connection was retried and resumed automatically, but the upload still could not finish. Please retry the operation once. If it happens again, contact your administrator and include the time of the attempt.'
         );
         return;
       }
@@ -987,7 +1129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const includesServerFile = selectedFiles.some(
       (file) => file.size > serverConfig.clientThresholdBytes
     );
-    if (includesServerFile && (selectedFiles.length > 1 || state.files.length > 0)) {
+    if (
+      includesServerFile &&
+      (selectedFiles.length > 1 || state.files.length > 0)
+    ) {
       showAlert(
         'One large PDF at a time',
         'PDF di atas 100 MB diproses melalui antrean server. Pilih satu file besar dalam satu proses.'
@@ -1049,15 +1194,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (cancelServerCompressionBtn) {
     cancelServerCompressionBtn.addEventListener('click', async () => {
-      if (!activeServerJobId) return;
+      if (!activeServerJobId && !activeServerUploadSlotId) return;
       cancelServerCompressionBtn.disabled = true;
+      serverJobCancelled = true;
       try {
-        await fetch(`/api/compression/jobs/${activeServerJobId}`, {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-        serverJobCancelled = true;
-        setServerStatus('Cancellation requested. Cleaning up the temporary server files...', false);
+        if (activeServerJobId) {
+          await fetch(`/api/compression/jobs/${activeServerJobId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+          });
+        } else {
+          const upload = activeTusUpload;
+          const rejectUpload = rejectActiveTusUpload;
+          activeTusUpload = null;
+          rejectActiveTusUpload = null;
+          await upload?.abort(true).catch((): undefined => undefined);
+          rejectUpload?.(new Error('Server compression was cancelled'));
+          await releaseServerUploadSlot();
+        }
+        setServerStatus(
+          'Cancellation requested. Cleaning up the temporary server files...',
+          false
+        );
       } finally {
         cancelServerCompressionBtn.disabled = false;
       }

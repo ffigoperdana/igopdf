@@ -8,10 +8,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-igopdf} -d ${DB_NAME:-igopdf}']
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${DB_USER:-igopdf} -d ${DB_NAME:-igopdf}']
       interval: 10s
       timeout: 5s
       retries: 5
+    cpus: 0.5
+    mem_limit: 512m
     restart: unless-stopped
 
   backend:
@@ -39,6 +42,11 @@ services:
       CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
       SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
       SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_UPLOAD_CHUNK_BYTES: ${COMPRESSION_UPLOAD_CHUNK_BYTES:-26214400}
+      COMPRESSION_UPLOAD_IDLE_TIMEOUT_MS: ${COMPRESSION_UPLOAD_IDLE_TIMEOUT_MS:-1800000}
+      COMPRESSION_UPLOAD_MAX_AGE_MS: ${COMPRESSION_UPLOAD_MAX_AGE_MS:-10800000}
+      COMPRESSION_DISK_HEADROOM_MULTIPLIER: ${COMPRESSION_DISK_HEADROOM_MULTIPLIER:-3}
+      COMPRESSION_DISK_MINIMUM_FREE_BYTES: ${COMPRESSION_DISK_MINIMUM_FREE_BYTES:-1073741824}
       COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
       COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
       COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
@@ -47,6 +55,8 @@ services:
         condition: service_healthy
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
+    cpus: 0.5
+    mem_limit: 512m
     restart: unless-stopped
 
   pdf-worker:
@@ -67,6 +77,8 @@ services:
       CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
       SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
       SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_UPLOAD_IDLE_TIMEOUT_MS: ${COMPRESSION_UPLOAD_IDLE_TIMEOUT_MS:-1800000}
+      COMPRESSION_UPLOAD_MAX_AGE_MS: ${COMPRESSION_UPLOAD_MAX_AGE_MS:-10800000}
       COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
       COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
       COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
@@ -84,6 +96,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    cpus: 0.25
+    mem_limit: 128m
     restart: unless-stopped
 
   nginx:
@@ -95,6 +109,8 @@ services:
     depends_on:
       - frontend
       - backend
+    cpus: 0.25
+    mem_limit: 128m
     restart: unless-stopped
 
 volumes:

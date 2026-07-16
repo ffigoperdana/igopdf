@@ -5,7 +5,7 @@ description: Reduce PDF file size by up to 90% with smart compression algorithms
 
 # Compress PDF
 
-Shrink your PDF files without destroying them. BentoPDF offers two distinct compression algorithms -- one for text-heavy documents, another for photo-heavy scans -- so you get meaningful size reduction regardless of what your PDF contains.
+Shrink PDF files without destroying them. IGO offers distinct compression paths for text-heavy documents and photo-heavy scans, plus a private server queue for large documents.
 
 ## How It Works
 
@@ -13,7 +13,16 @@ Shrink your PDF files without destroying them. BentoPDF offers two distinct comp
 2. Select a **Compression Algorithm** -- Condense or Photon.
 3. Pick a **Compression Level** from Light to Extreme.
 4. Optionally toggle **Convert to Grayscale** or expand **Custom Settings** for fine-grained control.
-5. Click **Compress PDF**. For multiple files, you get a single ZIP download.
+5. Click **Compress PDF**. For multiple browser-sized files, you get a single ZIP download.
+
+PDFs up to 100 MB are compressed locally in the browser. A PDF above 100 MB
+is uploaded in resumable 25 MiB chunks to the private server queue. Only one
+large upload/job is admitted at a time, and temporary files are removed after
+download, cancellation, or expiry. The maximum supported size is 1 GB; files
+above 500 MB use Lossless mode only.
+
+Self-hosting and operations details are documented in
+[Large PDF Compression](../deployment/large-pdf-compression).
 
 ## Compression Algorithms
 

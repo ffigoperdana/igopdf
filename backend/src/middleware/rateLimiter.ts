@@ -25,6 +25,35 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const authenticatedUserKey = (req: Request): string =>
+  req.user?.id || ipKey(req);
+
+export const compressionControlLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 600,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: authenticatedUserKey,
+  message: {
+    success: false,
+    error: 'Too many compression status requests. Please wait a moment.',
+    code: 'COMPRESSION_RATE_LIMITED',
+  },
+});
+
+export const compressionUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 240,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: authenticatedUserKey,
+  message: {
+    success: false,
+    error: 'Too many upload chunks. Resume this upload in a few minutes.',
+    code: 'COMPRESSION_UPLOAD_RATE_LIMITED',
+  },
+});
+
 // Keyed by IP + username (not IP alone). Office users often reach the app
 // through a shared address (misconfigured proxy XFF, NAT, future WAF), and a
 // pure per-IP counter pools everyone's failures into one bucket — ten typos
