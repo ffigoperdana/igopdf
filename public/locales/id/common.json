@@ -390,6 +390,21 @@
     "error": "Kesalahan",
     "failedToLoad": "Gagal memuat"
   },
+  "clientProcessing": {
+    "largeFileTitle": "File besar dipilih",
+    "largeFileMessage": "{{tool}} memproses pilihan berukuran {{size}} ini di browser Anda. Dokumen besar dapat menggunakan memori perangkat yang tinggi dan membuat tab lambat atau tidak responsif. Anda tetap dapat melanjutkan.",
+    "editor": "Editor PDF",
+    "multiTool": "PDF Multi Tool",
+    "ocr": "OCR PDF",
+    "pdfToWord": "PDF ke Word"
+  },
+  "pdfToWord": {
+    "nativeTextDetected": "Text layer terdeteksi pada halaman yang diperiksa. Font, tabel, spasi, dan tata letak kompleks di DOCX tetap dapat berubah.",
+    "imageBasedDetected": "{{imagePages}} dari {{samplePages}} halaman yang diperiksa tidak memiliki text layer yang dapat digunakan. PDF ini tampak berbasis gambar atau hasil scan; DOCX dapat berisi teks yang tidak lengkap atau tidak dapat diedit.",
+    "openOcr": "Buka OCR PDF",
+    "postNativeWarning": "Periksa kembali font, tabel, spasi, dan tata letak kompleks pada DOCX.",
+    "postImageWarning": "Sebagian halaman yang diperiksa tidak memiliki text layer yang dapat digunakan. Periksa kata yang hilang dan tata letak; gunakan OCR PDF terlebih dahulu untuk dokumen hasil scan."
+  },
   "simpleMode": {
     "title": "Alat PDF",
     "subtitle": "Pilih alat untuk memulai"

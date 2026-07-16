@@ -370,8 +370,28 @@
             id="server-compression-status"
             class="hidden p-4 rounded-lg border border-line bg-surface-muted"
             role="status"
+            aria-live="polite"
           >
             <p id="server-compression-status-text" class="text-sm text-content"></p>
+            <div class="mt-3">
+              <div
+                id="server-compression-progress-track"
+                class="h-2 overflow-hidden rounded-full bg-surface"
+                role="progressbar"
+                aria-label="Server compression progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  id="server-compression-progress-bar"
+                  class="h-full w-0 rounded-full bg-palm-500 transition-[width] duration-300"
+                ></div>
+              </div>
+              <p
+                id="server-compression-progress-label"
+                class="mt-1 text-xs text-content-muted"
+              ></p>
+            </div>
             <button
               id="cancel-server-compression"
               type="button"

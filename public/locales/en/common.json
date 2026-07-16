@@ -390,6 +390,21 @@
     "error": "Error",
     "failedToLoad": "Failed to load"
   },
+  "clientProcessing": {
+    "largeFileTitle": "Large file selected",
+    "largeFileMessage": "{{tool}} processes this {{size}} selection in your browser. Large documents can use substantial device memory and may make this tab slow or unresponsive. You can still continue.",
+    "editor": "PDF Editor",
+    "multiTool": "PDF Multi Tool",
+    "ocr": "OCR PDF",
+    "pdfToWord": "PDF to Word"
+  },
+  "pdfToWord": {
+    "nativeTextDetected": "Text layer detected in the checked pages. DOCX can still differ in fonts, tables, spacing, and complex layout.",
+    "imageBasedDetected": "{{imagePages}} of {{samplePages}} checked pages do not have a usable text layer. This PDF appears to be image-based or scanned; DOCX may contain incomplete or non-editable text.",
+    "openOcr": "Open OCR PDF",
+    "postNativeWarning": "Review fonts, tables, spacing, and complex layout in the DOCX.",
+    "postImageWarning": "Some checked pages had no usable text layer. Review missing words and layout; use OCR PDF first for scanned documents."
+  },
   "simpleMode": {
     "title": "PDF Tools",
     "subtitle": "Select a tool to get started"

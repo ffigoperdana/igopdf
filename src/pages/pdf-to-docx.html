@@ -182,6 +182,20 @@
 
         <div id="file-display-area" class="mt-4 space-y-2"></div>
 
+        <div
+          id="conversion-quality-notice"
+          class="hidden mt-4 rounded-lg border border-palm-500/40 bg-palm-500/10 p-4"
+          role="status"
+          aria-live="polite"
+        >
+          <p id="conversion-quality-message" class="text-sm text-content-muted"></p>
+          <a
+            id="conversion-open-ocr"
+            href="ocr-pdf.html"
+            class="hidden mt-3 inline-flex items-center text-sm font-semibold text-palm-500 hover:text-palm-400"
+          ></a>
+        </div>
+
         <div id="convert-options" class="hidden mt-6 space-y-6">
           <button id="process-btn" class="btn-gradient w-full mt-4">
             Convert to DOCX

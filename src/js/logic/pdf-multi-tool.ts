@@ -14,6 +14,10 @@ import { initializeGlobalShortcuts } from '../utils/shortcuts-init.js';
 import { repairPdfFile } from './repair-pdf.js';
 import { partitionIncomingFiles } from '../utils/multi-tool-file-input.js';
 import { convertImagesToPdfFile } from '../utils/images-to-pdf-lib.js';
+import {
+  warnForLargeClientSideFiles,
+  CLIENT_SIDE_LARGE_FILE_BYTES,
+} from '../utils/client-file-warning.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -438,6 +442,12 @@ async function handleIncomingFiles(rawFiles: File[]) {
     showModal(t('multiTool.pleaseWait'), t('multiTool.pagesRendering'), 'info');
     return;
   }
+
+  warnForLargeClientSideFiles(
+    rawFiles,
+    t('clientProcessing.multiTool'),
+    CLIENT_SIDE_LARGE_FILE_BYTES
+  );
 
   isProcessingDrop = true;
   try {

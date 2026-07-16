@@ -5,6 +5,11 @@ import { formatBytes } from '../utils/helpers.js';
 import { makeUniqueFileKey } from '../utils/deduplicate-filename.js';
 import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { getEditorDisabledCategories } from '../utils/disabled-tools.js';
+import {
+  warnForLargeClientSideFiles,
+  CLIENT_SIDE_LARGE_FILE_BYTES,
+} from '../utils/client-file-warning.js';
+import { t } from '../i18n/i18n.js';
 
 const embedPdfWasmUrl = new URL(
   'embedpdf-snippet/dist/pdfium.wasm',
@@ -1280,6 +1285,12 @@ async function handleFiles(files: FileList) {
     showAlert('Invalid File', 'Please upload a valid PDF file.');
     return;
   }
+
+  warnForLargeClientSideFiles(
+    pdfFiles,
+    t('clientProcessing.editor'),
+    CLIENT_SIDE_LARGE_FILE_BYTES
+  );
 
   showLoader('Loading PDF Editor...');
 

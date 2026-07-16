@@ -256,6 +256,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const serverCompressionNotice = document.getElementById(
     'server-compression-notice'
   );
+  const serverProgressTrack = document.getElementById(
+    'server-compression-progress-track'
+  );
+  const serverProgressBar = document.getElementById(
+    'server-compression-progress-bar'
+  );
+  const serverProgressLabel = document.getElementById(
+    'server-compression-progress-label'
+  );
 
   const clientAlgorithmOptions = algorithmSelect.innerHTML;
   const clientLevelOptions = (
@@ -273,11 +282,35 @@ document.addEventListener('DOMContentLoaded', () => {
     return file.size > serverConfig.clientThresholdBytes ? file : null;
   };
 
-  const setServerStatus = (text: string, cancellable: boolean) => {
+  const setServerStatus = (
+    text: string,
+    cancellable: boolean,
+    progress: number | null = null
+  ) => {
     if (!serverStatus || !serverStatusText) return;
     serverStatusText.textContent = text;
     serverStatus.classList.remove('hidden');
     cancelServerCompressionBtn?.classList.toggle('hidden', !cancellable);
+
+    if (!serverProgressBar || !serverProgressLabel || !serverProgressTrack) {
+      return;
+    }
+
+    if (progress === null) {
+      serverProgressBar.style.width = '100%';
+      serverProgressBar.classList.add('animate-pulse');
+      serverProgressTrack.setAttribute('aria-valuetext', 'In progress');
+      serverProgressTrack.removeAttribute('aria-valuenow');
+      serverProgressLabel.textContent = 'Processing on the server';
+      return;
+    }
+
+    const roundedProgress = Math.max(0, Math.min(100, Math.round(progress)));
+    serverProgressBar.classList.remove('animate-pulse');
+    serverProgressBar.style.width = `${roundedProgress}%`;
+    serverProgressTrack.setAttribute('aria-valuenow', String(roundedProgress));
+    serverProgressTrack.setAttribute('aria-valuetext', `${roundedProgress}%`);
+    serverProgressLabel.textContent = `${roundedProgress}%`;
   };
 
   const clearServerStatus = () => {
@@ -285,6 +318,11 @@ document.addEventListener('DOMContentLoaded', () => {
     serverJobCancelled = false;
     serverStatus?.classList.add('hidden');
     cancelServerCompressionBtn?.classList.add('hidden');
+    if (serverProgressBar) {
+      serverProgressBar.classList.remove('animate-pulse');
+      serverProgressBar.style.width = '0%';
+    }
+    if (serverProgressLabel) serverProgressLabel.textContent = '';
   };
 
   const updateCompressionControls = () => {
@@ -518,6 +556,61 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadFile(result, outputName);
   };
 
+  const createServerCompressionJob = (
+    formData: FormData
+  ): Promise<{ job: ServerCompressionJob; queuePosition: number | null }> =>
+    new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('POST', '/api/compression/jobs');
+      request.withCredentials = true;
+      request.responseType = 'text';
+
+      request.upload.addEventListener('progress', (event) => {
+        if (!event.lengthComputable) {
+          setServerStatus('Uploading PDF to the protected server queue...', false, null);
+          return;
+        }
+        const progress = (event.loaded / event.total) * 100;
+        setServerStatus(
+          `Uploading PDF to the protected server queue (${Math.round(progress)}%)...`,
+          false,
+          progress
+        );
+      });
+
+      request.addEventListener('error', () => {
+        reject(new Error('The upload to the server queue failed'));
+      });
+
+      request.addEventListener('load', () => {
+        let payload: {
+          error?: string;
+          data?: { job?: ServerCompressionJob; queuePosition?: number | null };
+        } = {};
+        try {
+          payload = request.responseText ? JSON.parse(request.responseText) : {};
+        } catch {
+          // The generic server message below is more useful than a JSON error.
+        }
+
+        if (request.status < 200 || request.status >= 300) {
+          reject(
+            new Error(payload.error || 'Server compression could not be started')
+          );
+          return;
+        }
+
+        const job = payload.data?.job;
+        if (!job) {
+          reject(new Error('Server did not create a compression job'));
+          return;
+        }
+        resolve({ job, queuePosition: payload.data?.queuePosition ?? null });
+      });
+
+      request.send(formData);
+    });
+
   const runServerCompression = async (file: File) => {
     if (!serverConfig.enabled) {
       throw new Error('Server-side compression is currently unavailable');
@@ -527,26 +620,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const mode = algorithmSelect.value === 'server-balanced' ? 'balanced' : 'lossless';
-    showLoader('Uploading PDF to the protected server queue...');
     const formData = new FormData();
     formData.append('file', file);
     formData.append('mode', mode);
-
-    const response = await fetch('/api/compression/jobs', {
-      method: 'POST',
-      credentials: 'include',
-      body: formData,
-    });
-    if (!response.ok) throw new Error(await readApiError(response));
-
-    const payload = (await response.json()) as {
-      data?: { job?: ServerCompressionJob; queuePosition?: number | null };
-    };
-    const job = payload.data?.job;
-    if (!job) throw new Error('Server did not create a compression job');
+    setServerStatus('Preparing secure upload...', false, 0);
+    const { job } = await createServerCompressionJob(formData);
 
     activeServerJobId = job.id;
-    hideLoader();
 
     while (activeServerJobId === job.id && !serverJobCancelled) {
       const statusResponse = await fetch(`/api/compression/jobs/${job.id}`, {
@@ -566,12 +646,13 @@ document.addEventListener('DOMContentLoaded', () => {
           position && position > 1
             ? `Waiting in server queue. Position ${position}.`
             : 'Waiting for the server worker to start compression.',
-          true
+          true,
+          null
         );
       } else if (current.status === 'processing') {
-        setServerStatus('Compressing on the server. Keep this page open.', true);
+        setServerStatus('Compressing on the server. Keep this page open.', true, null);
       } else if (current.status === 'completed') {
-        setServerStatus('Preparing secure download...', false);
+        setServerStatus('Preparing secure download...', false, 100);
         await downloadServerResult(job.id, file);
         clearServerStatus();
         showAlert(

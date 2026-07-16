@@ -11,6 +11,45 @@ import { createIcons, icons } from 'lucide';
 import { loadPyMuPDF } from '../utils/pymupdf-loader.js';
 import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { deduplicateFileName } from '../utils/deduplicate-filename.js';
+import {
+  warnForLargeClientSideFiles,
+  CLIENT_SIDE_OCR_WARNING_BYTES,
+} from '../utils/client-file-warning.js';
+
+type PdfTextLayerProfile = {
+  pageCount: number;
+  samplePages: number;
+  imageBasedPages: number;
+};
+
+const textLayerProfiles = new WeakMap<File, PdfTextLayerProfile>();
+
+async function inspectTextLayer(
+  file: File,
+  source?: ArrayBuffer
+): Promise<PdfTextLayerProfile> {
+  const arrayBuffer = source ?? (await readFileAsArrayBuffer(file));
+  const pdfDoc = await getPDFDocument({ data: arrayBuffer }).promise;
+  const pageCount = pdfDoc.numPages;
+  const samplePages = Math.min(pdfDoc.numPages, 3);
+  let imageBasedPages = 0;
+
+  try {
+    for (let pageNumber = 1; pageNumber <= samplePages; pageNumber++) {
+      const page = await pdfDoc.getPage(pageNumber);
+      const textContent = await page.getTextContent();
+      const textLength = textContent.items.reduce((length, item) => {
+        const text = 'str' in item ? item.str : '';
+        return length + text.trim().length;
+      }, 0);
+      if (textLength < 20) imageBasedPages += 1;
+    }
+  } finally {
+    await pdfDoc.destroy();
+  }
+
+  return { pageCount, samplePages, imageBasedPages };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -22,6 +61,51 @@ document.addEventListener('DOMContentLoaded', () => {
   const addMoreBtn = document.getElementById('add-more-btn');
   const clearFilesBtn = document.getElementById('clear-files-btn');
   const backBtn = document.getElementById('back-to-tools');
+  const qualityNotice = document.getElementById('conversion-quality-notice');
+  const qualityMessage = document.getElementById('conversion-quality-message');
+  const openOcrLink = document.getElementById(
+    'conversion-open-ocr'
+  ) as HTMLAnchorElement | null;
+
+  const updateQualityNotice = () => {
+    if (!qualityNotice || !qualityMessage || state.files.length === 0) return;
+    const profiles = state.files
+      .map((file) => textLayerProfiles.get(file))
+      .filter((profile): profile is PdfTextLayerProfile => Boolean(profile));
+
+    if (profiles.length === 0) {
+      qualityNotice.classList.add('hidden');
+      return;
+    }
+
+    const imageBasedPages = profiles.reduce(
+      (total, profile) => total + profile.imageBasedPages,
+      0
+    );
+    const samplePages = profiles.reduce(
+      (total, profile) => total + profile.samplePages,
+      0
+    );
+    const imageBased = imageBasedPages > 0;
+    qualityMessage.textContent = imageBased
+      ? t('pdfToWord.imageBasedDetected', { imagePages: imageBasedPages, samplePages })
+      : t('pdfToWord.nativeTextDetected');
+    qualityNotice.classList.remove('hidden');
+
+    if (openOcrLink) {
+      openOcrLink.textContent = t('pdfToWord.openOcr');
+      openOcrLink.classList.toggle('hidden', !imageBased);
+    }
+  };
+
+  const conversionQualitySummary = (files: File[]) => {
+    const hasImageBasedPage = files.some(
+      (file) => (textLayerProfiles.get(file)?.imageBasedPages ?? 0) > 0
+    );
+    return hasImageBasedPage
+      ? t('pdfToWord.postImageWarning')
+      : t('pdfToWord.postNativeWarning');
+  };
 
   if (backBtn) {
     backBtn.addEventListener('click', () => {
@@ -69,19 +153,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
           const arrayBuffer = await readFileAsArrayBuffer(file);
-          const pdfDoc = await getPDFDocument({ data: arrayBuffer }).promise;
+          const profile = await inspectTextLayer(file, arrayBuffer);
+          textLayerProfiles.set(file, profile);
+          const pdfDoc = { numPages: profile.pageCount };
           metaSpan.textContent = `${formatBytes(file.size)} • ${pdfDoc.numPages} pages`;
         } catch {
           metaSpan.textContent = `${formatBytes(file.size)} • Could not load page count`;
         }
       }
 
+      updateQualityNotice();
       createIcons({ icons });
       fileControls.classList.remove('hidden');
       convertOptions.classList.remove('hidden');
       (processBtn as HTMLButtonElement).disabled = false;
     } else {
       fileDisplayArea.innerHTML = '';
+      qualityNotice?.classList.add('hidden');
       fileControls.classList.add('hidden');
       convertOptions.classList.add('hidden');
       (processBtn as HTMLButtonElement).disabled = true;
@@ -100,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showAlert('No Files', 'Please select at least one PDF file.');
         return;
       }
+      const qualitySummary = conversionQualitySummary(state.files);
 
       showLoader('Loading PDF converter...');
       const pymupdf = await loadPyMuPDF();
@@ -120,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showAlert(
           'Conversion Complete',
-          `Successfully converted ${file.name} to DOCX.`,
+          `Successfully converted ${file.name} to DOCX. ${qualitySummary}`,
           'success',
           () => resetState()
         );
@@ -153,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showAlert(
           'Conversion Complete',
-          `Successfully converted ${state.files.length} PDF(s) to DOCX.`,
+          `Successfully converted ${state.files.length} PDF(s) to DOCX. ${qualitySummary}`,
           'success',
           () => resetState()
         );
@@ -172,6 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const pdfFiles = Array.from(files).filter(
         (f) =>
           f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+      );
+      warnForLargeClientSideFiles(
+        pdfFiles,
+        t('clientProcessing.pdfToWord'),
+        CLIENT_SIDE_OCR_WARNING_BYTES
       );
       state.files = [...state.files, ...pdfFiles];
       updateUI();

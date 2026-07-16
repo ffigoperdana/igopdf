@@ -6,6 +6,10 @@ import { icons, createIcons } from 'lucide';
 import { OcrState } from '@/types';
 import { performOcr } from '../utils/ocr.js';
 import {
+  warnForLargeClientSideFiles,
+  CLIENT_SIDE_OCR_WARNING_BYTES,
+} from '../utils/client-file-warning.js';
+import {
   getAvailableTesseractLanguageEntries,
   resolveConfiguredTesseractAvailableLanguages,
   UnsupportedOcrLanguageError,
@@ -243,6 +247,11 @@ async function handleFileSelect(files: FileList | null) {
       file.type === 'application/pdf' ||
       file.name.toLowerCase().endsWith('.pdf')
     ) {
+      warnForLargeClientSideFiles(
+        [file],
+        t('clientProcessing.ocr'),
+        CLIENT_SIDE_OCR_WARNING_BYTES
+      );
       const result = await loadPdfWithPasswordPrompt(file);
       if (!result) return;
       result.pdf.destroy();
