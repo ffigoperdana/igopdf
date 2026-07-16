@@ -1,7 +1,7 @@
 // Logic for PDF Editor Page
 import { createIcons, icons } from 'lucide';
 import { showAlert, showLoader, hideLoader } from '../ui.js';
-import { formatBytes, downloadFile } from '../utils/helpers.js';
+import { formatBytes } from '../utils/helpers.js';
 import { makeUniqueFileKey } from '../utils/deduplicate-filename.js';
 import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { getEditorDisabledCategories } from '../utils/disabled-tools.js';
@@ -51,7 +51,6 @@ let annotationPlugin: AnnotationCapability | null = null;
 let textEditRegistry: PluginRegistry | null = null;
 let textEditInteraction: InteractionManagerCapability | null = null;
 let isViewerInitialized = false;
-let currentFileName = 'document.pdf';
 const fileEntryMap = new Map<string, HTMLElement>();
 const textEditHandlerCleanups = new Map<string, () => void>();
 let textEditToolbarCleanup: (() => void) | null = null;
@@ -116,25 +115,6 @@ function waitForAnimationFrames(count = 2): Promise<void> {
     };
     wait(count);
   });
-}
-
-async function flushAnnotationChanges(documentId: string): Promise<void> {
-  if (!annotationPlugin) return;
-
-  const scope = annotationPlugin.forDocument(documentId);
-  blurDeepActiveElement();
-  scope.deselectAnnotation();
-  await waitForAnimationFrames();
-
-  const deadline = Date.now() + 10000;
-  while (scope.getState().hasPendingChanges) {
-    await scope.commit().toPromise();
-    if (!scope.getState().hasPendingChanges) return;
-    if (Date.now() >= deadline) {
-      throw new Error('Timed out while saving PDF annotations');
-    }
-    await new Promise((resolve) => window.setTimeout(resolve, 25));
-  }
 }
 
 function isEditableEventTarget(event: KeyboardEvent): boolean {
@@ -1321,7 +1301,6 @@ async function handleFiles(files: FileList) {
 
     if (!isViewerInitialized) {
       const firstFile = decryptedFiles[0];
-      currentFileName = firstFile.name;
       const firstBuffer = await firstFile.arrayBuffer();
 
       pdfContainer.textContent = '';
@@ -1424,14 +1403,17 @@ async function handleFiles(files: FileList) {
         downloadBtn.textContent = 'Saving annotations...';
         try {
           const documentId = docManagerPlugin?.getActiveDocumentId();
-          if (documentId) await flushAnnotationChanges(documentId);
+          if (!documentId) throw new Error('No active PDF document');
 
-          const exportPlugin = registry.getPlugin('export').provides();
-          const arrayBuffer = documentId
-            ? await exportPlugin.forDocument(documentId).saveAsCopy().toPromise()
-            : await exportPlugin.saveAsCopy().toPromise();
-          const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-          downloadFile(blob, currentFileName);
+          // Match the viewer's built-in Export flow so annotation lifecycle
+          // and download behavior remain owned by the viewer.
+          blurDeepActiveElement();
+          await waitForAnimationFrames();
+          const commands = registry
+            .getPlugin('commands')
+            ?.provides() as CommandsCapability | undefined;
+          if (!commands) throw new Error('PDF export command is unavailable');
+          commands.execute('document:export', documentId, 'ui');
         } catch (err) {
           console.error('Error downloading PDF:', err);
           showAlert('Error', 'Failed to download the edited PDF.');
