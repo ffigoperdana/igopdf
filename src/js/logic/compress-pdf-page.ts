@@ -551,6 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
     while (activeServerJobId === job.id && !serverJobCancelled) {
       const statusResponse = await fetch(`/api/compression/jobs/${job.id}`, {
         credentials: 'include',
+        cache: 'no-store',
       });
       if (!statusResponse.ok) throw new Error(await readApiError(statusResponse));
       const statusPayload = (await statusResponse.json()) as {
@@ -585,7 +586,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const detail = current.errorCode === 'TIMEOUT'
           ? 'The server reached its processing time limit.'
-          : 'The server could not compress this PDF.';
+          : current.errorCode === 'MEMORY_LIMIT'
+            ? 'This image-heavy PDF exceeded the server memory limit. Retry with Lossless (Server).'
+            : 'The server could not compress this PDF.';
         throw new Error(detail);
       }
       await wait(2000);

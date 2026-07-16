@@ -59,6 +59,11 @@ async function isPdfFile(filePath: string): Promise<boolean> {
 }
 
 router.use(authMiddleware);
+router.use((_req, res, next) => {
+  // Job state changes continuously; a cached 304 response makes browser polling stale.
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 router.get('/config', (_req, res) => {
   res.json({

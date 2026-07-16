@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { rm, stat } from 'node:fs/promises';
+import { readFile, rm, stat } from 'node:fs/promises';
 import { config } from './config/index.js';
 import { closePool } from './config/database.js';
 import {
@@ -23,7 +23,17 @@ interface ManagedChildProcess {
   kill(signal?: NodeJS.Signals): boolean;
   stderr: NodeJS.ReadableStream | null;
   on(event: 'error', listener: (error: NodeJS.ErrnoException) => void): void;
-  on(event: 'close', listener: (code: number | null) => void): void;
+  on(event: 'close', listener: (code: number | null, signal: NodeJS.Signals | null) => void): void;
+}
+
+async function oomKillCount(): Promise<number | null> {
+  try {
+    const memoryEvents = await readFile('/sys/fs/cgroup/memory.events', 'utf8');
+    const match = memoryEvents.match(/^oom_kill\s+(\d+)$/m);
+    return match ? Number(match[1]) : null;
+  } catch {
+    return null;
+  }
 }
 
 function commandFor(job: CompressionJob): { executable: string; args: string[] } {
@@ -34,6 +44,7 @@ function commandFor(job: CompressionJob): { executable: string; args: string[] }
     return {
       executable: 'qpdf',
       args: [
+        '--warning-exit-0',
         '--compress-streams=y',
         '--decode-level=generalized',
         '--recompress-flate',
@@ -105,11 +116,16 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
     child.stderr?.on('data', () => {
       // Do not retain document paths or contents in application logs.
     });
-    child.on('close', (code: number | null) => {
+    child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
       if (code === 0 && errorCode === 'PROCESS_FAILED') {
         settle();
       } else {
-        settle(new Error(errorCode));
+        const processError = errorCode === 'PROCESS_FAILED'
+          ? signal
+            ? `ENGINE_SIGNAL_${signal}`
+            : `ENGINE_EXIT_${code ?? 'UNKNOWN'}`
+          : errorCode;
+        settle(new Error(processError));
       }
     });
   });
@@ -119,6 +135,7 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
 }
 
 async function processJob(job: CompressionJob): Promise<void> {
+  const oomKillsBefore = await oomKillCount();
   try {
     if (await isCancellationRequested(job.id)) {
       await rm(getJobInputPath(job.id), { force: true });
@@ -138,7 +155,12 @@ async function processJob(job: CompressionJob): Promise<void> {
   } catch (error) {
     await rm(getJobOutputPath(job.id), { force: true });
     await rm(getJobInputPath(job.id), { force: true });
-    const errorCode = error instanceof Error ? error.message : 'PROCESS_FAILED';
+    const oomKillsAfter = await oomKillCount();
+    const processError = error instanceof Error ? error.message : 'PROCESS_FAILED';
+    const errorCode =
+      oomKillsBefore !== null && oomKillsAfter !== null && oomKillsAfter > oomKillsBefore
+        ? 'MEMORY_LIMIT'
+        : processError;
     await markJobFailed(job.id, errorCode);
     logger.warn('Compression job failed', { jobId: job.id, errorCode });
   }
