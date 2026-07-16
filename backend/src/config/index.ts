@@ -10,6 +10,11 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const nodeEnv = process.env.NODE_ENV || 'development';
 const sessionSecret = process.env.SESSION_SECRET || 'change-me-in-production';
 
+function positiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number.parseInt(value || '', 10);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 if (
   nodeEnv === 'production' &&
   (sessionSecret === 'change-me-in-production' || sessionSecret.length < 32)
@@ -107,6 +112,35 @@ export const config = {
 
   logging: {
     level: process.env.LOG_LEVEL || 'info',
+  },
+
+  compression: {
+    enabled: process.env.SERVER_COMPRESSION_ENABLED === 'true',
+    jobsDir: process.env.COMPRESSION_JOBS_DIR || '/var/lib/igo-jobs',
+    clientThresholdBytes: positiveInteger(
+      process.env.CLIENT_COMPRESSION_MAX_BYTES,
+      100 * 1024 * 1024
+    ),
+    balancedMaxBytes: positiveInteger(
+      process.env.SERVER_BALANCED_MAX_BYTES,
+      500 * 1024 * 1024
+    ),
+    maxUploadBytes: positiveInteger(
+      process.env.SERVER_COMPRESSION_MAX_BYTES,
+      1024 * 1024 * 1024
+    ),
+    jobTimeoutMs: positiveInteger(
+      process.env.COMPRESSION_JOB_TIMEOUT_MS,
+      45 * 60 * 1000
+    ),
+    retentionMs: positiveInteger(
+      process.env.COMPRESSION_RETENTION_MS,
+      15 * 60 * 1000
+    ),
+    workerPollMs: positiveInteger(
+      process.env.COMPRESSION_WORKER_POLL_MS,
+      2000
+    ),
   },
 } as const;
 

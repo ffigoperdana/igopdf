@@ -48,9 +48,48 @@ services:
       LDAP_TLS_REJECT_UNAUTHORIZED: ${LDAP_TLS_REJECT_UNAUTHORIZED:-true}
       LDAP_TLS_CA_FILE: ${LDAP_TLS_CA_FILE:-}
       LDAP_TLS_MIN_VERSION: ${LDAP_TLS_MIN_VERSION:-}
+      SERVER_COMPRESSION_ENABLED: ${SERVER_COMPRESSION_ENABLED:-true}
+      COMPRESSION_JOBS_DIR: /var/lib/igo-jobs
+      CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
+      SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
+      SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
+      COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
+      COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - pdf_jobs:/var/lib/igo-jobs
+    restart: unless-stopped
+
+  pdf-worker:
+    image: ${IGO_BACKEND_IMAGE}
+    command: ['node', 'dist/worker.js']
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+      SERVER_COMPRESSION_ENABLED: ${SERVER_COMPRESSION_ENABLED:-true}
+      COMPRESSION_JOBS_DIR: /var/lib/igo-jobs
+      CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
+      SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
+      SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
+      COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
+      COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pdf_jobs:/var/lib/igo-jobs
+    cpus: 1.5
+    mem_limit: 4g
     restart: unless-stopped
 
   frontend:
@@ -70,3 +109,4 @@ services:
 
 volumes:
   postgres_data:
+  pdf_jobs:

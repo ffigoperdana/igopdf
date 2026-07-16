@@ -34,9 +34,50 @@ services:
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
       MAX_LOGIN_ATTEMPTS: ${MAX_LOGIN_ATTEMPTS:-5}
       LOCKOUT_MINUTES: ${LOCKOUT_MINUTES:-15}
+      SERVER_COMPRESSION_ENABLED: ${SERVER_COMPRESSION_ENABLED:-true}
+      COMPRESSION_JOBS_DIR: /var/lib/igo-jobs
+      CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
+      SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
+      SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
+      COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
+      COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - pdf_jobs:/var/lib/igo-jobs
+    restart: unless-stopped
+
+  pdf-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ['node', 'dist/worker.js']
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-igopdf}
+      DB_USER: ${DB_USER:-igopdf}
+      DB_PASSWORD: ${DB_PASSWORD:-igopdf_password}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      SERVER_COMPRESSION_ENABLED: ${SERVER_COMPRESSION_ENABLED:-true}
+      COMPRESSION_JOBS_DIR: /var/lib/igo-jobs
+      CLIENT_COMPRESSION_MAX_BYTES: ${CLIENT_COMPRESSION_MAX_BYTES:-104857600}
+      SERVER_BALANCED_MAX_BYTES: ${SERVER_BALANCED_MAX_BYTES:-524288000}
+      SERVER_COMPRESSION_MAX_BYTES: ${SERVER_COMPRESSION_MAX_BYTES:-1073741824}
+      COMPRESSION_JOB_TIMEOUT_MS: ${COMPRESSION_JOB_TIMEOUT_MS:-2700000}
+      COMPRESSION_RETENTION_MS: ${COMPRESSION_RETENTION_MS:-900000}
+      COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pdf_jobs:/var/lib/igo-jobs
+    cpus: 1.5
+    mem_limit: 4g
     restart: unless-stopped
 
   frontend:
@@ -58,3 +99,4 @@ services:
 
 volumes:
   postgres_data:
+  pdf_jobs:

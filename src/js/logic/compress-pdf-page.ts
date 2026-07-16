@@ -49,6 +49,33 @@ const PHOTON_PRESETS = {
   extreme: { scale: 1.0, quality: 0.25 },
 };
 
+interface ServerCompressionConfig {
+  enabled: boolean;
+  clientThresholdBytes: number;
+  balancedMaxBytes: number;
+  maxUploadBytes: number;
+}
+
+interface ServerCompressionJob {
+  id: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  errorCode: string | null;
+}
+
+const DEFAULT_SERVER_COMPRESSION_CONFIG: ServerCompressionConfig = {
+  enabled: false,
+  clientThresholdBytes: 100 * 1024 * 1024,
+  balancedMaxBytes: 500 * 1024 * 1024,
+  maxUploadBytes: 1024 * 1024 * 1024,
+};
+
+const PYMUDF_MEMORY_ERROR = /memoryerror|out of memory|fzerror.*memory/i;
+
+function isPyMuPdfMemoryError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return PYMUDF_MEMORY_ERROR.test(message);
+}
+
 async function performCondenseCompression(
   fileBlob: Blob,
   level: string,
@@ -104,6 +131,10 @@ async function performCondenseCompression(
     return result;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
+    if (isPyMuPdfMemoryError(error)) {
+      throw new Error('CONDENSE_MEMORY_LIMIT', { cause: error });
+    }
+
     if (
       errorMessage.includes('PatternType') ||
       errorMessage.includes('pattern')
@@ -151,35 +182,46 @@ async function performPhotonCompression(
     PHOTON_PRESETS[level as keyof typeof PHOTON_PRESETS] ||
     PHOTON_PRESETS.balanced;
 
-  for (let i = 1; i <= pdfJsDoc.numPages; i++) {
-    const page = await pdfJsDoc.getPage(i);
-    const viewport = page.getViewport({ scale: settings.scale });
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+  try {
+    for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+      const page = await pdfJsDoc.getPage(i);
+      const viewport = page.getViewport({ scale: settings.scale });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Could not create a canvas for this PDF');
 
-    await page.render({ canvasContext: context, viewport, canvas: canvas })
-      .promise;
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-    const jpegBlob = await new Promise<Blob>((resolve) =>
-      canvas.toBlob(
-        (blob) => resolve(blob as Blob),
-        'image/jpeg',
-        settings.quality
-      )
-    );
-    const jpegBytes = await jpegBlob.arrayBuffer();
-    const jpegImage = await newPdfDoc.embedJpg(jpegBytes);
-    const newPage = newPdfDoc.addPage([viewport.width, viewport.height]);
-    newPage.drawImage(jpegImage, {
-      x: 0,
-      y: 0,
-      width: viewport.width,
-      height: viewport.height,
-    });
+      await page.render({ canvasContext: context, viewport, canvas }).promise;
+
+      const jpegBlob = await new Promise<Blob>((resolve, reject) =>
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Could not encode this PDF page'));
+          },
+          'image/jpeg',
+          settings.quality
+        )
+      );
+      canvas.width = 0;
+      canvas.height = 0;
+
+      const jpegBytes = await jpegBlob.arrayBuffer();
+      const jpegImage = await newPdfDoc.embedJpg(jpegBytes);
+      const newPage = newPdfDoc.addPage([viewport.width, viewport.height]);
+      newPage.drawImage(jpegImage, {
+        x: 0,
+        y: 0,
+        width: viewport.width,
+        height: viewport.height,
+      });
+    }
+    return await newPdfDoc.save();
+  } finally {
+    await pdfJsDoc.destroy();
   }
-  return await newPdfDoc.save();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -202,8 +244,115 @@ document.addEventListener('DOMContentLoaded', () => {
   const customSettingsChevron = document.getElementById(
     'custom-settings-chevron'
   );
+  const grayscaleSettings = document.getElementById('grayscale-settings');
+  const advancedSettings = document.getElementById('advanced-settings');
+  const serverStatus = document.getElementById('server-compression-status');
+  const serverStatusText = document.getElementById(
+    'server-compression-status-text'
+  );
+  const cancelServerCompressionBtn = document.getElementById(
+    'cancel-server-compression'
+  ) as HTMLButtonElement | null;
+  const serverCompressionNotice = document.getElementById(
+    'server-compression-notice'
+  );
+
+  const clientAlgorithmOptions = algorithmSelect.innerHTML;
+  const clientLevelOptions = (
+    document.getElementById('compression-level') as HTMLSelectElement
+  ).innerHTML;
+  let serverConfig = { ...DEFAULT_SERVER_COMPRESSION_CONFIG };
+  let activeServerJobId: string | null = null;
+  let serverJobCancelled = false;
 
   let useCustomSettings = false;
+
+  const getLargeFile = (): File | null => {
+    if (state.files.length !== 1) return null;
+    const [file] = state.files;
+    return file.size > serverConfig.clientThresholdBytes ? file : null;
+  };
+
+  const setServerStatus = (text: string, cancellable: boolean) => {
+    if (!serverStatus || !serverStatusText) return;
+    serverStatusText.textContent = text;
+    serverStatus.classList.remove('hidden');
+    cancelServerCompressionBtn?.classList.toggle('hidden', !cancellable);
+  };
+
+  const clearServerStatus = () => {
+    activeServerJobId = null;
+    serverJobCancelled = false;
+    serverStatus?.classList.add('hidden');
+    cancelServerCompressionBtn?.classList.add('hidden');
+  };
+
+  const updateCompressionControls = () => {
+    const largeFile = getLargeFile();
+    const compressionLevel = document.getElementById(
+      'compression-level'
+    ) as HTMLSelectElement;
+
+    if (!largeFile) {
+      algorithmSelect.innerHTML = clientAlgorithmOptions;
+      compressionLevel.innerHTML = clientLevelOptions;
+      compressionLevel.disabled = false;
+      grayscaleSettings?.classList.remove('hidden');
+      advancedSettings?.classList.remove('hidden');
+      condenseInfo?.classList.remove('hidden');
+      photonInfo?.classList.add('hidden');
+      serverCompressionNotice?.classList.add('hidden');
+      processBtn?.removeAttribute('disabled');
+      return;
+    }
+
+    if (!serverConfig.enabled) {
+      algorithmSelect.innerHTML = '<option value="server-unavailable">Server queue unavailable</option>';
+      algorithmSelect.disabled = true;
+      compressionLevel.innerHTML = '<option>Unavailable</option>';
+      compressionLevel.disabled = true;
+      grayscaleSettings?.classList.add('hidden');
+      advancedSettings?.classList.add('hidden');
+      condenseInfo?.classList.add('hidden');
+      photonInfo?.classList.add('hidden');
+      serverCompressionNotice?.classList.add('hidden');
+      processBtn?.setAttribute('disabled', 'true');
+      return;
+    }
+
+    const balancedAllowed = largeFile.size <= serverConfig.balancedMaxBytes;
+    algorithmSelect.innerHTML = balancedAllowed
+      ? '<option value="server-lossless">Lossless (Server)</option><option value="server-balanced">Balanced (Server)</option>'
+      : '<option value="server-lossless">Lossless (Server)</option>';
+    algorithmSelect.disabled = false;
+    compressionLevel.innerHTML = '<option value="light">Server-managed</option>';
+    compressionLevel.disabled = true;
+    grayscaleSettings?.classList.add('hidden');
+    advancedSettings?.classList.add('hidden');
+    condenseInfo?.classList.add('hidden');
+    photonInfo?.classList.add('hidden');
+    serverCompressionNotice?.classList.remove('hidden');
+    processBtn?.removeAttribute('disabled');
+  };
+
+  const fetchServerCompressionConfig = async () => {
+    try {
+      const response = await fetch('/api/compression/config', {
+        credentials: 'include',
+      });
+      const payload = (await response.json()) as {
+        success?: boolean;
+        data?: Partial<ServerCompressionConfig>;
+      };
+      if (response.ok && payload.success && payload.data) {
+        serverConfig = { ...serverConfig, ...payload.data };
+      }
+    } catch {
+      // A large file remains blocked if the authenticated server cannot be reached.
+    } finally {
+      updateCompressionControls();
+    }
+  };
 
   if (backBtn) {
     backBtn.addEventListener('click', () => {
@@ -214,7 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Toggle algorithm info
   if (algorithmSelect && condenseInfo && photonInfo) {
     algorithmSelect.addEventListener('change', () => {
-      if (algorithmSelect.value === 'condense') {
+      if (algorithmSelect.value.startsWith('server-')) {
+        condenseInfo.classList.add('hidden');
+        photonInfo.classList.add('hidden');
+      } else if (algorithmSelect.value === 'condense') {
         condenseInfo.classList.remove('hidden');
         photonInfo.classList.add('hidden');
       } else {
@@ -283,11 +435,13 @@ document.addEventListener('DOMContentLoaded', () => {
         createIcons({ icons });
       }
       compressOptions.classList.remove('hidden');
+      updateCompressionControls();
     } else {
       compressOptions.classList.add('hidden');
       // Clear file display area
       const fileDisplayArea = document.getElementById('file-display-area');
       if (fileDisplayArea) fileDisplayArea.innerHTML = '';
+      updateCompressionControls();
     }
   };
 
@@ -338,7 +492,105 @@ document.addEventListener('DOMContentLoaded', () => {
     if (condenseInfo) condenseInfo.classList.remove('hidden');
     if (photonInfo) photonInfo.classList.add('hidden');
 
+    clearServerStatus();
     updateUI();
+  };
+
+  const readApiError = async (response: Response): Promise<string> => {
+    try {
+      const payload = (await response.json()) as { error?: string };
+      return payload.error || 'Server compression could not be started';
+    } catch {
+      return 'Server compression could not be started';
+    }
+  };
+
+  const wait = (ms: number) =>
+    new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+  const downloadServerResult = async (jobId: string, file: File) => {
+    const response = await fetch(`/api/compression/jobs/${jobId}/download`, {
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error(await readApiError(response));
+    const result = await response.blob();
+    const outputName = file.name.replace(/\.pdf$/i, '_compressed.pdf');
+    downloadFile(result, outputName);
+  };
+
+  const runServerCompression = async (file: File) => {
+    if (!serverConfig.enabled) {
+      throw new Error('Server-side compression is currently unavailable');
+    }
+    if (file.size > serverConfig.maxUploadBytes) {
+      throw new Error('Ukuran maksimum untuk kompresi adalah 1 GB');
+    }
+
+    const mode = algorithmSelect.value === 'server-balanced' ? 'balanced' : 'lossless';
+    showLoader('Uploading PDF to the protected server queue...');
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('mode', mode);
+
+    const response = await fetch('/api/compression/jobs', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    });
+    if (!response.ok) throw new Error(await readApiError(response));
+
+    const payload = (await response.json()) as {
+      data?: { job?: ServerCompressionJob; queuePosition?: number | null };
+    };
+    const job = payload.data?.job;
+    if (!job) throw new Error('Server did not create a compression job');
+
+    activeServerJobId = job.id;
+    hideLoader();
+
+    while (activeServerJobId === job.id && !serverJobCancelled) {
+      const statusResponse = await fetch(`/api/compression/jobs/${job.id}`, {
+        credentials: 'include',
+      });
+      if (!statusResponse.ok) throw new Error(await readApiError(statusResponse));
+      const statusPayload = (await statusResponse.json()) as {
+        data?: { job?: ServerCompressionJob; queuePosition?: number | null };
+      };
+      const current = statusPayload.data?.job;
+      if (!current) throw new Error('Server job status is unavailable');
+
+      if (current.status === 'queued') {
+        const position = statusPayload.data?.queuePosition;
+        setServerStatus(
+          position && position > 1
+            ? `Waiting in server queue. Position ${position}.`
+            : 'Waiting for the server worker to start compression.',
+          true
+        );
+      } else if (current.status === 'processing') {
+        setServerStatus('Compressing on the server. Keep this page open.', true);
+      } else if (current.status === 'completed') {
+        setServerStatus('Preparing secure download...', false);
+        await downloadServerResult(job.id, file);
+        clearServerStatus();
+        showAlert(
+          'Compression Complete',
+          'The server-side compression result has been downloaded. The temporary server files have been removed.',
+          'success',
+          () => resetState()
+        );
+        return;
+      } else if (current.status === 'cancelled') {
+        throw new Error('Server compression was cancelled');
+      } else {
+        const detail = current.errorCode === 'TIMEOUT'
+          ? 'The server reached its processing time limit.'
+          : 'The server could not compress this PDF.';
+        throw new Error(detail);
+      }
+      await wait(2000);
+    }
+    if (serverJobCancelled) throw new Error('Server compression was cancelled');
   };
 
   const compress = async () => {
@@ -404,6 +656,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (state.files.length === 0) {
         showAlert('No Files', 'Please select at least one PDF file.');
         hideLoader();
+        return;
+      }
+
+      const serverFile = getLargeFile();
+      if (serverFile) {
+        await runServerCompression(serverFile);
         return;
       }
 
@@ -552,7 +810,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e: unknown) {
       hideLoader();
+      clearServerStatus();
       console.error('[CompressPDF] Error:', e);
+      if (
+        e instanceof Error &&
+        (e.message === 'CONDENSE_MEMORY_LIMIT' || isPyMuPdfMemoryError(e))
+      ) {
+        showAlert(
+          'PDF terlalu besar atau kompleks untuk Condense',
+          'PDF tidak diubah. Pilih Photon untuk memproses dokumen ini dengan kebutuhan memori yang lebih stabil. Photon mengubah setiap halaman menjadi gambar, sehingga teks dan tautan tidak lagi dapat dipilih.'
+        );
+        return;
+      }
       showAlert(
         'Error',
         `An error occurred during compression. Error: ${e instanceof Error ? e.message : String(e)}`
@@ -561,10 +830,33 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const handleFileSelect = (files: FileList | null) => {
-    if (files && files.length > 0) {
-      state.files = [...state.files, ...Array.from(files)];
-      updateUI();
+    if (!files || files.length === 0) return;
+
+    const selectedFiles = Array.from(files);
+    const tooLarge = selectedFiles.find(
+      (file) => file.size > serverConfig.maxUploadBytes
+    );
+    if (tooLarge) {
+      showAlert(
+        'File too large',
+        'Ukuran maksimum untuk kompresi adalah 1 GB. File tidak diunggah atau diproses.'
+      );
+      return;
     }
+
+    const includesServerFile = selectedFiles.some(
+      (file) => file.size > serverConfig.clientThresholdBytes
+    );
+    if (includesServerFile && (selectedFiles.length > 1 || state.files.length > 0)) {
+      showAlert(
+        'One large PDF at a time',
+        'PDF di atas 100 MB diproses melalui antrean server. Pilih satu file besar dalam satu proses.'
+      );
+      return;
+    }
+
+    state.files = [...state.files, ...selectedFiles];
+    updateUI();
   };
 
   if (fileInput && dropZone) {
@@ -615,7 +907,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (cancelServerCompressionBtn) {
+    cancelServerCompressionBtn.addEventListener('click', async () => {
+      if (!activeServerJobId) return;
+      cancelServerCompressionBtn.disabled = true;
+      try {
+        await fetch(`/api/compression/jobs/${activeServerJobId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        serverJobCancelled = true;
+        setServerStatus('Cancellation requested. Cleaning up the temporary server files...', false);
+      } finally {
+        cancelServerCompressionBtn.disabled = false;
+      }
+    });
+  }
+
   if (processBtn) {
     processBtn.addEventListener('click', compress);
   }
+
+  void fetchServerCompressionConfig();
 });

@@ -229,6 +229,7 @@
 
           <!-- Grayscale toggle - always visible -->
           <div
+            id="grayscale-settings"
             class="flex items-center gap-3 p-3 bg-surface-raised rounded-lg border border-line"
           >
             <input
@@ -248,7 +249,7 @@
             </div>
           </div>
 
-          <div>
+          <div id="advanced-settings">
             <button
               id="toggle-custom-settings"
               type="button"
@@ -356,6 +357,28 @@
                 </label>
               </div>
             </div>
+          </div>
+
+          <div
+            id="server-compression-notice"
+            class="hidden rounded-lg border border-palm-500/40 bg-palm-500/10 p-3 text-sm text-content-muted"
+          >
+            This large PDF will be processed in the private server queue. The original and result are deleted automatically after download or expiry.
+          </div>
+
+          <div
+            id="server-compression-status"
+            class="hidden p-4 rounded-lg border border-line bg-surface-muted"
+            role="status"
+          >
+            <p id="server-compression-status-text" class="text-sm text-content"></p>
+            <button
+              id="cancel-server-compression"
+              type="button"
+              class="hidden mt-3 text-sm font-medium text-red-400 hover:text-red-300"
+            >
+              Cancel queued job
+            </button>
           </div>
 
           <button id="process-btn" class="btn-gradient w-full mt-4">

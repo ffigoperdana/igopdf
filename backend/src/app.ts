@@ -11,6 +11,7 @@ import userRoutes from './routes/users.js';
 import adminRoutes from './routes/admin.js';
 import usageRoutes from './routes/usage.js';
 import reportRoutes from './routes/reports.js';
+import compressionRoutes from './routes/compression.js';
 import { cleanupExpiredSessions } from './services/authService.js';
 import { cleanupExpiredCaptchas } from './services/captchaService.js';
 import { logger } from './utils/logger.js';
@@ -40,6 +41,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/usage', usageRoutes);
 app.use('/api/admin/reports', reportRoutes);
+app.use('/api/compression', compressionRoutes);
 
 app.get('/health', (_req, res) => {
   // Minimal liveness only. Don't leak uptime/timestamp (reveals last

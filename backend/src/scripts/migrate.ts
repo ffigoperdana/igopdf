@@ -120,6 +120,32 @@ const migrations = [
       CREATE INDEX IF NOT EXISTS idx_usage_events_username ON usage_events(username);
     `,
   },
+  {
+    name: '006_compression_jobs',
+    sql: `
+      CREATE TABLE IF NOT EXISTS compression_jobs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        input_bytes BIGINT NOT NULL CHECK (input_bytes > 0),
+        mode VARCHAR(20) NOT NULL CHECK (mode IN ('lossless', 'balanced')),
+        status VARCHAR(20) NOT NULL DEFAULT 'queued'
+          CHECK (status IN ('queued', 'processing', 'completed', 'failed', 'cancelled', 'expired')),
+        error_code VARCHAR(80),
+        cancel_requested BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        started_at TIMESTAMPTZ,
+        completed_at TIMESTAMPTZ,
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_compression_jobs_queue
+        ON compression_jobs (status, created_at)
+        WHERE status = 'queued';
+      CREATE INDEX IF NOT EXISTS idx_compression_jobs_user
+        ON compression_jobs (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_compression_jobs_expiry
+        ON compression_jobs (expires_at);
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {
