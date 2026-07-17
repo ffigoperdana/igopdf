@@ -1,42 +1,48 @@
 ---
 title: PDF to Word
-description: Convert PDF files to editable Word (DOCX) documents. Supports batch conversion of multiple PDFs at once.
+description: Convert internal PDF files to DOCX using browser conversion or a private, temporary IGO server job.
 ---
 
 # PDF to Word
 
-Converts PDF files to editable Word (`.docx`) documents. The tool uses PyMuPDF to reconstruct the document content, preserving text, basic formatting, and layout. Supports single and batch conversion.
+IGO offers three DOCX conversion modes selected after the PDF is inspected. The tool samples up to five pages locally to identify whether the document contains a usable text layer, mixed content, or scanned/image-only pages.
 
-## How It Works
+## Conversion Modes
 
-1. Upload one or more PDFs by clicking the drop zone or dragging files onto it. You can add more files or remove individual ones from the list.
-2. Click **Convert** to start processing.
-3. A single file downloads as `filename.docx`. Multiple files are packaged into `converted-documents.zip`.
+- **Auto**: uses editable conversion for native-text PDFs and OCR for image-based or mixed PDFs.
+- **Editable text**: reconstructs Word paragraphs, basic formatting, and layout from the PDF text layer. It is the best option for office PDFs exported from Word, PowerPoint, or similar applications.
+- **OCR text**: renders each page and recognizes Indonesian and English text. This helps with scanned documents, but spelling, tables, and positions need review.
+- **Visual layout**: places each PDF page as an image in DOCX. This preserves the page appearance most reliably, but the page content is not editable as Word text.
 
-## Options
+## Private Processing
 
-This tool has no configurable options. Each PDF is converted to DOCX using PyMuPDF's built-in conversion engine.
+Small native-text PDFs are converted in the browser. OCR, repair fallback, visual-layout conversion, and files that exceed the browser threshold are processed on the private IGO server.
 
-## Output Format
+Server conversion uses resumable, chunked upload and a single heavy-job queue shared with server-side compression. Source PDFs and generated DOCX files are stored only in the private job volume, scoped to the signed-in user, and deleted automatically after download or the configured retention period. No file is sent to an external conversion service.
 
-- **Single file**: `filename.docx`
-- **Multiple files**: `converted-documents.zip` containing one `.docx` per input PDF.
+## Limits
 
-## Use Cases
+- Maximum PDF size for this deployment: **50 MB per file**.
+- Editable mode: up to **200 pages**.
+- OCR and visual-layout modes: up to **100 pages**.
+- Server conversion processes one PDF at a time. A later job remains queued until the current heavy job, including server-side compression, has completed.
 
-- Editing text in a PDF that you received and need to modify.
-- Converting archived PDF reports into a format that colleagues can edit in Microsoft Word or Google Docs.
-- Pulling content from PDF contracts or proposals into Word for redlining.
-- Migrating legacy PDF documentation into an editable format.
+These limits protect the 2 vCPU / 6 GB production VM. A complex scanned PDF can require substantially more memory than its original file size suggests.
 
-## Tips
+## Quality Expectations
 
-- Complex layouts with multi-column text, embedded forms, or heavy graphics may not convert perfectly. Review the output and adjust formatting in your word processor.
-- Scanned PDFs (image-only) will produce empty or minimal DOCX files. Run them through OCR first to add a text layer.
-- Batch mode is efficient for converting entire folders of PDFs -- upload them all at once.
+- DOCX is a reconstruction, not the original source file. Review fonts, tables, page breaks, spacing, and complex layout after conversion.
+- A scanned PDF does not contain editable text. Use **OCR text** when editable text is required, or **Visual layout** when appearance is more important.
+- Some PDFs contain invalid font references or damaged cross-reference data. IGO automatically attempts a safe repair for editable conversion; if it still fails, use OCR or visual layout, or export the PDF again from the source application.
+
+## Output
+
+- A single PDF downloads as `filename.docx`.
+- Browser mode can convert a batch of compatible native-text PDFs into `converted-documents.zip`.
+- Server modes intentionally process one PDF per job to preserve predictable memory usage and queue order.
 
 ## Related Tools
 
+- [OCR PDF](./ocr-pdf)
 - [PDF to Text](./pdf-to-text)
-- [PDF to Markdown](./pdf-to-markdown)
-- [PDF Workflow Builder](./pdf-workflow)
+- [Edit PDF](./edit-pdf)

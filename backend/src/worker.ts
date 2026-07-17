@@ -16,6 +16,10 @@ import {
   type CompressionJob,
 } from './services/compressionJobService.js';
 import { logger } from './utils/logger.js';
+import {
+  releaseHeavyJobLock,
+  tryAcquireHeavyJobLock,
+} from './services/heavyJobLockService.js';
 
 let stopping = false;
 let running = false;
@@ -189,8 +193,15 @@ async function tick(): Promise<void> {
   try {
     await cleanupExpiredUploadSlots();
     await cleanupExpiredJobs();
-    const job = await claimNextJob();
-    if (job) await processJob(job);
+    const lock = await tryAcquireHeavyJobLock();
+    if (lock) {
+      try {
+        const job = await claimNextJob();
+        if (job) await processJob(job);
+      } finally {
+        await releaseHeavyJobLock(lock);
+      }
+    }
   } catch (error) {
     logger.error(
       'Compression worker tick failed',

@@ -195,6 +195,51 @@ const migrations = [
         ON compression_upload_slots (last_activity_at);
     `,
   },
+  {
+    name: '009_docx_conversion_jobs',
+    sql: `
+      CREATE TABLE IF NOT EXISTS docx_jobs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        input_bytes BIGINT NOT NULL CHECK (input_bytes > 0),
+        mode VARCHAR(20) NOT NULL CHECK (mode IN ('editable', 'ocr', 'visual')),
+        status VARCHAR(20) NOT NULL DEFAULT 'queued'
+          CHECK (status IN ('queued', 'processing', 'completed', 'failed', 'cancelled', 'expired')),
+        stage VARCHAR(40) NOT NULL DEFAULT 'queued',
+        progress SMALLINT NOT NULL DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
+        current_page INTEGER,
+        total_pages INTEGER,
+        error_code VARCHAR(80),
+        cancel_requested BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        started_at TIMESTAMPTZ,
+        completed_at TIMESTAMPTZ,
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_docx_jobs_queue
+        ON docx_jobs (status, created_at) WHERE status = 'queued';
+      CREATE INDEX IF NOT EXISTS idx_docx_jobs_user
+        ON docx_jobs (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_docx_jobs_expiry ON docx_jobs (expires_at);
+
+      CREATE TABLE IF NOT EXISTS docx_upload_slots (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        mode VARCHAR(20) NOT NULL CHECK (mode IN ('editable', 'ocr', 'visual')),
+        status VARCHAR(20) NOT NULL DEFAULT 'ready'
+          CHECK (status IN ('ready', 'uploading', 'processing')),
+        job_id UUID REFERENCES docx_jobs(id) ON DELETE SET NULL,
+        input_bytes BIGINT NOT NULL CHECK (input_bytes > 0),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_docx_upload_slots_user
+        ON docx_upload_slots (user_id);
+      CREATE INDEX IF NOT EXISTS idx_docx_upload_slots_expiry
+        ON docx_upload_slots (expires_at);
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {

@@ -17,6 +17,8 @@ import usageRoutes from './routes/usage.js';
 import reportRoutes from './routes/reports.js';
 import compressionRoutes from './routes/compression.js';
 import { compressionTusServer } from './services/compressionTusService.js';
+import docxRoutes from './routes/docx.js';
+import { docxTusServer } from './services/docxTusService.js';
 import { cleanupExpiredSessions } from './services/authService.js';
 import { cleanupExpiredCaptchas } from './services/captchaService.js';
 import { logger } from './utils/logger.js';
@@ -51,10 +53,20 @@ app.all(
   }
 );
 
+app.all(
+  ['/api/docx/uploads', '/api/docx/uploads/*'],
+  authMiddleware,
+  compressionUploadLimiter,
+  (req, res, next) => {
+    void docxTusServer.handle(req, res).catch(next);
+  }
+);
+
 // Compression control/status polling has its own authenticated limiter. Keep
 // it outside the general API bucket so a long-running job cannot exhaust the
 // user's normal API allowance.
 app.use('/api/compression', compressionRoutes);
+app.use('/api/docx', docxRoutes);
 
 app.use('/api', apiLimiter);
 

@@ -159,6 +159,51 @@ export const config = {
     ),
     workerPollMs: positiveInteger(process.env.COMPRESSION_WORKER_POLL_MS, 2000),
   },
+
+  docx: {
+    enabled: process.env.SERVER_DOCX_ENABLED === 'true',
+    jobsDir: process.env.DOCX_JOBS_DIR || '/var/lib/igo-jobs',
+    clientMaxBytes: positiveInteger(
+      process.env.DOCX_CLIENT_MAX_BYTES,
+      50 * 1024 * 1024
+    ),
+    maxUploadBytes: positiveInteger(
+      process.env.DOCX_MAX_UPLOAD_BYTES,
+      50 * 1024 * 1024
+    ),
+    nativeMaxPages: positiveInteger(process.env.DOCX_NATIVE_MAX_PAGES, 200),
+    ocrMaxPages: positiveInteger(process.env.DOCX_OCR_MAX_PAGES, 100),
+    visualMaxPages: positiveInteger(process.env.DOCX_VISUAL_MAX_PAGES, 100),
+    uploadChunkBytes: positiveInteger(
+      process.env.DOCX_UPLOAD_CHUNK_BYTES,
+      10 * 1024 * 1024
+    ),
+    uploadIdleTimeoutMs: positiveInteger(
+      process.env.DOCX_UPLOAD_IDLE_TIMEOUT_MS,
+      30 * 60 * 1000
+    ),
+    uploadMaxAgeMs: positiveInteger(
+      process.env.DOCX_UPLOAD_MAX_AGE_MS,
+      3 * 60 * 60 * 1000
+    ),
+    diskHeadroomMultiplier: positiveInteger(
+      process.env.DOCX_DISK_HEADROOM_MULTIPLIER,
+      3
+    ),
+    diskMinimumFreeBytes: positiveInteger(
+      process.env.DOCX_DISK_MINIMUM_FREE_BYTES,
+      1024 * 1024 * 1024
+    ),
+    jobTimeoutMs: positiveInteger(
+      process.env.DOCX_JOB_TIMEOUT_MS,
+      45 * 60 * 1000
+    ),
+    retentionMs: positiveInteger(
+      process.env.DOCX_RETENTION_MS,
+      15 * 60 * 1000
+    ),
+    workerPollMs: positiveInteger(process.env.DOCX_WORKER_POLL_MS, 2000),
+  },
 } as const;
 
 export type Config = typeof config;
