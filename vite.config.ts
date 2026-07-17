@@ -509,6 +509,16 @@ export default defineConfig(() => {
       src: 'node_modules/embedpdf-snippet/dist/pdfium.wasm',
       dest: 'embedpdf',
     },
+    // OCR's worker and WASM core must be same-origin. Tesseract otherwise
+    // defaults to jsDelivr, which is intentionally blocked by IGO's CSP.
+    {
+      src: 'node_modules/tesseract.js/dist/worker.min.js',
+      dest: 'ocr',
+    },
+    {
+      src: 'node_modules/tesseract.js-core/*',
+      dest: 'ocr/core',
+    },
     // Self-hosted WASM modules for offline / air-gapped deployment. Copied from
     // node_modules into /wasm/* so PyMuPDF + Ghostscript load same-origin with no
     // external CDN. CoherentPDF is already bundled at public/coherentpdf.browser.min.js.

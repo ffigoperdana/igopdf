@@ -1,0 +1,78 @@
+<aside id="igo-floating-news" class="floating-news" aria-label="Info IGO">
+  <section id="floating-news-panel" class="floating-news__panel" aria-hidden="true" aria-labelledby="floating-news-title">
+    <div class="floating-news__panel-header">
+      <div>
+        <p class="floating-news__eyebrow" data-i18n="floatingNews.eyebrow">Info IGO</p>
+        <h2 id="floating-news-title" class="floating-news__title" data-i18n="floatingNews.title">Info dan bantuan</h2>
+      </div>
+      <button id="floating-news-close" class="floating-news__icon-button" type="button" aria-label="Tutup informasi" data-i18n-aria-label="floatingNews.close">
+        <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="floating-news__viewport">
+      <div id="floating-news-track" class="floating-news__track">
+        <article class="floating-news__slide floating-news__slide--gratification" aria-label="Kampanye anti gratifikasi">
+          <div class="floating-news__poster-frame">
+            <img src="/images/gratifikasi-bpdp.png" alt="Kampanye BPDP Tolak dan Laporkan Gratifikasi" data-i18n-alt="floatingNews.gratification.posterAlt" />
+          </div>
+          <div class="floating-news__slide-copy">
+            <p class="floating-news__slide-title" data-i18n="floatingNews.gratification.title">Tolak dan laporkan gratifikasi</p>
+            <p class="floating-news__slide-text" data-i18n="floatingNews.gratification.description">Jaga integritas layanan BPDP. Tolak pemberian yang berkaitan dengan jabatan atau layanan.</p>
+          </div>
+          <div class="floating-news__report-links">
+            <a class="floating-news__report-primary" href="https://www.wise.kemenkeu.go.id/" target="_blank" rel="noopener noreferrer">
+              <span data-i18n="floatingNews.gratification.report">Tolak dan laporkan</span>
+              <i data-lucide="arrow-up-right" class="h-4 w-4" aria-hidden="true"></i>
+            </a>
+            <div class="floating-news__report-tags">
+              <a href="https://www.wise.kemenkeu.go.id/" target="_blank" rel="noopener noreferrer">wise.kemenkeu.go.id</a>
+              <a href="https://pengaduandjpb.kemenkeu.go.id/sipandu/" target="_blank" rel="noopener noreferrer">pengaduandjpb.kemenkeu.go.id</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="floating-news__slide floating-news__slide--compact" aria-label="Pembaruan IGO">
+          <div class="floating-news__update-icon" aria-hidden="true"><i data-lucide="sparkles" class="h-5 w-5"></i></div>
+          <div class="floating-news__slide-copy floating-news__slide-copy--roomy">
+            <p class="floating-news__slide-title" data-i18n="floatingNews.updates.title">IGO updates v1.1</p>
+            <p class="floating-news__slide-text" data-i18n="floatingNews.updates.description">Kemampuan baru yang membantu pengolahan dokumen internal.</p>
+          </div>
+          <ul class="floating-news__update-list">
+            <li data-i18n="floatingNews.updates.itemOne">Kompresi PDF besar memakai antrean dan progres unggah.</li>
+            <li data-i18n="floatingNews.updates.itemTwo">PDF Editor mendukung anotasi dan pengeditan teks visual.</li>
+            <li data-i18n="floatingNews.updates.itemThree">PDF ke Word menyediakan mode teks, OCR, dan pertahankan tampilan.</li>
+          </ul>
+        </article>
+
+        <article class="floating-news__slide floating-news__slide--compact" aria-label="Bantuan IGO">
+          <div class="floating-news__update-icon" aria-hidden="true"><i data-lucide="life-buoy" class="h-5 w-5"></i></div>
+          <div class="floating-news__slide-copy floating-news__slide-copy--roomy">
+            <p class="floating-news__slide-title" data-i18n="floatingNews.help.title">Butuh bantuan?</p>
+            <p class="floating-news__slide-text" data-i18n="floatingNews.help.description">Laporkan kendala, bug, atau pertanyaan penggunaan kepada administrator IGO.</p>
+          </div>
+          <div class="floating-news__help-links">
+            <a href="mailto:figo.putra@bpdp.or.id"><i data-lucide="mail" class="h-4 w-4" aria-hidden="true"></i><span>figo.putra@bpdp.or.id</span></a>
+            <a href="https://wa.me/6281216195308" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle" class="h-4 w-4" aria-hidden="true"></i><span>081216195308</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="floating-news__footer">
+      <div class="floating-news__pagination" aria-live="polite"><span id="floating-news-position">1 / 3</span></div>
+      <div class="floating-news__nav-actions">
+        <button id="floating-news-prev" class="floating-news__icon-button" type="button" aria-label="Kartu sebelumnya" data-i18n-aria-label="floatingNews.previous"><i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i></button>
+        <button id="floating-news-next" class="floating-news__icon-button" type="button" aria-label="Kartu berikutnya" data-i18n-aria-label="floatingNews.next"><i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <button id="floating-news-toggle" class="floating-news__fab" type="button" aria-expanded="false" aria-controls="floating-news-panel">
+    <span class="floating-news__fab-label" data-i18n="floatingNews.fabLabel">Info IGO</span>
+    <span class="floating-news__fab-icon">
+      <i class="floating-news__open-icon" data-lucide="bell-ring" aria-hidden="true"></i>
+      <i class="floating-news__close-icon" data-lucide="x" aria-hidden="true"></i>
+    </span>
+  </button>
+</aside>

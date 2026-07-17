@@ -10,6 +10,7 @@ const PDF_WORKER_URL = new URL(
   import.meta.url
 ).toString();
 import '../css/styles.css';
+import '../css/floating-news.css';
 import { escapeHtml, formatShortcutDisplay } from './utils/helpers-light.js';
 import {
   initI18n,
@@ -26,6 +27,7 @@ import {
 import { initAuth, requireAuth, getUser } from './auth/guard.js';
 import { initTheme, createThemeToggle } from './theme.js';
 import { initPwaInstallPrompt } from './pwa-install.js';
+import { initFloatingNews } from './floating-news.js';
 declare const __BRAND_NAME__: string;
 
 // Lucide is loaded lazily (its own chunk) so its full icon set stays out of the
@@ -109,6 +111,7 @@ const init = async () => {
 
   // Logged in → offer the one-time "install as app" prompt (shows once, ever).
   initPwaInstallPrompt();
+  initFloatingNews();
 
   // Usage beacon for the admin Reports dashboard: record which tool page this
   // authed user opened. Shell pages are skipped; fire-and-forget.

@@ -47,10 +47,14 @@ describe('tesseract-runtime', () => {
     expect(hasCompleteTesseractOverrides(config)).toBe(true);
   });
 
-  it('returns logger-only options when no self-hosted OCR assets are configured', () => {
+  it('uses IGO-hosted worker and core assets when no overrides are configured', () => {
     const logger = vi.fn();
 
-    expect(buildTesseractWorkerOptions(logger, {})).toEqual({ logger });
+    expect(buildTesseractWorkerOptions(logger, {})).toEqual({
+      logger,
+      workerPath: '/ocr/worker.min.js',
+      corePath: '/ocr/core',
+    });
     expect(
       hasConfiguredTesseractOverrides(resolveTesseractAssetConfig({}))
     ).toBe(false);

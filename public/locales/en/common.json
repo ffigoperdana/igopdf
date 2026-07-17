@@ -523,5 +523,30 @@
     "faq5A": "Report it to the administrator via the email or phone number listed in the contact section below.",
     "contactTitle": "Need help?",
     "contactIntro": "If you have any issues, bugs, or questions about using igo, contact the administrator:"
+  },
+  "floatingNews": {
+    "eyebrow": "IGO info",
+    "title": "Information and help",
+    "fabLabel": "IGO info",
+    "close": "Close information",
+    "previous": "Previous card",
+    "next": "Next card",
+    "gratification": {
+      "posterAlt": "BPDP Refuse and Report Gratuities campaign",
+      "title": "Refuse and report gratuities",
+      "description": "Protect BPDP service integrity. Refuse gifts connected to a position or service.",
+      "report": "Refuse and report"
+    },
+    "updates": {
+      "title": "IGO updates v1.1",
+      "description": "New capabilities for internal document processing.",
+      "itemOne": "Large PDF compression now uses a queue and upload progress.",
+      "itemTwo": "PDF Editor supports annotations and visual text editing.",
+      "itemThree": "PDF to Word offers text, OCR, and preserve-appearance modes."
+    },
+    "help": {
+      "title": "Need help?",
+      "description": "Report issues, bugs, or usage questions to the IGO administrator."
+    }
   }
 }

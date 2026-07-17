@@ -523,5 +523,30 @@
     "faq5A": "Laporkan ke administrator melalui email atau telepon yang tercantum di bagian kontak di bawah.",
     "contactTitle": "Butuh bantuan?",
     "contactIntro": "Jika ada kendala, bug, atau pertanyaan seputar penggunaan igo, hubungi administrator:"
+  },
+  "floatingNews": {
+    "eyebrow": "Info IGO",
+    "title": "Informasi dan bantuan",
+    "fabLabel": "Info IGO",
+    "close": "Tutup informasi",
+    "previous": "Kartu sebelumnya",
+    "next": "Kartu berikutnya",
+    "gratification": {
+      "posterAlt": "Kampanye BPDP Tolak dan Laporkan Gratifikasi",
+      "title": "Tolak dan laporkan gratifikasi",
+      "description": "Jaga integritas layanan BPDP. Tolak pemberian yang berkaitan dengan jabatan atau layanan.",
+      "report": "Tolak dan laporkan"
+    },
+    "updates": {
+      "title": "Pembaruan IGO v1.1",
+      "description": "Kemampuan baru yang membantu pengolahan dokumen internal.",
+      "itemOne": "Kompresi PDF besar memakai antrean dan progres unggah.",
+      "itemTwo": "PDF Editor mendukung anotasi dan pengeditan teks visual.",
+      "itemThree": "PDF ke Word menyediakan mode teks, OCR, dan pertahankan tampilan."
+    },
+    "help": {
+      "title": "Butuh bantuan?",
+      "description": "Laporkan kendala, bug, atau pertanyaan penggunaan kepada administrator IGO."
+    }
   }
 }

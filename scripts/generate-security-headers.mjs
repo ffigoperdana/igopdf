@@ -31,6 +31,7 @@ function uniq(values) {
 }
 
 const DEFAULT_OCR_FONT_CDN_ORIGIN = 'https://rawcdn.githack.com';
+const DEFAULT_TESSERACT_LANG_CDN_ORIGIN = 'https://cdn.jsdelivr.net';
 
 // WASM modules are self-hosted (same-origin) by default — see wasm-provider.ts.
 // Only widen the CSP when an external CDN is explicitly configured via env.
@@ -56,6 +57,10 @@ const scriptOrigins = uniq([...wasmOrigins, ...tesseractOrigins]);
 const connectOrigins = uniq([
   ...wasmOrigins,
   ...tesseractOrigins,
+  // Worker + core are self-hosted. Tesseract language packs are fetched only
+  // when selected, so retain the upstream CDN rather than bundling every
+  // supported language into IGO's frontend image.
+  DEFAULT_TESSERACT_LANG_CDN_ORIGIN,
   corsProxyOrigin,
   ocrFontOrigin,
 ]);

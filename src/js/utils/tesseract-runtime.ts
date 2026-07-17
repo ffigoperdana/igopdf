@@ -27,6 +27,11 @@ export interface TesseractAssetConfig {
   langPath?: string;
 }
 
+const LOCAL_OCR_ASSETS = {
+  workerPath: `${import.meta.env.BASE_URL}ocr/worker.min.js`,
+  corePath: `${import.meta.env.BASE_URL}ocr/core`,
+};
+
 export type TesseractLoggerMessage = Tesseract.LoggerMessage;
 export type TesseractWorkerOptions = Partial<Tesseract.WorkerOptions>;
 export type TesseractWorker = Tesseract.Worker;
@@ -95,7 +100,12 @@ export function buildTesseractWorkerOptions(
   const config = resolveTesseractAssetConfig(env);
 
   if (!hasConfiguredTesseractOverrides(config)) {
-    return logger ? { logger } : {};
+    // Keep the worker and WASM core on IGO's origin. Language data remains
+    // on Tesseract's language CDN unless a complete self-hosted set is given.
+    return {
+      ...(logger ? { logger } : {}),
+      ...LOCAL_OCR_ASSETS,
+    };
   }
 
   if (!hasCompleteTesseractOverrides(config)) {
