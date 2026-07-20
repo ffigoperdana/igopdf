@@ -1,11 +1,11 @@
 ---
 title: PDF Multi Tool
-description: An all-in-one page manager for merging, splitting, rotating, duplicating, deleting, and reordering PDF pages.
+description: An all-in-one page manager for merging, splitting, cropping, rotating, duplicating, deleting, and reordering PDF pages.
 ---
 
 # PDF Multi Tool
 
-A unified workspace for every page-level PDF operation. Upload one or more PDFs and work with all their pages in a single visual grid. Rotate, reorder, duplicate, delete, insert new PDFs, add blank pages, and split the result -- all without leaving the tool.
+A unified workspace for every page-level PDF operation. Upload one or more PDFs and work with all their pages in a single visual grid. Crop, rotate, reorder, duplicate, delete, insert new PDFs, add blank pages, and split the result -- all without leaving the tool.
 
 ## How It Works
 
@@ -21,6 +21,7 @@ A unified workspace for every page-level PDF operation. Upload one or more PDFs 
 - **Merge**: Upload multiple PDFs and they combine into one workspace automatically
 - **Reorder**: Drag and drop page cards to rearrange the sequence
 - **Rotate**: Per-page or bulk rotation in 90-degree increments (left or right)
+- **Crop**: Visually crop one page or apply the same visible crop to multiple selected pages without rasterizing PDF text
 - **Duplicate**: Clone any page with one click
 - **Delete**: Remove individual pages or bulk-delete selected ones
 - **Insert PDF**: Add a new PDF after any specific page

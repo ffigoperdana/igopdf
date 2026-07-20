@@ -10,7 +10,7 @@ fi
 
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" pull
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" up -d postgres
-docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm backend node dist/scripts/migrate.js
+docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm migrate
 
 if [ "${1:-}" = "--seed-admin" ]; then
   docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm backend node dist/scripts/seed.js

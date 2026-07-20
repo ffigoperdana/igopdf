@@ -13,7 +13,7 @@
   "convertToPdf": "Konversi ke PDF",
   "pdfMultiTool": {
     "name": "Alat Multi PDF",
-    "subtitle": "Gabung, Pisah, Atur, Hapus, Putar, Tambah Halaman Kosong, Ekstrak dan Duplikat dalam antarmuka terpadu."
+    "subtitle": "Gabung, Pisah, Potong, Atur, Hapus, Putar, Tambah Halaman Kosong, Ekstrak dan Duplikat dalam antarmuka terpadu."
   },
   "mergePdf": {
     "name": "Gabung PDF",

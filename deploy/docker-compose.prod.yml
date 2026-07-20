@@ -16,6 +16,22 @@ services:
     mem_limit: 512m
     restart: unless-stopped
 
+  migrate:
+    image: ${IGO_BACKEND_IMAGE}
+    command: ['node', 'dist/scripts/migrate.js']
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
   backend:
     image: ${IGO_BACKEND_IMAGE}
     environment:
@@ -79,8 +95,8 @@ services:
       DOCX_RETENTION_MS: ${DOCX_RETENTION_MS:-900000}
       DOCX_WORKER_POLL_MS: ${DOCX_WORKER_POLL_MS:-2000}
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
     cpus: 0.5
@@ -110,8 +126,8 @@ services:
       COMPRESSION_WORKER_POLL_MS: ${COMPRESSION_WORKER_POLL_MS:-2000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
     cpus: 1.5
@@ -146,8 +162,8 @@ services:
       DOCX_WORKER_POLL_MS: ${DOCX_WORKER_POLL_MS:-2000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
     cpus: 1.5

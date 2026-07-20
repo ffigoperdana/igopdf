@@ -3,6 +3,7 @@ import { degrees, PDFDocument as PDFLibDocument, PDFPage } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import Sortable from 'sortablejs';
+import Cropper from 'cropperjs';
 import { downloadFile, getPDFDocument } from '../utils/helpers';
 import { loadPdfWithPasswordPrompt } from '../utils/password-prompt.js';
 import {
@@ -26,6 +27,15 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
 import { t } from '../i18n/i18n';
 import { loadPdfDocument } from '../utils/load-pdf-document.js';
+import {
+  applyNormalizedCropToPage,
+  isFullPageCrop,
+  normalizeQuarterTurn,
+  sourceCropToVisualCrop,
+  visualCropToSourceCrop,
+  type NormalizedCropBox,
+  type VisualCropBox,
+} from '../utils/page-crop.js';
 
 interface PageData {
   id: string; // Unique ID for DOM reconciliation
@@ -35,8 +45,10 @@ interface PageData {
   visualRotation: number;
   canvas: HTMLCanvasElement | null;
   pdfDoc: PDFLibDocument;
+  pdfJsDoc: pdfjsLib.PDFDocumentProxy | null;
   originalPageIndex: number;
   fileName: string; // Added for lazy loading identification
+  crop?: NormalizedCropBox;
 }
 
 function generateId(): string {
@@ -50,6 +62,9 @@ let splitMarkers: Set<number> = new Set();
 let isRendering = false;
 let renderCancelled = false;
 let sortableInstance: Sortable | null = null;
+let cropperInstance: Cropper | null = null;
+let cropEditorPageIndex: number | null = null;
+let cropEditorTargetIndices: number[] = [];
 
 const pageCanvasCache = new Map<string, HTMLCanvasElement>();
 
@@ -61,9 +76,17 @@ type Snapshot = {
 const undoStack: Snapshot[] = [];
 const redoStack: Snapshot[] = [];
 
+function clonePageData(page: PageData): PageData {
+  return {
+    ...page,
+    canvas: page.canvas,
+    crop: page.crop ? { ...page.crop } : undefined,
+  };
+}
+
 function snapshot() {
   const snap: Snapshot = {
-    allPages: allPages.map((p) => ({ ...p, canvas: p.canvas })),
+    allPages: allPages.map(clonePageData),
     selectedPages: Array.from(selectedPages),
     splitMarkers: Array.from(splitMarkers),
   };
@@ -72,10 +95,7 @@ function snapshot() {
 }
 
 function restore(snap: Snapshot) {
-  allPages = snap.allPages.map((p) => ({
-    ...p,
-    canvas: p.canvas,
-  }));
+  allPages = snap.allPages.map(clonePageData);
   selectedPages = new Set(snap.selectedPages);
   splitMarkers = new Set(snap.splitMarkers);
   updatePageDisplay();
@@ -250,6 +270,19 @@ function initializeTool() {
     snapshot();
     bulkSplit();
   });
+  document.getElementById('bulk-crop-btn')?.addEventListener('click', () => {
+    if (isRendering) return;
+    const targets = Array.from(selectedPages).sort((a, b) => a - b);
+    if (targets.length === 0) {
+      showModal(
+        t('multiTool.noPagesSelected'),
+        t('multiTool.selectPagesToCrop'),
+        'info'
+      );
+      return;
+    }
+    void openCropEditor(targets[0], targets);
+  });
   document
     .getElementById('bulk-download-btn')
     ?.addEventListener('click', () => {
@@ -306,7 +339,7 @@ function initializeTool() {
     const last = undoStack.pop();
     if (last) {
       const current: Snapshot = {
-        allPages: allPages.map((p) => ({ ...p })),
+        allPages: allPages.map(clonePageData),
         selectedPages: Array.from(selectedPages),
         splitMarkers: Array.from(splitMarkers),
       };
@@ -319,7 +352,7 @@ function initializeTool() {
     const next = redoStack.pop();
     if (next) {
       const current: Snapshot = {
-        allPages: allPages.map((p) => ({ ...p })),
+        allPages: allPages.map(clonePageData),
         selectedPages: Array.from(selectedPages),
         splitMarkers: Array.from(splitMarkers),
       };
@@ -343,6 +376,27 @@ function initializeTool() {
     if (e.target === document.getElementById('modal')) {
       hideModal();
     }
+  });
+
+  document
+    .getElementById('crop-modal-close-btn')
+    ?.addEventListener('click', closeCropEditor);
+  document
+    .getElementById('crop-cancel-btn')
+    ?.addEventListener('click', closeCropEditor);
+  document
+    .getElementById('crop-reset-btn')
+    ?.addEventListener('click', resetCropSelection);
+  document
+    .getElementById('crop-apply-btn')
+    ?.addEventListener('click', applyCropSelection);
+  document.getElementById('crop-modal')?.addEventListener('click', (event) => {
+    if (event.target === document.getElementById('crop-modal'))
+      closeCropEditor();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && cropEditorPageIndex !== null)
+      closeCropEditor();
   });
 
   setupGlobalDragAndDrop();
@@ -575,6 +629,7 @@ async function loadPdfs(files: File[]) {
             visualRotation: 0,
             canvas: null, // Will be filled when rendered
             pdfDoc,
+            pdfJsDoc: pdfjsDoc,
             originalPageIndex: i,
             fileName: file.name,
           });
@@ -634,6 +689,245 @@ async function loadPdfs(files: File[]) {
   }
 }
 
+function getTotalPageRotation(pageData: PageData): number {
+  const intrinsicRotation =
+    pageData.pdfDoc && pageData.originalPageIndex >= 0
+      ? pageData.pdfDoc.getPage(pageData.originalPageIndex).getRotation().angle
+      : 0;
+  return normalizeQuarterTurn(intrinsicRotation + pageData.rotation);
+}
+
+function rotateCanvas(
+  source: HTMLCanvasElement,
+  rotation: number
+): HTMLCanvasElement {
+  const normalized = normalizeQuarterTurn(rotation);
+  if (normalized === 0) return source;
+
+  const output = document.createElement('canvas');
+  const swapDimensions = normalized === 90 || normalized === 270;
+  output.width = swapDimensions ? source.height : source.width;
+  output.height = swapDimensions ? source.width : source.height;
+  const context = output.getContext('2d');
+  if (!context) return source;
+
+  if (normalized === 90) {
+    context.translate(output.width, 0);
+    context.rotate(Math.PI / 2);
+  } else if (normalized === 180) {
+    context.translate(output.width, output.height);
+    context.rotate(Math.PI);
+  } else {
+    context.translate(0, output.height);
+    context.rotate(-Math.PI / 2);
+  }
+  context.drawImage(source, 0, 0);
+  return output;
+}
+
+function createPagePreviewCanvas(pageData: PageData): HTMLCanvasElement | null {
+  if (!pageData.canvas) return null;
+  const rotated = rotateCanvas(pageData.canvas, pageData.visualRotation);
+  if (!pageData.crop) return rotated;
+
+  const visualCrop = sourceCropToVisualCrop(
+    pageData.crop,
+    getTotalPageRotation(pageData)
+  );
+  const sourceX = Math.round(visualCrop.x * rotated.width);
+  const sourceY = Math.round(visualCrop.y * rotated.height);
+  const sourceWidth = Math.max(1, Math.round(visualCrop.width * rotated.width));
+  const sourceHeight = Math.max(
+    1,
+    Math.round(visualCrop.height * rotated.height)
+  );
+  const output = document.createElement('canvas');
+  output.width = sourceWidth;
+  output.height = sourceHeight;
+  output
+    .getContext('2d')
+    ?.drawImage(
+      rotated,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      sourceWidth,
+      sourceHeight
+    );
+  return output;
+}
+
+function refreshCardPreview(card: HTMLElement, pageData: PageData): void {
+  const preview = card.querySelector(
+    '[data-page-preview]'
+  ) as HTMLElement | null;
+  if (!preview) return;
+  const previewCanvas = createPagePreviewCanvas(pageData);
+  preview.replaceChildren();
+  preview.className =
+    'bg-white rounded mb-2 overflow-hidden w-full flex items-center justify-center relative h-36 sm:h-64';
+
+  if (previewCanvas) {
+    previewCanvas.className = 'max-w-full max-h-full object-contain';
+    preview.appendChild(previewCanvas);
+  } else {
+    const loading = document.createElement('div');
+    loading.className =
+      'flex flex-col items-center justify-center text-content-muted';
+    loading.innerHTML =
+      '<i data-lucide="loader" class="w-8 h-8 animate-spin mb-2"></i>';
+    const label = document.createElement('span');
+    label.className = 'text-xs';
+    label.textContent = t('common.loading');
+    loading.appendChild(label);
+    preview.appendChild(loading);
+    preview.classList.add('bg-surface-muted');
+  }
+
+  if (pageData.crop) {
+    const badge = document.createElement('span');
+    badge.className =
+      'absolute top-2 left-2 rounded bg-deep-forest/90 px-2 py-1 text-[11px] font-semibold text-white';
+    badge.textContent = t('multiTool.cropped');
+    preview.appendChild(badge);
+  }
+}
+
+async function openCropEditor(
+  pageIndex: number,
+  targetIndices: number[] = [pageIndex]
+): Promise<void> {
+  const pageData = allPages[pageIndex];
+  if (!pageData) return;
+
+  if (!pageData.canvas && pageData.pdfJsDoc && pageData.pageIndex >= 0) {
+    pageData.canvas = await renderPageToCanvas(
+      pageData.pdfJsDoc,
+      pageData.pageIndex + 1,
+      1.5
+    );
+  }
+  if (!pageData.canvas) {
+    showModal(
+      t('multiTool.error'),
+      t('multiTool.cropPreviewUnavailable'),
+      'error'
+    );
+    return;
+  }
+
+  cropEditorPageIndex = pageIndex;
+  cropEditorTargetIndices = targetIndices.filter((index) => allPages[index]);
+  const modal = document.getElementById('crop-modal');
+  const container = document.getElementById('multi-cropper-container');
+  const pageInfo = document.getElementById('crop-page-info');
+  const applyRow = document.getElementById('crop-apply-selected-row');
+  const applyCheckbox = document.getElementById(
+    'crop-apply-selected'
+  ) as HTMLInputElement | null;
+  if (!modal || !container) return;
+
+  if (pageInfo) {
+    pageInfo.textContent = `${t('common.page')} ${pageIndex + 1} - ${pageData.fileName || t('multiTool.blankPage')}`;
+  }
+  applyRow?.classList.toggle('hidden', cropEditorTargetIndices.length < 2);
+  applyRow?.classList.toggle('flex', cropEditorTargetIndices.length >= 2);
+  if (applyCheckbox)
+    applyCheckbox.checked = cropEditorTargetIndices.length >= 2;
+
+  cropperInstance?.destroy();
+  cropperInstance = null;
+  container.replaceChildren();
+  const editorCanvas = rotateCanvas(pageData.canvas, pageData.visualRotation);
+  const image = document.createElement('img');
+  image.alt = t('multiTool.cropPreview');
+  image.className = 'block max-w-full';
+  image.onload = () => {
+    cropperInstance = new Cropper(image, {
+      viewMode: 1,
+      background: false,
+      autoCropArea: 1,
+      responsive: true,
+      rotatable: false,
+      zoomable: false,
+      ready: () => {
+        if (!cropperInstance || !pageData.crop) return;
+        const visualCrop = sourceCropToVisualCrop(
+          pageData.crop,
+          getTotalPageRotation(pageData)
+        );
+        const imageData = cropperInstance.getImageData();
+        cropperInstance.setData({
+          x: visualCrop.x * imageData.naturalWidth,
+          y: visualCrop.y * imageData.naturalHeight,
+          width: visualCrop.width * imageData.naturalWidth,
+          height: visualCrop.height * imageData.naturalHeight,
+        });
+      },
+    });
+  };
+  image.src = editorCanvas.toDataURL('image/png');
+  container.appendChild(image);
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeCropEditor(): void {
+  cropperInstance?.destroy();
+  cropperInstance = null;
+  cropEditorPageIndex = null;
+  cropEditorTargetIndices = [];
+  const modal = document.getElementById('crop-modal');
+  modal?.classList.add('hidden');
+  modal?.classList.remove('flex');
+  document.getElementById('multi-cropper-container')?.replaceChildren();
+}
+
+function resetCropSelection(): void {
+  if (!cropperInstance) return;
+  const imageData = cropperInstance.getImageData();
+  cropperInstance.setData({
+    x: 0,
+    y: 0,
+    width: imageData.naturalWidth,
+    height: imageData.naturalHeight,
+  });
+}
+
+function applyCropSelection(): void {
+  if (!cropperInstance || cropEditorPageIndex === null) return;
+  const cropData = cropperInstance.getData(true);
+  const imageData = cropperInstance.getImageData();
+  const visualCrop: VisualCropBox = {
+    x: cropData.x / imageData.naturalWidth,
+    y: cropData.y / imageData.naturalHeight,
+    width: cropData.width / imageData.naturalWidth,
+    height: cropData.height / imageData.naturalHeight,
+  };
+  const applyToSelected = (
+    document.getElementById('crop-apply-selected') as HTMLInputElement | null
+  )?.checked;
+  const targets = applyToSelected
+    ? cropEditorTargetIndices
+    : [cropEditorPageIndex];
+
+  snapshot();
+  targets.forEach((index) => {
+    const pageData = allPages[index];
+    if (!pageData) return;
+    const sourceCrop = visualCropToSourceCrop(
+      visualCrop,
+      getTotalPageRotation(pageData)
+    );
+    pageData.crop = isFullPageCrop(sourceCrop) ? undefined : sourceCrop;
+  });
+  closeCropEditor();
+  updatePageDisplay();
+}
+
 // Modified to return the element instead of appending it
 function createPageElement(
   canvas: HTMLCanvasElement | null,
@@ -665,15 +959,13 @@ function createPageElement(
   }
 
   const preview = document.createElement('div');
+  preview.dataset.pagePreview = 'true';
   preview.className =
     'bg-white rounded mb-2 overflow-hidden w-full flex items-center justify-center relative h-36 sm:h-64';
 
   if (canvas) {
-    const previewCanvas = canvas;
+    const previewCanvas = createPagePreviewCanvas(pageData)!;
     previewCanvas.className = 'max-w-full max-h-full object-contain';
-
-    previewCanvas.style.transform = `rotate(${pageData.visualRotation}deg)`;
-    previewCanvas.style.transition = 'transform 0.2s ease';
     preview.appendChild(previewCanvas);
   } else {
     // Show loading placeholder if canvas is null
@@ -689,6 +981,14 @@ function createPageElement(
     loading.append(loadingIcon, loadingLabel);
     preview.appendChild(loading);
     preview.classList.add('bg-surface-muted'); // Darker background for loading
+  }
+
+  if (pageData.crop) {
+    const cropBadge = document.createElement('span');
+    cropBadge.className =
+      'absolute top-2 left-2 rounded bg-deep-forest/90 px-2 py-1 text-[11px] font-semibold text-white';
+    cropBadge.textContent = t('multiTool.cropped');
+    preview.appendChild(cropBadge);
   }
 
   // Page info
@@ -740,6 +1040,16 @@ function createPageElement(
   rotateLeftBtn.onclick = (e) => {
     e.stopPropagation();
     rotatePage(index, -90);
+  };
+
+  const cropBtn = document.createElement('button');
+  cropBtn.className = 'p-1 rounded hover:bg-surface-muted';
+  cropBtn.innerHTML =
+    '<i data-lucide="crop" class="w-4 h-4 text-content-muted"></i>';
+  cropBtn.title = t('multiTool.actions.cropPage');
+  cropBtn.onclick = (event) => {
+    event.stopPropagation();
+    void openCropEditor(index);
   };
 
   // Duplicate button
@@ -794,6 +1104,7 @@ function createPageElement(
   actionsInner.append(
     rotateLeftBtn,
     rotateBtn,
+    cropBtn,
     duplicateBtn,
     insertBtn,
     splitBtn,
@@ -901,13 +1212,8 @@ function rotatePage(index: number, delta: number) {
   const card = pagesContainer.children[index] as HTMLElement;
   if (!card) return;
 
-  const canvas = card.querySelector('canvas');
-  const preview = card.querySelector('.bg-white');
-
-  if (canvas && preview) {
-    canvas.style.transform = `rotate(${pageData.visualRotation}deg)`;
-    canvas.style.transition = 'transform 0.2s ease';
-  }
+  refreshCardPreview(card, pageData);
+  createIcons({ icons });
 }
 
 function duplicatePage(index: number) {
@@ -927,6 +1233,7 @@ function duplicatePage(index: number) {
     ...originalPageData,
     id: generateId(), // New ID for the duplicate
     canvas: newCanvas,
+    crop: originalPageData.crop ? { ...originalPageData.crop } : undefined,
   };
 
   const newIndex = index + 1;
@@ -990,6 +1297,7 @@ async function handleInsertPdf(e: Event) {
         visualRotation: 0,
         canvas: null, // Placeholder
         pdfDoc,
+        pdfJsDoc: pdfjsDoc,
         originalPageIndex: i,
         fileName: file.name,
       });
@@ -1018,21 +1326,7 @@ async function handleInsertPdf(e: Event) {
           `div[data-page-index="${globalIndex}"]`
         );
         if (card) {
-          const preview =
-            card.querySelector('.bg-surface-muted') ||
-            card.querySelector('.bg-white');
-          if (preview) {
-            // Re-create the preview content
-            preview.innerHTML = '';
-            preview.className =
-              'bg-white rounded mb-2 overflow-hidden w-full flex items-center justify-center relative h-36 sm:h-64';
-
-            const previewCanvas = canvas;
-            previewCanvas.className = 'max-w-full max-h-full object-contain';
-            previewCanvas.style.transform = `rotate(${allPages[globalIndex].visualRotation}deg)`;
-            previewCanvas.style.transition = 'transform 0.2s ease';
-            preview.appendChild(previewCanvas);
-          }
+          refreshCardPreview(card as HTMLElement, allPages[globalIndex]);
         }
       }
     }
@@ -1089,6 +1383,7 @@ function addBlankPage() {
     visualRotation: 0,
     canvas,
     pdfDoc: null!,
+    pdfJsDoc: null,
     originalPageIndex: -1,
     fileName: '', // Blank page has no file
   };
@@ -1116,10 +1411,7 @@ function bulkRotate(delta: number) {
         `div[data-page-index="${index}"]`
       );
       if (card) {
-        const canvas = card.querySelector('canvas');
-        if (canvas) {
-          canvas.style.transform = `rotate(${pageData.visualRotation}deg)`;
-        }
+        refreshCardPreview(card as HTMLElement, pageData);
         // If no canvas (placeholder), the state update is enough.
         // When it eventually renders, createPageElement will use the new rotation.
       }
@@ -1229,8 +1521,9 @@ async function downloadSplitPdfs() {
             pdfDoc: PDFLibDocument;
             originalPageIndex: number;
             rotation: number;
+            crop?: NormalizedCropBox;
           }
-        | { type: 'blank' }
+        | { type: 'blank'; rotation: number; crop?: NormalizedCropBox }
       )[] = [];
       for (const index of segment) {
         const pageData = allPages[index];
@@ -1241,9 +1534,14 @@ async function downloadSplitPdfs() {
             pdfDoc: pageData.pdfDoc,
             originalPageIndex: pageData.originalPageIndex,
             rotation: pageData.rotation,
+            crop: pageData.crop ? { ...pageData.crop } : undefined,
           });
         } else {
-          segSpecs.push({ type: 'blank' });
+          segSpecs.push({
+            type: 'blank',
+            rotation: pageData.rotation,
+            crop: pageData.crop ? { ...pageData.crop } : undefined,
+          });
         }
       }
 
@@ -1273,12 +1571,15 @@ async function downloadSplitPdfs() {
           docConsumeIndex.set(spec.pdfDoc, idx + 1);
 
           const page = newPdf.addPage(copiedPage);
+          applyNormalizedCropToPage(page, spec.crop);
           if (spec.rotation !== 0) {
             const currentRotation = page.getRotation().angle;
             page.setRotation(degrees(currentRotation + spec.rotation));
           }
         } else {
-          newPdf.addPage([595, 842]);
+          const page = newPdf.addPage([595, 842]);
+          applyNormalizedCropToPage(page, spec.crop);
+          if (spec.rotation !== 0) page.setRotation(degrees(spec.rotation));
         }
       }
 
@@ -1313,8 +1614,9 @@ async function downloadPagesAsPdf(indices: number[], filename: string) {
           pdfDoc: PDFLibDocument;
           originalPageIndex: number;
           rotation: number;
+          crop?: NormalizedCropBox;
         }
-      | { type: 'blank' }
+      | { type: 'blank'; rotation: number; crop?: NormalizedCropBox }
     )[] = [];
     for (const index of indices) {
       const pageData = allPages[index];
@@ -1325,9 +1627,14 @@ async function downloadPagesAsPdf(indices: number[], filename: string) {
           pdfDoc: pageData.pdfDoc,
           originalPageIndex: pageData.originalPageIndex,
           rotation: pageData.rotation,
+          crop: pageData.crop ? { ...pageData.crop } : undefined,
         });
       } else {
-        pageSpecs.push({ type: 'blank' });
+        pageSpecs.push({
+          type: 'blank',
+          rotation: pageData.rotation,
+          crop: pageData.crop ? { ...pageData.crop } : undefined,
+        });
       }
     }
 
@@ -1357,12 +1664,15 @@ async function downloadPagesAsPdf(indices: number[], filename: string) {
         docConsumeIndex.set(spec.pdfDoc, idx + 1);
 
         const page = newPdf.addPage(copiedPage);
+        applyNormalizedCropToPage(page, spec.crop);
         if (spec.rotation !== 0) {
           const currentRotation = page.getRotation().angle;
           page.setRotation(degrees(currentRotation + spec.rotation));
         }
       } else {
-        newPdf.addPage([595, 842]);
+        const page = newPdf.addPage([595, 842]);
+        applyNormalizedCropToPage(page, spec.crop);
+        if (spec.rotation !== 0) page.setRotation(degrees(spec.rotation));
       }
     }
 
@@ -1426,11 +1736,7 @@ function updatePageDisplay() {
           selectBtn.innerHTML =
             '<i data-lucide="check-square" class="w-4 h-4 text-palm-400"></i>';
         } else {
-          card.classList.remove(
-            'border-palm-500',
-            'ring-2',
-            'ring-palm-500'
-          );
+          card.classList.remove('border-palm-500', 'ring-2', 'ring-palm-500');
           selectBtn.innerHTML =
             '<i data-lucide="square" class="w-4 h-4 text-content"></i>';
         }
@@ -1441,11 +1747,7 @@ function updatePageDisplay() {
         };
       }
 
-      // Update visual rotation
-      const canvas = card.querySelector('canvas');
-      if (canvas) {
-        canvas.style.transform = `rotate(${pageData.visualRotation}deg)`;
-      }
+      refreshCardPreview(card, pageData);
 
       // Update action buttons
       const actionsInner = card.querySelector(
@@ -1466,24 +1768,29 @@ function updatePageDisplay() {
         if (buttons[2])
           (buttons[2] as HTMLElement).onclick = (e) => {
             e.stopPropagation();
-            snapshot();
-            duplicatePage(index);
+            void openCropEditor(index);
           };
         if (buttons[3])
           (buttons[3] as HTMLElement).onclick = (e) => {
             e.stopPropagation();
             snapshot();
-            insertPdfAfter(index);
+            duplicatePage(index);
           };
         if (buttons[4])
           (buttons[4] as HTMLElement).onclick = (e) => {
             e.stopPropagation();
             snapshot();
-            toggleSplitMarker(index);
-            renderSplitMarkers();
+            insertPdfAfter(index);
           };
         if (buttons[5])
           (buttons[5] as HTMLElement).onclick = (e) => {
+            e.stopPropagation();
+            snapshot();
+            toggleSplitMarker(index);
+            renderSplitMarkers();
+          };
+        if (buttons[6])
+          (buttons[6] as HTMLElement).onclick = (e) => {
             e.stopPropagation();
             snapshot();
             deletePage(index);
@@ -1520,7 +1827,9 @@ function updatePageNumbers() {
     card.dataset.pageIndex = index.toString();
 
     // Update visible page number text
-    const info = card.querySelector('.text-xs.text-content-muted.text-center.mb-2');
+    const info = card.querySelector(
+      '.text-xs.text-content-muted.text-center.mb-2'
+    );
     if (info) {
       info.textContent = `Page ${index + 1} `;
     }
@@ -1544,7 +1853,7 @@ function updatePageNumbers() {
     );
     if (actionsInner) {
       const buttons = actionsInner.querySelectorAll('button');
-      // Order: Rotate Left, Rotate Right, Duplicate, Insert, Split, Delete
+      // Order: Rotate Left, Rotate Right, Crop, Duplicate, Insert, Split, Delete
       if (buttons[0])
         buttons[0].onclick = (e) => {
           e.stopPropagation();
@@ -1558,24 +1867,29 @@ function updatePageNumbers() {
       if (buttons[2])
         buttons[2].onclick = (e) => {
           e.stopPropagation();
-          snapshot();
-          duplicatePage(index);
+          void openCropEditor(index);
         };
       if (buttons[3])
         buttons[3].onclick = (e) => {
           e.stopPropagation();
           snapshot();
-          insertPdfAfter(index);
+          duplicatePage(index);
         };
       if (buttons[4])
         buttons[4].onclick = (e) => {
           e.stopPropagation();
           snapshot();
-          toggleSplitMarker(index);
-          renderSplitMarkers();
+          insertPdfAfter(index);
         };
       if (buttons[5])
         buttons[5].onclick = (e) => {
+          e.stopPropagation();
+          snapshot();
+          toggleSplitMarker(index);
+          renderSplitMarkers();
+        };
+      if (buttons[6])
+        buttons[6].onclick = (e) => {
           e.stopPropagation();
           snapshot();
           deletePage(index);

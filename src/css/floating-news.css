@@ -8,6 +8,7 @@
   align-items: flex-end;
   gap: .75rem;
   color: var(--color-content, #f8fafc);
+  pointer-events: none;
 }
 
 .floating-news__panel {
@@ -225,6 +226,7 @@
 
 .floating-news__fab {
   display: inline-flex;
+  pointer-events: auto;
   align-items: center;
   gap: .625rem;
   min-height: 3rem;

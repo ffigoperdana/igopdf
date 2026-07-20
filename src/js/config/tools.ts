@@ -8,7 +8,7 @@ const baseCategories = [
         name: 'PDF Multi Tool',
         icon: 'ph-pencil-ruler',
         subtitle:
-          'Merge, Split, Organize, Delete, Rotate, Add Blank Pages, Extract and Duplicate in an unified interface.',
+          'Merge, Split, Crop, Organize, Delete, Rotate, Add Blank Pages, Extract and Duplicate in a unified interface.',
       },
       {
         href: import.meta.env.BASE_URL + 'merge-pdf.html',
@@ -560,7 +560,7 @@ const baseCategories = [
         href: import.meta.env.BASE_URL + 'pdf-multi-tool.html',
         name: 'PDF Multi Tool',
         icon: 'ph-pencil-ruler',
-        subtitle: 'Full-featured PDF editor with page management.',
+        subtitle: 'Full-featured PDF editor with crop and page management.',
       },
       {
         href: import.meta.env.BASE_URL + 'pdf-layers.html',
