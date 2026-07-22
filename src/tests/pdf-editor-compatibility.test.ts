@@ -37,6 +37,29 @@ function getHelveticaResource(pdfDoc: PDFDocument): PDFRef {
 }
 
 describe('PDF editor compatibility repair', () => {
+  it('creates AcroForm font resources when the PDF has none', async () => {
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.addPage();
+    const bytes = await pdfDoc.save();
+    const buffer = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength
+    ) as ArrayBuffer;
+    const input = new File([buffer], 'without-acroform.pdf', {
+      type: 'application/pdf',
+    });
+
+    const repaired = await repairPdfEditorFontResources(input);
+    const repairedDoc = await PDFDocument.load(await repaired.arrayBuffer());
+    const helvetica = getHelveticaResource(repairedDoc);
+
+    expect(repaired).not.toBe(input);
+    expect(helvetica.objectNumber).toBeGreaterThan(0);
+    expect(repairedDoc.context.lookupMaybe(helvetica, PDFDict)).toBeInstanceOf(
+      PDFDict
+    );
+  });
+
   it('replaces a null Helvetica reference with a valid font resource', async () => {
     const input = await createPdfWithHelveticaResource('invalid');
 
