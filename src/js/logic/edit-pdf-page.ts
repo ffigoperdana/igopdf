@@ -10,6 +10,7 @@ import {
   CLIENT_SIDE_LARGE_FILE_BYTES,
 } from '../utils/client-file-warning.js';
 import { t } from '../i18n/i18n.js';
+import { repairPdfEditorFontResources } from '../utils/pdf-editor-compatibility.js';
 
 const embedPdfWasmUrl = new URL(
   'embedpdf-snippet/dist/pdfium.wasm',
@@ -58,6 +59,7 @@ let textEditInteraction: InteractionManagerCapability | null = null;
 let isViewerInitialized = false;
 const fileEntryMap = new Map<string, HTMLElement>();
 const textEditHandlerCleanups = new Map<string, () => void>();
+const appearanceRepairAttempts = new Set<string>();
 let textEditToolbarCleanup: (() => void) | null = null;
 
 type PendingTextReplacement = {
@@ -120,6 +122,78 @@ function waitForAnimationFrames(count = 2): Promise<void> {
     };
     wait(count);
   });
+}
+
+async function waitForAnnotationChangesToCommit(
+  documentId: string,
+  timeoutMs = 15_000
+): Promise<void> {
+  if (!annotationPlugin) return;
+
+  const scope = annotationPlugin.forDocument(documentId);
+  const deadline = Date.now() + timeoutMs;
+
+  while (scope.getState().hasPendingChanges) {
+    await scope.commit().toPromise();
+    if (!scope.getState().hasPendingChanges) return;
+    if (Date.now() >= deadline) {
+      throw new Error('Timed out while saving PDF annotations');
+    }
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+      const subscription: { unsubscribe?: () => void } = {};
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        subscription.unsubscribe?.();
+        resolve();
+      };
+      subscription.unsubscribe = scope.onStateChange((state) => {
+        if (!state.hasPendingChanges) finish();
+      });
+      window.setTimeout(finish, 50);
+    });
+  }
+}
+
+async function regenerateMissingFreeTextAppearances(
+  documentId: string
+): Promise<void> {
+  if (!annotationPlugin || !docManagerPlugin || !textEditRegistry) return;
+
+  const document = docManagerPlugin.getDocument(documentId);
+  if (!document) return;
+
+  const scope = annotationPlugin.forDocument(documentId);
+  const annotations = Object.values(scope.getState().byUid).filter(
+    ({ object, commitState }) =>
+      commitState === 'synced' &&
+      object.type === FREE_TEXT_ANNOTATION_TYPE &&
+      !object.appearanceModes
+  );
+
+  for (const { object } of annotations) {
+    const page = document.pages.find((item) => item.index === object.pageIndex);
+    if (!page) continue;
+
+    const attemptKey = `${documentId}:${object.id}`;
+    if (appearanceRepairAttempts.has(attemptKey)) continue;
+    appearanceRepairAttempts.add(attemptKey);
+
+    try {
+      await textEditRegistry
+        .getEngine()
+        .updatePageAnnotation(document, page, object)
+        .toPromise();
+      scope.invalidatePageAppearances(object.pageIndex);
+    } catch (error) {
+      console.warn(
+        `[PDF Editor] Could not regenerate the appearance for annotation ${object.id}.`,
+        error
+      );
+    }
+  }
 }
 
 function isEditableEventTarget(event: KeyboardEvent): boolean {
@@ -1083,32 +1157,43 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
     })
   );
 
-  textEditHandlerCleanups.set(documentId, () => {
-    unregister.forEach((remove) => remove());
-  });
-  annotationPlugin?.forDocument(documentId).onAnnotationEvent((event) => {
-    if (event.type === 'loaded') return;
-    const replacement = pendingTextReplacements.find(
-      (item) => item.annotationId === event.annotation.id
-    );
-    if (!replacement) return;
-    if (event.type === 'delete') {
-      replacement.cancelled = true;
-    }
-    if (event.type === 'update' && event.annotation.type === FREE_TEXT_ANNOTATION_TYPE) {
-      replacement.annotation = event.annotation as PdfFreeTextAnnoObject;
-      replacement.text = event.annotation.contents;
-      if (event.patch.rect) {
-        const guides = getTextEditAlignmentGuides(
-          replacement,
-          replacement.annotation
-        );
-        if (guides) {
-          showTextEditSnapGuide(replacement.page, guides.guideX, guides.guideY);
+  const annotationScope = annotationPlugin?.forDocument(documentId);
+  const unsubscribeAnnotationEvents = annotationScope?.onAnnotationEvent(
+    (event) => {
+      if (event.type === 'loaded') {
+        void regenerateMissingFreeTextAppearances(documentId);
+        return;
+      }
+      const replacement = pendingTextReplacements.find(
+        (item) => item.annotationId === event.annotation.id
+      );
+      if (!replacement) return;
+      if (event.type === 'delete') {
+        replacement.cancelled = true;
+      }
+      if (
+        event.type === 'update' &&
+        event.annotation.type === FREE_TEXT_ANNOTATION_TYPE
+      ) {
+        replacement.annotation = event.annotation as PdfFreeTextAnnoObject;
+        replacement.text = event.annotation.contents;
+        if (event.patch.rect) {
+          const guides = getTextEditAlignmentGuides(
+            replacement,
+            replacement.annotation
+          );
+          if (guides) {
+            showTextEditSnapGuide(replacement.page, guides.guideX, guides.guideY);
+          }
         }
       }
     }
+  );
+  textEditHandlerCleanups.set(documentId, () => {
+    unregister.forEach((remove) => remove());
+    unsubscribeAnnotationEvents?.();
   });
+  void regenerateMissingFreeTextAppearances(documentId);
 }
 
 function setupAnnotationClipboard(pdfContainer: HTMLElement) {
@@ -1195,6 +1280,7 @@ function resetViewer() {
   textEditToolbarCleanup = null;
   textEditHandlerCleanups.forEach((cleanup) => cleanup());
   textEditHandlerCleanups.clear();
+  appearanceRepairAttempts.clear();
   textEditScopes.clear();
   isViewerInitialized = false;
   fileEntryMap.clear();
@@ -1310,8 +1396,12 @@ async function handleFiles(files: FileList) {
       return;
     }
 
+    const editorFiles = await Promise.all(
+      decryptedFiles.map(repairPdfEditorFontResources)
+    );
+
     if (!isViewerInitialized) {
-      const firstFile = decryptedFiles[0];
+      const firstFile = editorFiles[0];
       const firstBuffer = await firstFile.arrayBuffer();
 
       pdfContainer.textContent = '';
@@ -1348,6 +1438,9 @@ async function handleFiles(files: FileList) {
         const docId = data?.id || '';
         textEditHandlerCleanups.get(docId)?.();
         textEditHandlerCleanups.delete(docId);
+        appearanceRepairAttempts.forEach((key) => {
+          if (key.startsWith(`${docId}:`)) appearanceRepairAttempts.delete(key);
+        });
         textEditScopes.delete(docId);
         pageTextRunCache.forEach((_, key) => {
           if (key.startsWith(`${docId}:`)) pageTextRunCache.delete(key);
@@ -1379,7 +1472,7 @@ async function handleFiles(files: FileList) {
         }
       );
 
-      addFileEntries(fileDisplayArea, decryptedFiles);
+      addFileEntries(fileDisplayArea, editorFiles);
 
       docManagerPlugin.openDocumentBuffer({
         buffer: firstBuffer,
@@ -1387,11 +1480,11 @@ async function handleFiles(files: FileList) {
         autoActivate: true,
       });
 
-      for (let i = 1; i < decryptedFiles.length; i++) {
-        const buffer = await decryptedFiles[i].arrayBuffer();
+      for (let i = 1; i < editorFiles.length; i++) {
+        const buffer = await editorFiles[i].arrayBuffer();
         docManagerPlugin.openDocumentBuffer({
           buffer,
-          name: makeUniqueFileKey(i, decryptedFiles[i].name),
+          name: makeUniqueFileKey(i, editorFiles[i].name),
           autoActivate: false,
         });
       }
@@ -1420,6 +1513,7 @@ async function handleFiles(files: FileList) {
           // and download behavior remain owned by the viewer.
           blurDeepActiveElement();
           await waitForAnimationFrames();
+          await waitForAnnotationChangesToCommit(documentId);
           const commands = registry
             .getPlugin('commands')
             ?.provides() as CommandsCapability | undefined;
@@ -1444,13 +1538,13 @@ async function handleFiles(files: FileList) {
         });
       }
     } else {
-      addFileEntries(fileDisplayArea, decryptedFiles);
+      addFileEntries(fileDisplayArea, editorFiles);
 
-      for (let i = 0; i < decryptedFiles.length; i++) {
-        const buffer = await decryptedFiles[i].arrayBuffer();
+      for (let i = 0; i < editorFiles.length; i++) {
+        const buffer = await editorFiles[i].arrayBuffer();
         docManagerPlugin.openDocumentBuffer({
           buffer,
-          name: makeUniqueFileKey(i, decryptedFiles[i].name),
+          name: makeUniqueFileKey(i, editorFiles[i].name),
           autoActivate: true,
         });
       }
