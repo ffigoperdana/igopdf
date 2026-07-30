@@ -1,16 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script>
-      try {
-        var __t =
-          localStorage.getItem('igo-theme') ||
-          (matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light');
-        if (__t === 'dark') document.documentElement.classList.add('dark');
-      } catch (e) {}
-    </script>
+    <!-- prettier-ignore -->
+    <script>try{var __m=matchMedia('(prefers-color-scheme: dark)').matches,__s;try{__s=localStorage.getItem('igo-theme')}catch(e){}var __t=__s==='light'||__s==='dark'?__s:__m?'dark':'light';if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

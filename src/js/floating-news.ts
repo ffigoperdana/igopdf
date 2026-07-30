@@ -1,31 +1,15 @@
-const GRATIFICATION_NOTICE_KEY = 'igo-floating-news-gratification-v1';
 const SLIDE_COUNT = 3;
 
 function isHomePage(): boolean {
-  const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  const page = (
+    location.pathname.split('/').pop() || 'index.html'
+  ).toLowerCase();
   return page === '' || page === 'index.html' || page === 'index';
-}
-
-function hasSeenGratificationNotice(): boolean {
-  try {
-    return localStorage.getItem(GRATIFICATION_NOTICE_KEY) === 'seen';
-  } catch {
-    return false;
-  }
-}
-
-function markGratificationNoticeSeen(): void {
-  try {
-    localStorage.setItem(GRATIFICATION_NOTICE_KEY, 'seen');
-  } catch {
-    // The panel remains usable when browser storage is unavailable.
-  }
 }
 
 export function initFloatingNews(): void {
   const root = document.getElementById('igo-floating-news');
   const panel = document.getElementById('floating-news-panel');
-  const viewport = root.querySelector<HTMLElement>('.floating-news__viewport');
   const track = document.getElementById('floating-news-track');
   const toggle = document.getElementById('floating-news-toggle');
   const close = document.getElementById('floating-news-close');
@@ -33,13 +17,30 @@ export function initFloatingNews(): void {
   const next = document.getElementById('floating-news-next');
   const position = document.getElementById('floating-news-position');
 
-  if (!root || !panel || !viewport || !track || !toggle || !close || !previous || !next || !position) return;
+  if (
+    !root ||
+    !panel ||
+    !track ||
+    !toggle ||
+    !close ||
+    !previous ||
+    !next ||
+    !position
+  )
+    return;
 
-  const slides = [...track.querySelectorAll<HTMLElement>('.floating-news__slide')];
+  const viewport = root.querySelector<HTMLElement>('.floating-news__viewport');
+  if (!viewport) return;
+
+  const slides = [
+    ...track.querySelectorAll<HTMLElement>('.floating-news__slide'),
+  ];
   if (slides.length !== SLIDE_COUNT) return;
 
   let activeSlide = 0;
   let isOpen = false;
+  const autoOpenOnThisPage = isHomePage();
+  let initialOpenTimer: number | undefined;
 
   const updateSlide = () => {
     track.style.transform = `translateX(-${activeSlide * 100}%)`;
@@ -63,7 +64,9 @@ export function initFloatingNews(): void {
     setOpen(true, focusPanel);
   };
 
-  toggle.addEventListener('click', () => (isOpen ? setOpen(false) : openAt(activeSlide, true)));
+  toggle.addEventListener('click', () =>
+    isOpen ? setOpen(false) : openAt(activeSlide, true)
+  );
   close.addEventListener('click', () => {
     setOpen(false);
     toggle.focus();
@@ -78,16 +81,28 @@ export function initFloatingNews(): void {
     }
   });
   document.addEventListener('pointerdown', (event) => {
-    if (isOpen && event.target instanceof Node && !root.contains(event.target)) setOpen(false);
+    if (isOpen && event.target instanceof Node && !root.contains(event.target))
+      setOpen(false);
   });
-  document.addEventListener('igo:languagechange', () => window.requestAnimationFrame(updateSlide));
+  document.addEventListener('igo:languagechange', () =>
+    window.requestAnimationFrame(updateSlide)
+  );
   window.addEventListener('resize', updateSlide);
+  window.addEventListener('pageshow', (event) => {
+    if (!autoOpenOnThisPage || !event.persisted || !isHomePage()) return;
+
+    if (initialOpenTimer !== undefined) {
+      window.clearTimeout(initialOpenTimer);
+      initialOpenTimer = undefined;
+    }
+    openAt(0);
+  });
 
   updateSlide();
-  if (isHomePage() && !hasSeenGratificationNotice()) {
-    window.setTimeout(() => {
+  if (autoOpenOnThisPage) {
+    initialOpenTimer = window.setTimeout(() => {
+      initialOpenTimer = undefined;
       openAt(0);
-      markGratificationNoticeSeen();
     }, 650);
   }
 }

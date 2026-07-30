@@ -10,6 +10,7 @@ import { t } from '../i18n/i18n';
 import { loadPdfDocument } from '../utils/load-pdf-document.js';
 import { flattenAnnotations } from '../utils/flatten-annotations.js';
 import type { SignState, PDFViewerWindow } from '@/types';
+import { attachPdfJsThemeSync } from '../pdfjs-theme.js';
 
 const signState: SignState = {
   file: null,
@@ -18,6 +19,7 @@ const signState: SignState = {
   viewerReady: false,
   blobUrl: null,
 };
+let detachViewerThemeSync: (() => void) | null = null;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializePage);
@@ -120,8 +122,11 @@ async function updateFileDisplay() {
   removeBtn.className = 'ml-4 text-red-400 hover:text-red-300 flex-shrink-0';
   removeBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
   removeBtn.onclick = () => {
+    cleanup();
     signState.file = null;
     signState.pdfDoc = null;
+    signState.viewerIframe = null;
+    signState.viewerReady = false;
     fileDisplayArea.innerHTML = '';
     document.getElementById('signature-editor')?.classList.add('hidden');
   };
@@ -165,6 +170,7 @@ async function setupSignTool() {
     return;
   }
 
+  cleanup();
   container.textContent = '';
   const iframe = document.createElement('iframe');
   iframe.style.width = '100%';
@@ -172,6 +178,7 @@ async function setupSignTool() {
   iframe.style.border = 'none';
   container.appendChild(iframe);
   signState.viewerIframe = iframe;
+  detachViewerThemeSync = attachPdfJsThemeSync(iframe);
 
   const pdfBytes = await readFileAsArrayBuffer(signState.file);
   const blob = new Blob([new Uint8Array(pdfBytes as ArrayBuffer)], {
@@ -367,6 +374,8 @@ function resetState() {
 }
 
 function cleanup() {
+  detachViewerThemeSync?.();
+  detachViewerThemeSync = null;
   if (signState.blobUrl) {
     URL.revokeObjectURL(signState.blobUrl);
     signState.blobUrl = null;

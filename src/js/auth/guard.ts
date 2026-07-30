@@ -39,10 +39,9 @@ function updateUI(): void {
 
   // Navbar inverts (green→white text in light, white→ink text in dark), so
   // links inherit/flip; the orange button stays the same in both themes.
-  const linkCls =
-    'text-white hover:text-vibrant-palm text-sm font-medium';
+  const linkCls = 'text-white hover:text-palm-300 text-sm font-medium';
   const btnCls =
-    'bg-vibrant-palm hover:bg-palm-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors';
+    'bg-vibrant-palm hover:bg-palm-500 text-ink-slate px-4 py-2 rounded text-sm font-medium transition-colors';
 
   if (currentUser) {
     const adminLinkDesktop = isAdmin(currentUser)
@@ -71,8 +70,12 @@ function updateUI(): void {
       authAreaMobile.innerHTML = `<span class="text-sm text-white">${safeName}</span>`;
     if (mobileAuthMenu) mobileAuthMenu.innerHTML = mobileHTML;
 
-    document.getElementById('logout-btn')?.addEventListener('click', () => logout());
-    document.getElementById('logout-btn-mobile')?.addEventListener('click', () => logout());
+    document
+      .getElementById('logout-btn')
+      ?.addEventListener('click', () => logout());
+    document
+      .getElementById('logout-btn-mobile')
+      ?.addEventListener('click', () => logout());
   } else {
     const loginHTML = `<a href="/login.html" class="${btnCls}">Login</a>`;
 

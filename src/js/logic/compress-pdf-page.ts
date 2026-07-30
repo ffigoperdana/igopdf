@@ -84,6 +84,30 @@ const DEFAULT_SERVER_COMPRESSION_CONFIG: ServerCompressionConfig = {
 const PYMUDF_MEMORY_ERROR = /memoryerror|out of memory|fzerror.*memory/i;
 const RESUMABLE_UPLOAD_INTERRUPTED = 'RESUMABLE_UPLOAD_INTERRUPTED';
 
+export interface ServerCompressionAlgorithmOption {
+  value: 'server-balanced' | 'server-lossless';
+  label: string;
+}
+
+export function getServerCompressionAlgorithmOptions(
+  inputBytes: number,
+  balancedMaxBytes: number
+): ServerCompressionAlgorithmOption[] {
+  return inputBytes <= balancedMaxBytes
+    ? [
+        { value: 'server-balanced', label: 'Balanced (Server)' },
+        { value: 'server-lossless', label: 'Lossless (Server)' },
+      ]
+    : [{ value: 'server-lossless', label: 'Lossless (Server)' }];
+}
+
+export function isCompressionResultSmaller(
+  inputBytes: number,
+  outputBytes: number
+): boolean {
+  return outputBytes < inputBytes;
+}
+
 function isPyMuPdfMemoryError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return PYMUDF_MEMORY_ERROR.test(message);
@@ -402,13 +426,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const balancedAllowed = largeFile.size <= serverConfig.balancedMaxBytes;
-    setOptions(algorithmSelect, [
-      { value: 'server-lossless', label: 'Lossless (Server)' },
-      ...(balancedAllowed
-        ? [{ value: 'server-balanced', label: 'Balanced (Server)' }]
-        : []),
-    ]);
+    const previousAlgorithm = algorithmSelect.value;
+    const serverAlgorithms = getServerCompressionAlgorithmOptions(
+      largeFile.size,
+      serverConfig.balancedMaxBytes
+    );
+    setOptions(algorithmSelect, serverAlgorithms);
+    algorithmSelect.value = serverAlgorithms.some(
+      ({ value }) => value === previousAlgorithm
+    )
+      ? previousAlgorithm
+      : serverAlgorithms[0].value;
     algorithmSelect.disabled = false;
     setOptions(compressionLevel, [{ value: 'light', label: 'Server-managed' }]);
     compressionLevel.disabled = true;
@@ -592,14 +620,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const wait = (ms: number) =>
     new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 
-  const downloadServerResult = async (jobId: string, file: File) => {
+  const downloadServerResult = async (
+    jobId: string,
+    file: File
+  ): Promise<{ preservedOriginal: boolean }> => {
     const response = await fetch(`/api/compression/jobs/${jobId}/download`, {
       credentials: 'include',
     });
     if (!response.ok) throw new Error(await readApiError(response));
     const result = await response.blob();
     const outputName = file.name.replace(/\.pdf$/i, '_compressed.pdf');
-    downloadFile(result, outputName);
+    const preservedOriginal = !isCompressionResultSmaller(
+      file.size,
+      result.size
+    );
+    downloadFile(preservedOriginal ? file : result, outputName);
+    return { preservedOriginal };
   };
 
   const reserveServerUploadSlot = async (
@@ -834,14 +870,23 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       } else if (current.status === 'completed') {
         setServerStatus('Preparing secure download...', false, 100);
-        await downloadServerResult(jobId, file);
+        const { preservedOriginal } = await downloadServerResult(jobId, file);
         clearServerStatus();
-        showAlert(
-          'Compression Complete',
-          'The server-side compression result has been downloaded. The temporary server files have been removed.',
-          'success',
-          () => resetState()
-        );
+        if (preservedOriginal) {
+          showAlert(
+            'Compression Finished',
+            'Compression could not make this PDF smaller, so the original PDF was downloaded unchanged.',
+            'warning',
+            () => resetState()
+          );
+        } else {
+          showAlert(
+            'Compression Complete',
+            'The server-side compression result has been downloaded. The temporary server files have been removed.',
+            'success',
+            () => resetState()
+          );
+        }
         return;
       } else if (current.status === 'cancelled') {
         throw new Error('Server compression was cancelled');
@@ -980,6 +1025,15 @@ document.addEventListener('DOMContentLoaded', () => {
           usedMethod = 'Photon';
         }
 
+        const preservedOriginal = !isCompressionResultSmaller(
+          originalFile.size,
+          resultSize
+        );
+        if (preservedOriginal) {
+          resultBlob = originalFile;
+          resultSize = originalFile.size;
+        }
+
         const originalSize = formatBytes(originalFile.size);
         const compressedSize = formatBytes(resultSize);
         const savings = originalFile.size - resultSize;
@@ -1000,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           showAlert(
             'Compression Finished',
-            `Method: ${usedMethod}. Could not reduce file size further. Original: ${originalSize}, New: ${compressedSize}.`,
+            `Method: ${usedMethod}. Could not reduce file size further, so the original PDF was downloaded unchanged (${originalSize}).`,
             'warning',
             () => resetState()
           );
@@ -1011,6 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const zip = new JSZip();
         let totalOriginalSize = 0;
         let totalCompressedSize = 0;
+        let originalsPreserved = 0;
 
         for (let i = 0; i < state.files.length; i++) {
           const file = state.files[i];
@@ -1040,8 +1095,14 @@ document.addEventListener('DOMContentLoaded', () => {
             resultBytes = photonResult;
           }
 
-          totalCompressedSize += resultBytes.length;
-          zip.file(file.name, resultBytes);
+          if (isCompressionResultSmaller(file.size, resultBytes.length)) {
+            totalCompressedSize += resultBytes.length;
+            zip.file(file.name, resultBytes);
+          } else {
+            originalsPreserved += 1;
+            totalCompressedSize += file.size;
+            zip.file(file.name, file);
+          }
         }
 
         const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -1056,16 +1117,20 @@ document.addEventListener('DOMContentLoaded', () => {
         hideLoader();
 
         if (totalSavings > 0) {
+          const preservationNote =
+            originalsPreserved > 0
+              ? ` ${originalsPreserved} PDF(s) that did not shrink were kept unchanged.`
+              : '';
           showAlert(
             'Compression Complete',
-            `Compressed ${state.files.length} PDF(s). Total size reduced from ${formatBytes(totalOriginalSize)} to ${formatBytes(totalCompressedSize)} (Saved ${totalSavingsPercent}%).`,
+            `Compressed ${state.files.length} PDF(s). Total size reduced from ${formatBytes(totalOriginalSize)} to ${formatBytes(totalCompressedSize)} (Saved ${totalSavingsPercent}%).${preservationNote}`,
             'success',
             () => resetState()
           );
         } else {
           showAlert(
             'Compression Finished',
-            `Compressed ${state.files.length} PDF(s). Total size: ${formatBytes(totalCompressedSize)}.`,
+            `No PDF became smaller. The ${originalsPreserved} original PDF(s) were kept unchanged in the ZIP (${formatBytes(totalCompressedSize)}).`,
             'info',
             () => resetState()
           );

@@ -158,7 +158,8 @@ async function waitForAnnotationChangesToCommit(
 }
 
 async function regenerateMissingFreeTextAppearances(
-  documentId: string
+  documentId: string,
+  skipAnnotationIds: ReadonlySet<string> = new Set()
 ): Promise<void> {
   if (!annotationPlugin || !docManagerPlugin || !textEditRegistry) return;
 
@@ -172,28 +173,95 @@ async function regenerateMissingFreeTextAppearances(
       object.type === FREE_TEXT_ANNOTATION_TYPE &&
       !object.appearanceModes
   );
+  const failedAnnotationIds: string[] = [];
 
   for (const { object } of annotations) {
+    if (skipAnnotationIds.has(object.id)) continue;
     const page = document.pages.find((item) => item.index === object.pageIndex);
-    if (!page) continue;
+    if (!page) {
+      failedAnnotationIds.push(object.id);
+      continue;
+    }
 
     const attemptKey = `${documentId}:${object.id}`;
     if (appearanceRepairAttempts.has(attemptKey)) continue;
-    appearanceRepairAttempts.add(attemptKey);
 
     try {
       await textEditRegistry
         .getEngine()
-        .updatePageAnnotation(document, page, object)
+        .updatePageAnnotation(document, page, object, {
+          regenerateAppearance: true,
+        })
         .toPromise();
+      appearanceRepairAttempts.add(attemptKey);
       scope.invalidatePageAppearances(object.pageIndex);
     } catch (error) {
+      failedAnnotationIds.push(object.id);
       console.warn(
         `[PDF Editor] Could not regenerate the appearance for annotation ${object.id}.`,
         error
       );
     }
   }
+
+  if (failedAnnotationIds.length > 0) {
+    throw new Error(
+      `Could not prepare ${failedAnnotationIds.length} text annotation appearance(s) for export`
+    );
+  }
+}
+
+/**
+ * PDFium can show a newly-created FreeText replacement from its transient UI
+ * state while the serialized annotation still has no /AP stream. PDF viewers
+ * then synthesize that appearance themselves, which produces different font
+ * sizes in Edge, Chrome, mobile viewers, and Word. Rebuilding the appearance
+ * through the engine immediately before export makes the PDF self-contained.
+ */
+async function regeneratePendingTextReplacementAppearances(
+  documentId: string
+): Promise<string[]> {
+  if (!annotationPlugin || !docManagerPlugin || !textEditRegistry) return [];
+
+  const document = docManagerPlugin.getDocument(documentId);
+  if (!document) return [];
+
+  const replacements = pendingTextReplacements.filter(
+    (replacement) =>
+      replacement.documentId === documentId && !replacement.cancelled
+  );
+  if (replacements.length === 0) return [];
+
+  const scope = annotationPlugin.forDocument(documentId);
+  const regeneratedIds: string[] = [];
+  for (const replacement of replacements) {
+    const tracked = scope.getAnnotationById(replacement.annotationId);
+    if (!tracked || tracked.commitState === 'deleted') {
+      replacement.cancelled = true;
+      continue;
+    }
+    const annotation = tracked.object as PdfFreeTextAnnoObject;
+    const page = document.pages.find(
+      (candidate) => candidate.index === annotation.pageIndex
+    );
+    if (!page) {
+      throw new Error(
+        `Could not find page ${annotation.pageIndex} for text replacement`
+      );
+    }
+
+    replacement.annotation = annotation;
+    replacement.page = page;
+    await textEditRegistry
+      .getEngine()
+      .updatePageAnnotation(document, page, annotation, {
+        regenerateAppearance: true,
+      })
+      .toPromise();
+    regeneratedIds.push(annotation.id);
+    scope.invalidatePageAppearances(page.index);
+  }
+  return regeneratedIds;
 }
 
 function isEditableEventTarget(event: KeyboardEvent): boolean {
@@ -280,7 +348,10 @@ function countVisibleCharacters(value: string): number {
   return [...value].filter((character) => !/\s/.test(character)).length;
 }
 
-function shouldCenterReplacement(originalText: string, replacementText: string) {
+function shouldCenterReplacement(
+  originalText: string,
+  replacementText: string
+) {
   const originalLength = countVisibleCharacters(originalText);
   const replacementLength = countVisibleCharacters(replacementText);
   return originalLength >= 8 && replacementLength <= originalLength * 0.6;
@@ -311,9 +382,7 @@ function getTextEditScope(documentId: string): TextEditScope {
 }
 
 function getTextEditToolbar(scope: TextEditScope): string {
-  return scope === 'phrase'
-    ? TEXT_EDIT_PHRASE_TOOLBAR
-    : TEXT_EDIT_WORD_TOOLBAR;
+  return scope === 'phrase' ? TEXT_EDIT_PHRASE_TOOLBAR : TEXT_EDIT_WORD_TOOLBAR;
 }
 
 function isTextEditToolbar(toolbarId: string | null): boolean {
@@ -420,8 +489,7 @@ function getCompactModeButton(): HTMLButtonElement | null {
       (button) => {
         const wrapper = button.parentElement;
         return (
-          wrapper?.style.width === '100px' &&
-          wrapper.style.maxWidth === '100px'
+          wrapper?.style.width === '100px' && wrapper.style.maxWidth === '100px'
         );
       }
     );
@@ -468,7 +536,9 @@ function showTextEditSnapGuide(
   if (bounds.width === 0 || bounds.height === 0) return;
 
   const guide = getTextEditSnapGuide();
-  const horizontal = guide.querySelector<HTMLElement>('[data-guide="horizontal"]');
+  const horizontal = guide.querySelector<HTMLElement>(
+    '[data-guide="horizontal"]'
+  );
   const vertical = guide.querySelector<HTMLElement>('[data-guide="vertical"]');
   const scaleX = bounds.width / page.size.width;
   const scaleY = bounds.height / page.size.height;
@@ -548,10 +618,12 @@ function getTextEditAlignmentGuides(
       guide: run.rect.origin.x + run.rect.size.width / 2,
     },
   ]);
-  const yCandidates = runs.map((run): AlignmentGuide => ({
-    origin: run.rect.origin.y - verticalPadding,
-    guide: run.rect.origin.y,
-  }));
+  const yCandidates = runs.map(
+    (run): AlignmentGuide => ({
+      origin: run.rect.origin.y - verticalPadding,
+      guide: run.rect.origin.y,
+    })
+  );
   const guideX = nearestAlignmentGuide(
     annotation.rect.origin.x,
     xCandidates,
@@ -630,8 +702,9 @@ function rectForTextRange(
   end: number,
   textLength: number
 ): PdfTextRun['rect'] {
-  const matchingGlyphs = Array.from({ length: Math.max(0, end - start) }, (_, index) =>
-    glyphs[run.charIndex + start + index]
+  const matchingGlyphs = Array.from(
+    { length: Math.max(0, end - start) },
+    (_, index) => glyphs[run.charIndex + start + index]
   ).filter((glyph): glyph is PdfGlyphObject => Boolean(glyph));
   if (matchingGlyphs.length === 0) {
     const ratioStart = start / Math.max(1, textLength);
@@ -658,7 +731,10 @@ function rectForTextRange(
   );
   return {
     origin: { x: left, y: top },
-    size: { width: Math.max(1, right - left), height: Math.max(1, bottom - top) },
+    size: {
+      width: Math.max(1, right - left),
+      height: Math.max(1, bottom - top),
+    },
   };
 }
 
@@ -672,7 +748,9 @@ function selectWordFromRun(
   let selectedIndex = getNearestCharacterIndex(run, text, glyphs, position);
   if (!isWordCharacter(text[selectedIndex] ?? '')) {
     const right = [...text.slice(selectedIndex)].findIndex(isWordCharacter);
-    const left = [...text.slice(0, selectedIndex)].reverse().findIndex(isWordCharacter);
+    const left = [...text.slice(0, selectedIndex)]
+      .reverse()
+      .findIndex(isWordCharacter);
     if (right >= 0) selectedIndex += right;
     else if (left >= 0) selectedIndex -= left + 1;
   }
@@ -695,10 +773,18 @@ function selectWordFromRun(
   };
 }
 
-function isOnSameTextLine(reference: PdfTextRun, candidate: PdfTextRun): boolean {
-  const referenceCenter = reference.rect.origin.y + reference.rect.size.height / 2;
-  const candidateCenter = candidate.rect.origin.y + candidate.rect.size.height / 2;
-  return Math.abs(referenceCenter - candidateCenter) <= Math.max(2, reference.fontSize * 0.38);
+function isOnSameTextLine(
+  reference: PdfTextRun,
+  candidate: PdfTextRun
+): boolean {
+  const referenceCenter =
+    reference.rect.origin.y + reference.rect.size.height / 2;
+  const candidateCenter =
+    candidate.rect.origin.y + candidate.rect.size.height / 2;
+  return (
+    Math.abs(referenceCenter - candidateCenter) <=
+    Math.max(2, reference.fontSize * 0.38)
+  );
 }
 
 async function selectPhraseFromRuns(
@@ -708,7 +794,9 @@ async function selectPhraseFromRuns(
   runs: PdfTextRun[]
 ): Promise<TextEditSelection> {
   const lineRuns = runs
-    .filter((run) => isEditableTextRun(run) && isOnSameTextLine(clickedRun, run))
+    .filter(
+      (run) => isEditableTextRun(run) && isOnSameTextLine(clickedRun, run)
+    )
     .sort((left, right) => left.rect.origin.x - right.rect.origin.x);
   const clickedIndex = Math.max(0, lineRuns.indexOf(clickedRun));
   let start = clickedIndex;
@@ -718,7 +806,8 @@ async function selectPhraseFromRuns(
   while (
     start > 0 &&
     lineRuns[start].rect.origin.x -
-      (lineRuns[start - 1].rect.origin.x + lineRuns[start - 1].rect.size.width) <=
+      (lineRuns[start - 1].rect.origin.x +
+        lineRuns[start - 1].rect.size.width) <=
       maxGap
   ) {
     start -= 1;
@@ -741,7 +830,9 @@ async function selectPhraseFromRuns(
     if (!phrase) return part;
     const previous = phraseRuns[index - 1];
     const current = phraseRuns[index];
-    const gap = current.rect.origin.x - (previous.rect.origin.x + previous.rect.size.width);
+    const gap =
+      current.rect.origin.x -
+      (previous.rect.origin.x + previous.rect.size.width);
     return `${phrase}${/\s$/.test(phrase) || /^\s/.test(part) || gap < 1 ? '' : ' '}${part}`;
   }, '');
   const left = Math.min(...phraseRuns.map((run) => run.rect.origin.x));
@@ -792,7 +883,9 @@ function findTextRunAtPosition(
 }
 
 function getTextEditDialog(): HTMLDialogElement | null {
-  return document.getElementById('text-edit-dialog') as HTMLDialogElement | null;
+  return document.getElementById(
+    'text-edit-dialog'
+  ) as HTMLDialogElement | null;
 }
 
 function closeTextEditor() {
@@ -803,7 +896,9 @@ function closeTextEditor() {
 
 function openTextEditor(edit: ActiveTextEdit) {
   const dialog = getTextEditDialog();
-  const input = document.getElementById('text-edit-value') as HTMLTextAreaElement;
+  const input = document.getElementById(
+    'text-edit-value'
+  ) as HTMLTextAreaElement;
   const fontLabel = document.getElementById('text-edit-font');
   if (!dialog || !input || !fontLabel) return;
 
@@ -854,7 +949,9 @@ function createReplacementAnnotation(edit: ActiveTextEdit, text: string) {
 }
 
 function applyTextReplacement() {
-  const input = document.getElementById('text-edit-value') as HTMLTextAreaElement;
+  const input = document.getElementById(
+    'text-edit-value'
+  ) as HTMLTextAreaElement;
   if (!activeTextEdit || !input || !annotationPlugin) return;
 
   const text = input.value.trim();
@@ -879,16 +976,16 @@ function applyTextReplacement() {
 }
 
 function installTextEditMode(registry: PluginRegistry) {
-  const commands = registry
-    .getPlugin('commands')
-    ?.provides() as CommandsCapability | undefined;
+  const commands = registry.getPlugin('commands')?.provides() as
+    | CommandsCapability
+    | undefined;
   const ui = registry.getPlugin('ui')?.provides() as UICapability | undefined;
-  const selection = registry
-    .getPlugin('selection')
-    ?.provides() as SelectionCapability | undefined;
-  const interaction = registry
-    .getPlugin('interaction-manager')
-    ?.provides() as InteractionManagerCapability | undefined;
+  const selection = registry.getPlugin('selection')?.provides() as
+    | SelectionCapability
+    | undefined;
+  const interaction = registry.getPlugin('interaction-manager')?.provides() as
+    | InteractionManagerCapability
+    | undefined;
   if (!commands || !ui || !selection || !interaction) return;
 
   textEditRegistry = registry;
@@ -907,9 +1004,11 @@ function installTextEditMode(registry: PluginRegistry) {
       { enableSelection: true, showSelectionRects: true },
       documentId
     );
-    ui
-      .forDocument(documentId)
-      .setActiveToolbar('top', 'secondary', getTextEditToolbar(scope));
+    ui.forDocument(documentId).setActiveToolbar(
+      'top',
+      'secondary',
+      getTextEditToolbar(scope)
+    );
     interaction.forDocument(documentId).activate(TEXT_EDIT_MODE);
   };
 
@@ -1003,7 +1102,11 @@ function installTextEditMode(registry: PluginRegistry) {
       (tab) => tab.commandId === 'tabs:overflow-menu'
     );
     const tabs = [...tabGroup.tabs];
-    tabs.splice(overflowIndex >= 0 ? overflowIndex : tabs.length, 0, editTextTab);
+    tabs.splice(
+      overflowIndex >= 0 ? overflowIndex : tabs.length,
+      0,
+      editTextTab
+    );
     return {
       ...tabGroup,
       tabs,
@@ -1071,9 +1174,7 @@ function installTextEditMode(registry: PluginRegistry) {
   ui.mergeSchema({
     toolbars: {
       [toolbar.id]: { ...toolbar, items, responsive },
-      [TEXT_EDIT_WORD_TOOLBAR]: createTextEditToolbar(
-        TEXT_EDIT_WORD_TOOLBAR
-      ),
+      [TEXT_EDIT_WORD_TOOLBAR]: createTextEditToolbar(TEXT_EDIT_WORD_TOOLBAR),
       [TEXT_EDIT_PHRASE_TOOLBAR]: createTextEditToolbar(
         TEXT_EDIT_PHRASE_TOOLBAR
       ),
@@ -1183,7 +1284,11 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
             replacement.annotation
           );
           if (guides) {
-            showTextEditSnapGuide(replacement.page, guides.guideX, guides.guideY);
+            showTextEditSnapGuide(
+              replacement.page,
+              guides.guideX,
+              guides.guideY
+            );
           }
         }
       }
@@ -1198,7 +1303,12 @@ function registerTextEditHandlers(documentId: string, attempts = 0) {
 
 function setupAnnotationClipboard(pdfContainer: HTMLElement) {
   pdfContainer.addEventListener('keydown', (event) => {
-    if (event.altKey || isEditableEventTarget(event) || !annotationPlugin || !docManagerPlugin) {
+    if (
+      event.altKey ||
+      isEditableEventTarget(event) ||
+      !annotationPlugin ||
+      !docManagerPlugin
+    ) {
       return;
     }
 
@@ -1229,9 +1339,7 @@ function setupAnnotationClipboard(pdfContainer: HTMLElement) {
       if (selected.length === 0) return;
 
       annotationClipboard = {
-        annotations: selected.map(({ object }) =>
-          structuredClone(object)
-        ),
+        annotations: selected.map(({ object }) => structuredClone(object)),
         pasteCount: 0,
       };
       event.preventDefault();
@@ -1353,7 +1461,6 @@ function initializePage() {
       event.preventDefault();
       applyTextReplacement();
     });
-
 }
 
 async function handleFileUpload(e: Event) {
@@ -1436,6 +1543,15 @@ async function handleFiles(files: FileList) {
 
       docManagerPlugin.onDocumentClosed((data: { id?: string }) => {
         const docId = data?.id || '';
+        for (
+          let index = pendingTextReplacements.length - 1;
+          index >= 0;
+          index -= 1
+        ) {
+          if (pendingTextReplacements[index].documentId === docId) {
+            pendingTextReplacements.splice(index, 1);
+          }
+        }
         textEditHandlerCleanups.get(docId)?.();
         textEditHandlerCleanups.delete(docId);
         appearanceRepairAttempts.forEach((key) => {
@@ -1512,13 +1628,38 @@ async function handleFiles(files: FileList) {
           // Match the viewer's built-in Export flow so annotation lifecycle
           // and download behavior remain owned by the viewer.
           blurDeepActiveElement();
+          const annotationScope = annotationPlugin?.forDocument(documentId);
+          annotationScope?.deselectAnnotation();
           await waitForAnimationFrames();
           await waitForAnnotationChangesToCommit(documentId);
-          const commands = registry
-            .getPlugin('commands')
-            ?.provides() as CommandsCapability | undefined;
+          const regeneratedReplacementIds =
+            await regeneratePendingTextReplacementAppearances(documentId);
+          await regenerateMissingFreeTextAppearances(
+            documentId,
+            new Set(regeneratedReplacementIds)
+          );
+          await waitForAnimationFrames();
+          await waitForAnnotationChangesToCommit(documentId);
+          const commands = registry.getPlugin('commands')?.provides() as
+            | CommandsCapability
+            | undefined;
           if (!commands) throw new Error('PDF export command is unavailable');
           commands.execute('document:export', documentId, 'ui');
+          for (
+            let index = pendingTextReplacements.length - 1;
+            index >= 0;
+            index -= 1
+          ) {
+            if (
+              pendingTextReplacements[index].documentId === documentId &&
+              (pendingTextReplacements[index].cancelled ||
+                regeneratedReplacementIds.includes(
+                  pendingTextReplacements[index].annotationId
+                ))
+            ) {
+              pendingTextReplacements.splice(index, 1);
+            }
+          }
         } catch (err) {
           console.error('Error downloading PDF:', err);
           showAlert('Error', 'Failed to download the edited PDF.');

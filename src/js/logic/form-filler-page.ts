@@ -2,10 +2,12 @@
 import { createIcons, icons } from 'lucide';
 import { getPDFDocument } from '../utils/helpers.js';
 import { loadPdfWithPasswordPrompt } from '../utils/password-prompt.js';
+import { attachPdfJsThemeSync } from '../pdfjs-theme.js';
 
 let viewerIframe: HTMLIFrameElement | null = null;
 let viewerReady = false;
 let currentFile: File | null = null;
+let detachViewerThemeSync: (() => void) | null = null;
 
 // UI helpers
 function showLoader(message: string = 'Processing...') {
@@ -99,6 +101,8 @@ function updateFileDisplay() {
 }
 
 function resetState() {
+  detachViewerThemeSync?.();
+  detachViewerThemeSync = null;
   viewerIframe = null;
   viewerReady = false;
   currentFile = null;
@@ -191,6 +195,9 @@ async function setupFormViewer() {
     // Apply dynamic height
     await adjustViewerHeight(currentFile);
 
+    detachViewerThemeSync?.();
+    detachViewerThemeSync = null;
+    viewerReady = false;
     pdfViewerContainer.innerHTML = '';
 
     const arrayBuffer = await currentFile.arrayBuffer();
@@ -198,6 +205,7 @@ async function setupFormViewer() {
     const blobUrl = URL.createObjectURL(blob);
 
     viewerIframe = document.createElement('iframe');
+    detachViewerThemeSync = attachPdfJsThemeSync(viewerIframe);
     viewerIframe.src = `${import.meta.env.BASE_URL}pdfjs-viewer/viewer.html?file=${encodeURIComponent(blobUrl)}`;
     viewerIframe.style.width = '100%';
     viewerIframe.style.height = '100%';
@@ -213,6 +221,8 @@ async function setupFormViewer() {
     const formFillerOptions = document.getElementById('form-filler-options');
     if (formFillerOptions) formFillerOptions.classList.remove('hidden');
   } catch (e) {
+    detachViewerThemeSync?.();
+    detachViewerThemeSync = null;
     console.error('Critical error setting up form filler:', e);
     showAlert('Error', 'Failed to load PDF form viewer.');
     hideLoader();

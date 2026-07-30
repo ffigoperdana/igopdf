@@ -8,6 +8,14 @@
 /* Enable `dark:` utilities driven by a `.dark` class on <html>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
 @theme {
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
   --color-deep-forest: #1F5630;
@@ -399,12 +407,12 @@ footer {
 }
 
 .nav-item:hover {
-  color: var(--color-vibrant-palm);
+  color: var(--color-palm-300);
 }
 
 .nav-item.is-active,
 .nav-item.is-active:hover {
-  color: #ffffff;
+  color: var(--color-ink-slate);
 }
 
 .nav-item.is-active::before {
@@ -587,11 +595,11 @@ footer a {
 }
 
 .nav-link {
-  @apply text-white hover:text-vibrant-palm px-3 py-2 rounded-md text-sm font-medium transition-colors;
+  @apply text-white hover:text-palm-300 px-3 py-2 rounded-md text-sm font-medium transition-colors;
 }
 
 .mobile-nav-link {
-  @apply text-white hover:text-vibrant-palm block px-3 py-2 rounded-md text-base font-medium transition-colors;
+  @apply text-white hover:text-palm-300 block px-3 py-2 rounded-md text-base font-medium transition-colors;
 }
 
 .marker-slanted {

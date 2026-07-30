@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readFile, rm, stat } from 'node:fs/promises';
+import { readFile, rename, rm, stat } from 'node:fs/promises';
 import { config } from './config/index.js';
 import { closePool } from './config/database.js';
 import {
@@ -20,6 +20,10 @@ import {
   releaseHeavyJobLock,
   tryAcquireHeavyJobLock,
 } from './services/heavyJobLockService.js';
+import {
+  buildCompressionCommand,
+  decideCompressionOutput,
+} from './services/compressionCommand.js';
 
 let stopping = false;
 let running = false;
@@ -44,52 +48,16 @@ async function oomKillCount(): Promise<number | null> {
   }
 }
 
-function commandFor(job: CompressionJob): {
-  executable: string;
-  args: string[];
-} {
-  const input = getJobInputPath(job.id);
-  const output = getJobOutputPath(job.id);
-
-  if (job.mode === 'lossless') {
-    return {
-      executable: 'qpdf',
-      args: [
-        '--warning-exit-0',
-        '--compress-streams=y',
-        '--decode-level=generalized',
-        '--recompress-flate',
-        '--compression-level=6',
-        '--object-streams=generate',
-        input,
-        output,
-      ],
-    };
-  }
-
-  return {
-    executable: 'gs',
-    args: [
-      '-dSAFER',
-      '-dBATCH',
-      '-dNOPAUSE',
-      '-sDEVICE=pdfwrite',
-      '-dCompatibilityLevel=1.6',
-      '-dPDFSETTINGS=/ebook',
-      '-dDownsampleColorImages=true',
-      '-dColorImageResolution=150',
-      '-dDownsampleGrayImages=true',
-      '-dGrayImageResolution=150',
-      '-dDownsampleMonoImages=true',
-      '-dMonoImageResolution=300',
-      `-sOutputFile=${output}`,
-      input,
-    ],
-  };
-}
-
-async function runJobProcess(job: CompressionJob): Promise<void> {
-  const { executable, args } = commandFor(job);
+async function runJobProcess(
+  job: CompressionJob,
+  mode: CompressionJob['mode'] = job.mode
+): Promise<void> {
+  const { executable, args } = buildCompressionCommand({
+    inputBytes: job.inputBytes,
+    mode,
+    inputPath: getJobInputPath(job.id),
+    outputPath: getJobOutputPath(job.id),
+  });
   const outputPath = getJobOutputPath(job.id);
   await rm(outputPath, { force: true });
 
@@ -152,6 +120,66 @@ async function runJobProcess(job: CompressionJob): Promise<void> {
   if (output.size === 0) throw new Error('EMPTY_OUTPUT');
 }
 
+async function keepSmallestCompressionResult(
+  job: CompressionJob
+): Promise<'compressed' | 'original'> {
+  const inputPath = getJobInputPath(job.id);
+  const outputPath = getJobOutputPath(job.id);
+  const input = await stat(inputPath);
+  let output = await stat(outputPath);
+  let attemptedMode = job.mode;
+  let decision = decideCompressionOutput({
+    requestedMode: job.mode,
+    attemptedMode,
+    inputBytes: input.size,
+    outputBytes: output.size,
+  });
+
+  if (decision === 'retry-lossless') {
+    if (await isCancellationRequested(job.id)) {
+      throw new Error('CANCELLED');
+    }
+
+    logger.info('Balanced output was not smaller; retrying lossless', {
+      jobId: job.id,
+    });
+    attemptedMode = 'lossless';
+    try {
+      await runJobProcess(job, attemptedMode);
+      output = await stat(outputPath);
+      decision = decideCompressionOutput({
+        requestedMode: job.mode,
+        attemptedMode,
+        inputBytes: input.size,
+        outputBytes: output.size,
+      });
+    } catch (error) {
+      if (
+        (error instanceof Error && error.message === 'CANCELLED') ||
+        (await isCancellationRequested(job.id))
+      ) {
+        throw error;
+      }
+      await rm(outputPath, { force: true });
+      decision = 'preserve-original';
+      logger.warn('Lossless retry failed; preserving original PDF', {
+        jobId: job.id,
+      });
+    }
+  }
+
+  if (decision === 'preserve-original') {
+    if (await isCancellationRequested(job.id)) {
+      throw new Error('CANCELLED');
+    }
+    await rm(outputPath, { force: true });
+    await rename(inputPath, outputPath);
+    return 'original';
+  }
+
+  return 'compressed';
+}
+
 async function processJob(job: CompressionJob): Promise<void> {
   const oomKillsBefore = await oomKillCount();
   try {
@@ -161,6 +189,7 @@ async function processJob(job: CompressionJob): Promise<void> {
       return;
     }
     await runJobProcess(job);
+    const resultKind = await keepSmallestCompressionResult(job);
     if (await isCancellationRequested(job.id)) {
       await rm(getJobOutputPath(job.id), { force: true });
       await rm(getJobInputPath(job.id), { force: true });
@@ -169,7 +198,11 @@ async function processJob(job: CompressionJob): Promise<void> {
     }
     await rm(getJobInputPath(job.id), { force: true });
     await markJobCompleted(job.id);
-    logger.info('Compression job completed', { jobId: job.id, mode: job.mode });
+    logger.info('Compression job completed', {
+      jobId: job.id,
+      mode: job.mode,
+      resultKind,
+    });
   } catch (error) {
     await rm(getJobOutputPath(job.id), { force: true });
     await rm(getJobInputPath(job.id), { force: true });

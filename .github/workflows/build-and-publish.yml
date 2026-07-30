@@ -38,7 +38,7 @@ jobs:
         run: npm run build
 
       - name: Run targeted frontend tests
-        run: npm run test:run -- src/tests/comic-info.test.ts src/tests/tesseract-runtime.test.ts src/tests/xss-replay.test.ts src/tests/digital-sign-pdf.test.ts
+        run: npm run test:run -- src/tests/comic-info.test.ts src/tests/tesseract-runtime.test.ts src/tests/xss-replay.test.ts src/tests/digital-sign-pdf.test.ts src/tests/floating-news.test.ts src/tests/theme.test.ts src/tests/pdfjs-theme.test.ts src/tests/pdf-editor-compatibility.test.ts src/tests/compress-pdf-flow.test.ts src/tests/pdf-to-docx-routing.test.ts
 
       - name: Install backend dependencies
         working-directory: backend
@@ -47,6 +47,23 @@ jobs:
       - name: Build backend
         working-directory: backend
         run: npm run build
+
+      - name: Run backend compression tests
+        working-directory: backend
+        run: npm run test:run -- src/services/compressionCommand.test.ts
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements-docx.txt
+
+      - name: Install DOCX test dependencies
+        run: python -m pip install --disable-pip-version-check --requirement backend/requirements-docx.txt
+
+      - name: Run DOCX conversion tests
+        run: python backend/src/scripts/docx_convert_test.py
 
   docker-build-check:
     runs-on: ubuntu-latest

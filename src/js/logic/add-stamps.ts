@@ -6,10 +6,12 @@ import {
 import { initializeGlobalShortcuts } from '../utils/shortcuts-init.js';
 import { createIcons, icons } from 'lucide';
 import { loadPdfWithPasswordPrompt } from '../utils/password-prompt.js';
+import { attachPdfJsThemeSync } from '../pdfjs-theme.js';
 
 let selectedFile: File | null = null;
 let viewerIframe: HTMLIFrameElement | null = null;
 let currentBlobUrl: string | null = null;
+let detachViewerThemeSync: (() => void) | null = null;
 
 const pdfInput = document.getElementById('pdfFile') as HTMLInputElement;
 const fileListDiv = document.getElementById('fileList') as HTMLDivElement;
@@ -34,6 +36,8 @@ const usernameInput = document.getElementById(
 
 function resetState() {
   selectedFile = null;
+  detachViewerThemeSync?.();
+  detachViewerThemeSync = null;
   if (currentBlobUrl) {
     URL.revokeObjectURL(currentBlobUrl);
     currentBlobUrl = null;
@@ -148,6 +152,8 @@ async function loadPdfInViewer(file: File) {
   }
 
   // Clear existing iframe and blob URL
+  detachViewerThemeSync?.();
+  detachViewerThemeSync = null;
   if (viewerIframe && viewerIframe.parentElement === viewerContainer) {
     viewerContainer.removeChild(viewerIframe);
   }
@@ -190,6 +196,7 @@ async function loadPdfInViewer(file: File) {
   const hashParams = stampUserName
     ? `#ae_username=${encodeURIComponent(stampUserName)}`
     : '';
+  detachViewerThemeSync = attachPdfJsThemeSync(iframe);
   iframe.src = `${viewerUrl.toString()}?file=${encodeURIComponent(currentBlobUrl)}${hashParams}`;
 
   iframe.addEventListener('load', () => {

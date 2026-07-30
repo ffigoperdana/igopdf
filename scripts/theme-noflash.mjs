@@ -10,4 +10,4 @@
 // <script> and </script>, and Vite passes non-module inline scripts through
 // verbatim, so the built output must equal this string exactly.
 export const THEME_NOFLASH_JS =
-  "try{var __t=localStorage.getItem('igo-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}";
+  "try{var __m=matchMedia('(prefers-color-scheme: dark)').matches,__s;try{__s=localStorage.getItem('igo-theme')}catch(e){}var __t=__s==='light'||__s==='dark'?__s:__m?'dark':'light';if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}";
