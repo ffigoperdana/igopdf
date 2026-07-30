@@ -37,11 +37,10 @@ function updateUI(): void {
   const authAreaMobile = document.getElementById('auth-area-mobile');
   const mobileAuthMenu = document.getElementById('mobile-auth-menu');
 
-  // Navbar inverts (green→white text in light, white→ink text in dark), so
-  // links inherit/flip; the orange button stays the same in both themes.
-  const linkCls = 'text-white hover:text-palm-300 text-sm font-medium';
+  // Keep navbar actions consistent with the production treatment in both themes.
+  const linkCls = 'text-white hover:text-vibrant-palm text-sm font-medium';
   const btnCls =
-    'bg-vibrant-palm hover:bg-palm-500 text-ink-slate px-4 py-2 rounded text-sm font-medium transition-colors';
+    'bg-vibrant-palm hover:bg-palm-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors';
 
   if (currentUser) {
     const adminLinkDesktop = isAdmin(currentUser)

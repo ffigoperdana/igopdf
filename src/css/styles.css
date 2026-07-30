@@ -407,12 +407,12 @@ footer {
 }
 
 .nav-item:hover {
-  color: var(--color-palm-300);
+  color: var(--color-vibrant-palm);
 }
 
 .nav-item.is-active,
 .nav-item.is-active:hover {
-  color: var(--color-ink-slate);
+  color: #ffffff;
 }
 
 .nav-item.is-active::before {
@@ -595,11 +595,11 @@ footer a {
 }
 
 .nav-link {
-  @apply text-white hover:text-palm-300 px-3 py-2 rounded-md text-sm font-medium transition-colors;
+  @apply text-white hover:text-vibrant-palm px-3 py-2 rounded-md text-sm font-medium transition-colors;
 }
 
 .mobile-nav-link {
-  @apply text-white hover:text-palm-300 block px-3 py-2 rounded-md text-base font-medium transition-colors;
+  @apply text-white hover:text-vibrant-palm block px-3 py-2 rounded-md text-base font-medium transition-colors;
 }
 
 .marker-slanted {
@@ -932,10 +932,29 @@ button:disabled,
 }
 
 /* Scroll to Top Button Visibility */
+#scroll-to-top-btn {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 3.75rem);
+  transform: translateY(1.5rem);
+}
+
 #scroll-to-top-btn.visible {
   opacity: 1;
   transform: translateY(0);
   visibility: visible;
+}
+
+body:has(.floating-news.is-open) #scroll-to-top-btn {
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (max-width: 640px) {
+  #scroll-to-top-btn {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 3.75rem);
+  }
 }
 
 .bg-grid-pattern {
