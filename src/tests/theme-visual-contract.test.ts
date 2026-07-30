@@ -156,7 +156,7 @@ describe('theme visual contracts', () => {
     );
 
     expect(compact(darkRoot)).toContain(
-      '--floating-news-bg: color-mix( in srgb, var(--color-deep-forest, #1f5630) 93%, #071b12 );'
+      '--floating-news-bg: var(--color-surface-raised, #112e20);'
     );
     expect(compact(darkRoot)).toContain('--floating-news-fg: #f3fbf6;');
     expect(compact(darkRoot)).toContain('--floating-news-muted: #c8ddcf;');

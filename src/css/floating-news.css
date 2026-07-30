@@ -29,11 +29,9 @@
 }
 
 .dark .floating-news {
-  --floating-news-bg: color-mix(
-    in srgb,
-    var(--color-deep-forest, #1f5630) 93%,
-    #071b12
-  );
+  /* Match the dark dashboard cards and navbar; only the gold outline should
+     make this panel stand out. */
+  --floating-news-bg: var(--color-surface-raised, #112e20);
   --floating-news-fg: #f3fbf6;
   --floating-news-muted: #c8ddcf;
   --floating-news-accent: #ffc46b;
