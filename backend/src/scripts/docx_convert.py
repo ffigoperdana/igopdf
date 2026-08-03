@@ -13,10 +13,12 @@ import tempfile
 import fitz
 import pytesseract
 from docx import Document
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches
+from docx.table import Table, _Cell
 from pdf2docx import Converter
 from PIL import Image
 
@@ -589,6 +591,273 @@ def _recover_collapsed_nota_riil_tables(document):
     return recovered
 
 
+def _as_dxa(value):
+    try:
+        return round(float(value))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _table_indent(table):
+    indent = table._tbl.tblPr.find(qn("w:tblInd"))
+    if indent is None or indent.get(qn("w:type")) != "dxa":
+        return 0
+    return _as_dxa(indent.get(qn("w:w")))
+
+
+def _table_ancestors(table):
+    """Return immediate-to-outer table ancestors for a nested Word table."""
+    ancestors = []
+    current = table
+    while isinstance(current._parent, _Cell):
+        parent = current._parent._parent
+        if not isinstance(parent, Table):
+            break
+        ancestors.append(parent)
+        current = parent
+    return ancestors
+
+
+def _has_exact_row_height(table):
+    for row in table.rows:
+        properties = row._tr.trPr
+        height = (
+            properties.find(qn("w:trHeight"))
+            if properties is not None
+            else None
+        )
+        if height is not None and height.get(qn("w:hRule")) == "exact":
+            return True
+    return False
+
+
+def _is_disposable_expense_wrapper(ancestors):
+    """Recognize the empty fixed-height table stack emitted by pdf2docx.
+
+    Those wrapper tables do not represent visible source content. Leaving the
+    expense grid inside them makes Word clip the entire editable table even
+    though its XML text is present.
+    """
+    if not ancestors or not any(_has_exact_row_height(table) for table in ancestors):
+        return False
+    for table in ancestors:
+        if len(table.rows) != 1 or len(table.columns) != 1:
+            return False
+        if any(paragraph.text.strip() for paragraph in table.cell(0, 0).paragraphs):
+            return False
+    return True
+
+
+def _cell_dxa_width(cell):
+    properties = cell._tc.tcPr
+    width = properties.find(qn("w:tcW")) if properties is not None else None
+    if width is None or width.get(qn("w:type")) != "dxa":
+        return 0
+    return _as_dxa(width.get(qn("w:w")))
+
+
+def _expense_table_widths(table, header_index):
+    header_cells = _logical_row_cells(table.rows[header_index])
+    widths = [_cell_dxa_width(cell) for cell in header_cells]
+    if len(widths) >= 3 and all(width > 0 for width in widths[:3]):
+        return widths[:3]
+
+    grid_widths = [
+        _as_dxa(column.get(qn("w:w")))
+        for column in table._tbl.tblGrid
+    ]
+    if len(grid_widths) >= 3 and all(grid_widths):
+        total = sum(grid_widths)
+        return [
+            max(520, round(total * 0.08)),
+            max(3200, round(total * 0.55)),
+            max(1800, total - round(total * 0.08) - round(total * 0.55)),
+        ]
+    return [760, 5180, 3440]
+
+
+def _expense_table_data(table):
+    """Extract the useful three-column content before discarding bad wrappers."""
+    header_index = _expense_header_index(table)
+    if header_index is None:
+        return None
+    total_index = _find_total_row_index(table, header_index)
+    if total_index is None or total_index <= header_index + 1:
+        return None
+
+    header_cells = _logical_row_cells(table.rows[header_index])
+    item_rows = []
+    for index in range(header_index + 1, total_index):
+        cells = _logical_row_cells(table.rows[index])
+        if len(cells) < 3 or not _is_item_number(cells[0].text):
+            continue
+        item_rows.append(
+            {
+                "number": cells[0].text.strip(),
+                "description": cells[1].text.strip(),
+                "amount": cells[-1].text.strip(),
+                "template": cells[1],
+            }
+        )
+    if not item_rows:
+        return None
+
+    total_cells = _logical_row_cells(table.rows[total_index])
+    if len(total_cells) < 2:
+        return None
+
+    # Some PDFs put the final item's calculation in the surplus cells of the
+    # total row. Keep it attached to that item's description in the rebuilt
+    # editable grid, where it appears in the source PDF.
+    middle_cells = total_cells[1:-1]
+    calculation = " ".join(
+        cell.text.strip() for cell in middle_cells if cell.text.strip()
+    )
+    if calculation and _looks_like_calculation(calculation):
+        description = item_rows[-1]["description"]
+        if calculation not in re.sub(r"\s+", " ", description):
+            item_rows[-1]["description"] = (
+                description + "\n" + calculation
+            ).strip()
+
+    headers = [cell.text.strip() for cell in header_cells]
+    if len(headers) < 3:
+        headers = ["No", "Uraian", "Jumlah"]
+    return {
+        "headers": headers[:3],
+        "items": item_rows,
+        "total": {
+            "label": total_cells[0].text.strip() or "Jumlah",
+            "amount": total_cells[-1].text.strip(),
+            "template": total_cells[-1],
+        },
+        "header_template": header_cells[0],
+        "widths": _expense_table_widths(table, header_index),
+    }
+
+
+def _set_table_indent(table, width):
+    properties = table._tbl.tblPr
+    indent = properties.find(qn("w:tblInd"))
+    if indent is None:
+        indent = OxmlElement("w:tblInd")
+        properties.append(indent)
+    indent.set(qn("w:type"), "dxa")
+    indent.set(qn("w:w"), str(max(0, width)))
+
+
+def _set_cell_shading(cell, fill):
+    properties = cell._tc.get_or_add_tcPr()
+    shading = properties.find(qn("w:shd"))
+    if shading is None:
+        shading = OxmlElement("w:shd")
+        properties.append(shading)
+    shading.set(qn("w:val"), "clear")
+    shading.set(qn("w:color"), "auto")
+    shading.set(qn("w:fill"), fill)
+
+
+def _set_cell_margins(cell, top=70, start=100, bottom=70, end=100):
+    properties = cell._tc.get_or_add_tcPr()
+    margins = properties.find(qn("w:tcMar"))
+    if margins is None:
+        margins = OxmlElement("w:tcMar")
+        properties.append(margins)
+    for edge, value in (("top", top), ("start", start), ("bottom", bottom), ("end", end)):
+        margin = margins.find(qn(f"w:{edge}"))
+        if margin is None:
+            margin = OxmlElement(f"w:{edge}")
+            margins.append(margin)
+        margin.set(qn("w:w"), str(value))
+        margin.set(qn("w:type"), "dxa")
+
+
+def _set_cell_run_color(cell, color):
+    for paragraph in cell.paragraphs:
+        for run in paragraph.runs:
+            properties = run._r.get_or_add_rPr()
+            color_element = properties.find(qn("w:color"))
+            if color_element is None:
+                color_element = OxmlElement("w:color")
+                properties.append(color_element)
+            color_element.set(qn("w:val"), color)
+
+
+def _replace_clipped_expense_table(document, table, ancestors, data):
+    """Promote a deeply nested grid to the document body so Word can render it."""
+    outer_table = ancestors[-1]
+    effective_indent = sum(_table_indent(candidate) for candidate in ancestors)
+    effective_indent += _table_indent(table)
+
+    rebuilt = document.add_table(rows=len(data["items"]) + 2, cols=3)
+    _set_table_geometry(rebuilt, data["widths"])
+    _set_table_indent(rebuilt, effective_indent)
+
+    for column, value in enumerate(data["headers"]):
+        cell = rebuilt.cell(0, column)
+        _set_cell_text_like(cell, value, data["header_template"])
+        _set_cell_shading(cell, "808080")
+        _set_cell_margins(cell)
+        _set_cell_run_color(cell, "FFFFFF")
+        for run in cell.paragraphs[0].runs:
+            run.bold = True
+        cell.paragraphs[0].alignment = (
+            WD_ALIGN_PARAGRAPH.LEFT
+            if column == 0
+            else WD_ALIGN_PARAGRAPH.CENTER
+        )
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    _set_row_height(rebuilt.rows[0], 420)
+
+    for offset, item in enumerate(data["items"], start=1):
+        row = rebuilt.rows[offset]
+        _set_cell_text_like(row.cells[0], item["number"], item["template"])
+        _set_cell_text_like(row.cells[1], item["description"], item["template"])
+        _set_cell_text_like(row.cells[2], item["amount"], item["template"])
+        for cell in row.cells:
+            _set_cell_margins(cell)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+        row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+        row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+        row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        _set_row_height(row, _minimum_expense_row_height(row))
+
+    total_row = rebuilt.rows[-1]
+    total_cell = total_row.cells[0].merge(total_row.cells[1])
+    _set_cell_text_like(total_cell, data["total"]["label"], data["total"]["template"])
+    _set_cell_text_like(
+        total_row.cells[2], data["total"]["amount"], data["total"]["template"]
+    )
+    for cell in (total_cell, total_row.cells[2]):
+        _set_cell_margins(cell)
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+    total_cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+    total_row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    _set_row_height(total_row, 420)
+    _set_table_grid_borders(rebuilt)
+
+    # add_table appends to the body. Put the clean table exactly where the
+    # clipping wrapper lived, then delete the entire wrapper stack with it.
+    outer_table._tbl.addprevious(rebuilt._tbl)
+    outer_table._tbl.getparent().remove(outer_table._tbl)
+
+
+def _promote_clipped_nota_riil_tables(document):
+    promoted = 0
+    for table in list(iter_document_tables(document)):
+        if not _is_nota_riil_expense_table(table):
+            continue
+        ancestors = _table_ancestors(table)
+        if not _is_disposable_expense_wrapper(ancestors):
+            continue
+        data = _expense_table_data(table)
+        if data is None:
+            continue
+        _replace_clipped_expense_table(document, table, ancestors, data)
+        promoted += 1
+    return promoted
+
+
 def _logical_row_cells(row):
     cells = []
     seen = set()
@@ -737,6 +1006,10 @@ def _repair_nota_riil_row_layout(table):
 
 def _repair_nota_riil_expense_tables(document):
     repaired = _recover_collapsed_nota_riil_tables(document)
+    # pdf2docx occasionally places a perfectly valid nested grid inside an
+    # exact-height stack of empty one-cell tables. Word clips that stack, so
+    # promote the grid before applying ordinary border/row repairs.
+    repaired += _promote_clipped_nota_riil_tables(document)
     for table in iter_document_tables(document):
         if not _is_nota_riil_expense_table(table):
             continue

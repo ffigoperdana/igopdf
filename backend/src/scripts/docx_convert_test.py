@@ -3,6 +3,7 @@ import tempfile
 import unittest
 
 from docx import Document
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches
 
@@ -465,6 +466,63 @@ class DocxConvertTextRepairTest(unittest.TestCase):
             self.assertEqual(
                 table_borders.find(qn("w:insideV")).get(qn("w:color")), "auto"
             )
+
+    def test_promotes_nota_riil_grid_out_of_exact_height_pdf2docx_wrappers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "nota-riil-clipped.docx")
+            document = Document()
+            outer = document.add_table(rows=1, cols=1)
+            middle = outer.cell(0, 0).add_table(rows=1, cols=1)
+            for row, height_value in ((outer.rows[0], 1688), (middle.rows[0], 1538)):
+                height = OxmlElement("w:trHeight")
+                height.set(qn("w:val"), str(height_value))
+                height.set(qn("w:hRule"), "exact")
+                row._tr.get_or_add_trPr().append(height)
+
+            table = middle.cell(0, 0).add_table(rows=3, cols=5)
+            table.cell(0, 0).text = "No"
+            table.cell(0, 1).merge(table.cell(0, 3)).text = "Uraian"
+            table.cell(0, 4).text = "Jumlah"
+            table.cell(1, 0).text = "1."
+            table.cell(1, 1).merge(table.cell(1, 3)).text = (
+                "Transportasi Dalam Kota (PP)\n1 x 170,000.0 x 100%"
+            )
+            table.cell(1, 4).text = "Rp. 170,000"
+            table.cell(2, 0).merge(table.cell(2, 3)).text = "Jumlah"
+            table.cell(2, 4).text = "Rp 170,000"
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["DAFTAR PENGELUARAN RIIL\nNo Uraian Jumlah"],
+                nota_riil=True,
+            )
+
+            result = Document(path)
+            self.assertEqual(len(result.tables), 1)
+            expense_table = result.tables[0]
+            self.assertEqual((len(expense_table.rows), len(expense_table.columns)), (3, 3))
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[0].cells],
+                ["No", "Uraian", "Jumlah"],
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[1].cells],
+                [
+                    "1.",
+                    "Transportasi Dalam Kota (PP)\n1 x 170,000.0 x 100%",
+                    "Rp. 170,000",
+                ],
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[2].cells],
+                ["Jumlah", "Jumlah", "Rp 170,000"],
+            )
+            self.assertFalse(expense_table.cell(0, 0).tables)
+            header_shading = expense_table.cell(0, 0)._tc.tcPr.find(qn("w:shd"))
+            self.assertEqual(header_shading.get(qn("w:fill")), "808080")
+            item_height = expense_table.rows[1]._tr.trPr.find(qn("w:trHeight"))
+            self.assertEqual(item_height.get(qn("w:hRule")), "atLeast")
 
 
 if __name__ == "__main__":
