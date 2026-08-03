@@ -11,6 +11,7 @@ try:
     from .docx_convert import (
         is_nota_dinas,
         is_nota_riil,
+        is_rincian_biaya_perjalanan_dinas,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -18,6 +19,7 @@ except ImportError:
     from docx_convert import (
         is_nota_dinas,
         is_nota_riil,
+        is_rincian_biaya_perjalanan_dinas,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -46,6 +48,29 @@ class DocxConvertTextRepairTest(unittest.TestCase):
         )
         self.assertFalse(
             is_nota_riil(["No Uraian Jumlah\nRekap biaya perjalanan"])
+        )
+
+    def test_detects_rincian_biaya_form_without_matching_generic_tables(self):
+        self.assertTrue(
+            is_rincian_biaya_perjalanan_dinas(
+                [
+                    "RINCIAN BIAYA PERJALANAN DINAS\n"
+                    "No Perincian Biaya Jumlah Keterangan"
+                ]
+            )
+        )
+        self.assertTrue(
+            is_rincian_biaya_perjalanan_dinas(
+                [
+                    "RINCIANBIAYAPERJALANANDINAS\n"
+                    "No PerincianBiaya Jumlah Keterangan"
+                ]
+            )
+        )
+        self.assertFalse(
+            is_rincian_biaya_perjalanan_dinas(
+                ["Rincian biaya rapat\nNo Uraian Jumlah"]
+            )
         )
 
     def test_restores_realistic_nd_prose_from_pdf_whitespace(self):
@@ -523,6 +548,84 @@ class DocxConvertTextRepairTest(unittest.TestCase):
             self.assertEqual(header_shading.get(qn("w:fill")), "808080")
             item_height = expense_table.rows[1]._tr.trPr.find(qn("w:trHeight"))
             self.assertEqual(item_height.get(qn("w:hRule")), "atLeast")
+
+    def test_restores_light_gray_cells_in_rincian_biaya_form(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "rincian-biaya.docx")
+            document = Document()
+            total_table = document.add_table(rows=2, cols=3)
+            total_table.cell(0, 0).text = "No"
+            total_table.cell(0, 1).text = "Perincian Biaya"
+            total_table.cell(0, 2).text = "Jumlah"
+            total_table.cell(1, 0).merge(total_table.cell(1, 1)).text = "Jumlah"
+            total_table.cell(1, 2).text = "Rp 730,000"
+            receipt_table = document.add_table(rows=1, cols=1)
+            receipt_table.cell(0, 0).text = "Rp 730,000"
+            untouched_table = document.add_table(rows=1, cols=1)
+            placeholder_table = document.add_table(rows=1, cols=1)
+            thin_border_table = document.add_table(rows=1, cols=1)
+
+            def apply_black_shading(cell):
+                shading = OxmlElement("w:shd")
+                shading.set(qn("w:val"), "clear")
+                shading.set(qn("w:color"), "auto")
+                shading.set(qn("w:fill"), "000000")
+                cell._tc.get_or_add_tcPr().append(shading)
+
+            def apply_black_end_border(cell, size):
+                borders = OxmlElement("w:tcBorders")
+                border = OxmlElement("w:end")
+                border.set(qn("w:val"), "single")
+                border.set(qn("w:sz"), str(size))
+                border.set(qn("w:color"), "#000000")
+                borders.append(border)
+                cell._tc.get_or_add_tcPr().append(borders)
+
+            apply_black_shading(total_table.cell(1, 0))
+            apply_black_shading(total_table.cell(1, 2))
+            apply_black_shading(receipt_table.cell(0, 0))
+            apply_black_shading(untouched_table.cell(0, 0))
+            apply_black_end_border(placeholder_table.cell(0, 0), 48)
+            apply_black_end_border(thin_border_table.cell(0, 0), 8)
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                [
+                    "RINCIAN BIAYA PERJALANAN DINAS\n"
+                    "No Perincian Biaya Jumlah Keterangan"
+                ],
+                rincian_biaya_perjalanan_dinas=True,
+            )
+
+            result = Document(path)
+            repaired_cells = (
+                result.tables[0].cell(1, 0),
+                result.tables[0].cell(1, 2),
+                result.tables[1].cell(0, 0),
+            )
+            for cell in repaired_cells:
+                shading = cell._tc.tcPr.find(qn("w:shd"))
+                self.assertEqual(shading.get(qn("w:fill")), "E7E6E6")
+                self.assertEqual(
+                    cell.paragraphs[0].runs[0]._r.rPr.find(qn("w:color")).get(
+                        qn("w:val")
+                    ),
+                    "000000",
+                )
+
+            untouched_shading = result.tables[2].cell(0, 0)._tc.tcPr.find(
+                qn("w:shd")
+            )
+            self.assertEqual(untouched_shading.get(qn("w:fill")), "000000")
+            placeholder_border = result.tables[3].cell(0, 0)._tc.tcPr.find(
+                qn("w:tcBorders")
+            ).find(qn("w:end"))
+            self.assertEqual(placeholder_border.get(qn("w:color")), "#E7E6E6")
+            thin_border = result.tables[4].cell(0, 0)._tc.tcPr.find(
+                qn("w:tcBorders")
+            ).find(qn("w:end"))
+            self.assertEqual(thin_border.get(qn("w:color")), "#000000")
 
 
 if __name__ == "__main__":

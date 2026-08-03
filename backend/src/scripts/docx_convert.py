@@ -94,6 +94,18 @@ def is_nota_riil(reference_pages):
     )
 
 
+def is_rincian_biaya_perjalanan_dinas(reference_pages):
+    """Identify the BPDP SPJ form that pdf2docx can turn black by mistake."""
+    normalized = re.sub(r"\s+", "", " ".join(reference_pages)).upper()
+    return (
+        "RINCIANBIAYAPERJALANANDINAS" in normalized
+        and all(
+            label in normalized
+            for label in ("PERINCIANBIAYA", "JUMLAH", "KETERANGAN")
+        )
+    )
+
+
 def _non_whitespace_positions(text):
     return [index for index, char in enumerate(text) if not char.isspace()]
 
@@ -783,6 +795,72 @@ def _set_cell_run_color(cell, color):
             color_element.set(qn("w:val"), color)
 
 
+def _is_near_black_color(value):
+    value = (value or "").strip().lstrip("#").casefold()
+    if value in {"black", "000", "000000"}:
+        return True
+    if not re.fullmatch(r"[0-9a-f]{6}", value):
+        return False
+    return all(int(value[index:index + 2], 16) <= 0x20 for index in (0, 2, 4))
+
+
+def _is_black_cell_shading(cell):
+    properties = cell._tc.tcPr
+    shading = properties.find(qn("w:shd")) if properties is not None else None
+    fill = shading.get(qn("w:fill")) if shading is not None else None
+    return _is_near_black_color(fill)
+
+
+def _repair_black_placeholder_borders(cell):
+    """Restore empty light-gray separator cells emitted as thick black borders."""
+    if cell.text.strip() or "<w:drawing" in cell._tc.xml:
+        return 0
+
+    properties = cell._tc.tcPr
+    borders = properties.find(qn("w:tcBorders")) if properties is not None else None
+    if borders is None:
+        return 0
+
+    repaired = 0
+    for edge in ("top", "start", "left", "bottom", "end", "right"):
+        border = borders.find(qn(f"w:{edge}"))
+        if border is None or not _is_near_black_color(border.get(qn("w:color"))):
+            continue
+        try:
+            size = float(border.get(qn("w:sz"), "0"))
+        except (TypeError, ValueError):
+            size = 0
+        if size < 24:
+            continue
+        border.set(qn("w:color"), "#E7E6E6")
+        repaired += 1
+    return repaired
+
+
+def _repair_rincian_biaya_shading(document):
+    """Restore the light-gray totals that pdf2docx emits as black cells.
+
+    This is limited to the recognized BPDP Rincian Biaya form. We deliberately
+    only touch text-bearing table cells, keeping drawings such as a scanned
+    signature or an embedded image intact.
+    """
+    repaired = 0
+    seen_cells = set()
+    for table in iter_document_tables(document):
+        for row in table.rows:
+            for cell in row.cells:
+                cell_key = cell._tc
+                if cell_key in seen_cells:
+                    continue
+                seen_cells.add(cell_key)
+                if cell.text.strip() and _is_black_cell_shading(cell):
+                    _set_cell_shading(cell, "E7E6E6")
+                    _set_cell_run_color(cell, "000000")
+                    repaired += 1
+                repaired += _repair_black_placeholder_borders(cell)
+    return repaired
+
+
 def _replace_clipped_expense_table(document, table, ancestors, data):
     """Promote a deeply nested grid to the document body so Word can render it."""
     outer_table = ancestors[-1]
@@ -1268,7 +1346,11 @@ def _repair_nd_tembusan_tables(document, reference_pages):
 
 
 def repair_editable_docx(
-    output, reference_pages, nota_dinas=False, nota_riil=False
+    output,
+    reference_pages,
+    nota_dinas=False,
+    nota_riil=False,
+    rincian_biaya_perjalanan_dinas=False,
 ):
     if not reference_pages or not any(page.strip() for page in reference_pages):
         return 0
@@ -1304,6 +1386,11 @@ def repair_editable_docx(
         if nota_riil
         else 0
     )
+    table_repairs += (
+        _repair_rincian_biaya_shading(document)
+        if rincian_biaya_perjalanan_dinas
+        else 0
+    )
     if restored or normalized or table_repairs:
         document.save(output)
     # Keep the public count compatible with the existing text-repair metric;
@@ -1330,6 +1417,7 @@ def convert_editable(
     reference_pages=None,
     nota_dinas=False,
     nota_riil=False,
+    rincian_biaya_perjalanan_dinas=False,
 ):
     emit({"type": "progress", "stage": "repairing", "progress": 12})
     repaired = normalize_with_qpdf(source, workspace)
@@ -1363,6 +1451,7 @@ def convert_editable(
         reference_pages or [],
         nota_dinas=nota_dinas,
         nota_riil=nota_riil,
+        rincian_biaya_perjalanan_dinas=rincian_biaya_perjalanan_dinas,
     )
 
 
@@ -1434,6 +1523,9 @@ def main():
                 reference_pages = extract_reference_pages(document)
                 nota_dinas = is_nota_dinas(reference_pages)
                 nota_riil = is_nota_riil(reference_pages)
+                rincian_biaya_perjalanan_dinas = (
+                    is_rincian_biaya_perjalanan_dinas(reference_pages)
+                )
                 document.close()
                 convert_editable(
                     args.input,
@@ -1442,6 +1534,9 @@ def main():
                     reference_pages=reference_pages,
                     nota_dinas=nota_dinas,
                     nota_riil=nota_riil,
+                    rincian_biaya_perjalanan_dinas=(
+                        rincian_biaya_perjalanan_dinas
+                    ),
                 )
             elif args.mode == "ocr":
                 convert_ocr(document, args.output)
