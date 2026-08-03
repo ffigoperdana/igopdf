@@ -51,6 +51,42 @@ function loadPages(): Set<string> {
 
 const PAGES = loadPages();
 
+function resolveBuildId(): string {
+  const value = (
+    process.env.VITE_BUILD_ID ||
+    process.env.GITHUB_SHA ||
+    `local-${Date.now().toString(36)}`
+  ).trim();
+  return value.replace(/[^a-zA-Z0-9._-]/g, '-') || 'local';
+}
+
+function deploymentVersionPlugin(buildId: string): Plugin {
+  const buildToken = '__IGO_BUILD_ID__';
+
+  return {
+    name: 'igo-deployment-version',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: `${JSON.stringify({ buildId })}\n`,
+      });
+    },
+    closeBundle() {
+      const serviceWorkerPath = resolve(__dirname, 'dist', 'sw.js');
+      const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
+      if (!serviceWorker.includes(buildToken)) {
+        throw new Error('Service worker build-version token is missing');
+      }
+      fs.writeFileSync(
+        serviceWorkerPath,
+        serviceWorker.replaceAll(buildToken, buildId)
+      );
+    },
+  };
+}
+
 function getBasePath(): string {
   return (process.env.BASE_URL || '/').replace(/\/$/, '');
 }
@@ -497,6 +533,7 @@ function markActiveNavPlugin(): Plugin {
 
 export default defineConfig(() => {
   const USE_CDN = process.env.VITE_USE_CDN === 'true';
+  const BUILD_ID = resolveBuildId();
 
   if (USE_CDN) {
     console.log('[Vite] Using CDN for WASM files (with local fallback)');
@@ -567,6 +604,9 @@ export default defineConfig(() => {
       viteStaticCopy({
         targets: staticCopyTargets,
       }),
+      // Stamp both the service worker cache and a small network-only version
+      // file. This lets an already-open browser detect a new deployment.
+      deploymentVersionPlugin(BUILD_ID),
       viteCompression({
         algorithm: 'brotliCompress',
         ext: '.br',
@@ -591,6 +631,7 @@ export default defineConfig(() => {
     ],
     define: {
       __SIMPLE_MODE__: JSON.stringify(process.env.SIMPLE_MODE === 'true'),
+      __IGO_BUILD_ID__: JSON.stringify(BUILD_ID),
       __BRAND_NAME__: JSON.stringify(process.env.VITE_BRAND_NAME || ''),
       __DISABLED_TOOLS__: JSON.stringify(
         (process.env.DISABLE_TOOLS || '')

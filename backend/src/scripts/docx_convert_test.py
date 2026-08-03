@@ -627,6 +627,49 @@ class DocxConvertTextRepairTest(unittest.TestCase):
             ).find(qn("w:end"))
             self.assertEqual(thin_border.get(qn("w:color")), "#000000")
 
+    def test_restores_form_title_underlines_without_retaining_spj_table_line(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "form-title-underlines.docx")
+            document = Document()
+            nota_title = document.add_paragraph()
+            nota_title.add_run("\t")
+            nota_run = nota_title.add_run("DAFTAR PENGELUARAN RIIL ")
+            nota_body = nota_title.add_run("Yang bertanda tangan dibawah ini :")
+            spj_title = document.add_paragraph()
+            spj_run = spj_title.add_run("RINCIAN BIAYA PERJALANAN DINAS")
+            field_table = document.add_table(rows=1, cols=3)
+            field_table.cell(0, 0).text = "Lampiran SPD No."
+            field_table.cell(0, 1).text = ":"
+            field_table.cell(0, 2).text = "SPD-7/BPDP.33/2026"
+            for cell in field_table.rows[0].cells:
+                borders = OxmlElement("w:tcBorders")
+                top = OxmlElement("w:top")
+                top.set(qn("w:val"), "single")
+                top.set(qn("w:sz"), "6")
+                top.set(qn("w:color"), "#000000")
+                borders.append(top)
+                cell._tc.get_or_add_tcPr().append(borders)
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                [
+                    "DAFTAR PENGELUARAN RIIL\nNo Uraian Jumlah\n"
+                    "RINCIAN BIAYA PERJALANAN DINAS\n"
+                    "Perincian Biaya Jumlah Keterangan"
+                ],
+                nota_riil=True,
+                rincian_biaya_perjalanan_dinas=True,
+            )
+
+            result = Document(path)
+            self.assertTrue(result.paragraphs[0].runs[1].font.underline)
+            self.assertIsNone(result.paragraphs[0].runs[2].font.underline)
+            self.assertTrue(result.paragraphs[1].runs[0].font.underline)
+            for cell in result.tables[0].rows[0].cells:
+                borders = cell._tc.tcPr.find(qn("w:tcBorders"))
+                self.assertIsNone(borders.find(qn("w:top")))
+
 
 if __name__ == "__main__":
     unittest.main()

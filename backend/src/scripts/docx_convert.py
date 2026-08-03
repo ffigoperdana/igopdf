@@ -861,6 +861,52 @@ def _repair_rincian_biaya_shading(document):
     return repaired
 
 
+def _restore_form_title_underline(document, title):
+    """Restore a short title underline that pdf2docx drops from BPDP forms."""
+    repairs = 0
+    title_upper = title.upper()
+    for paragraph in iter_document_paragraphs(document):
+        start = paragraph.text.upper().find(title_upper)
+        if start < 0:
+            continue
+        end = start + len(title)
+        offset = 0
+        for run in paragraph.runs:
+            run_end = offset + len(run.text)
+            if offset < end and run_end > start and not run.font.underline:
+                # The standard forms keep the title in its own run. On older
+                # variants it can contain a trailing space, which is harmless
+                # and preserves the original title width in Word.
+                run.font.underline = True
+                repairs += 1
+            offset = run_end
+    return repairs
+
+
+def _remove_rincian_title_placeholder_border(document):
+    """Remove the title underline that pdf2docx incorrectly assigns to a table."""
+    repairs = 0
+    for table in iter_document_tables(document):
+        if not table.rows or "LAMPIRAN SPD NO." not in table.rows[0].cells[0].text.upper():
+            continue
+        seen_cells = set()
+        for cell in table.rows[0].cells:
+            if cell._tc in seen_cells:
+                continue
+            seen_cells.add(cell._tc)
+            properties = cell._tc.tcPr
+            borders = (
+                properties.find(qn("w:tcBorders")) if properties is not None else None
+            )
+            if borders is None:
+                continue
+            top_border = borders.find(qn("w:top"))
+            if top_border is not None:
+                borders.remove(top_border)
+                repairs += 1
+    return repairs
+
+
 def _replace_clipped_expense_table(document, table, ancestors, data):
     """Promote a deeply nested grid to the document body so Word can render it."""
     outer_table = ancestors[-1]
@@ -1386,11 +1432,20 @@ def repair_editable_docx(
         if nota_riil
         else 0
     )
+    if nota_riil:
+        table_repairs += _restore_form_title_underline(
+            document, "DAFTAR PENGELUARAN RIIL"
+        )
     table_repairs += (
         _repair_rincian_biaya_shading(document)
         if rincian_biaya_perjalanan_dinas
         else 0
     )
+    if rincian_biaya_perjalanan_dinas:
+        table_repairs += _restore_form_title_underline(
+            document, "RINCIAN BIAYA PERJALANAN DINAS"
+        )
+        table_repairs += _remove_rincian_title_placeholder_border(document)
     if restored or normalized or table_repairs:
         document.save(output)
     # Keep the public count compatible with the existing text-repair metric;

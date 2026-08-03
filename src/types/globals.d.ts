@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly VITE_BUILD_ID?: string;
   readonly VITE_TESSERACT_WORKER_URL?: string;
   readonly VITE_TESSERACT_CORE_URL?: string;
   readonly VITE_TESSERACT_LANG_URL?: string;
@@ -13,4 +14,5 @@ interface ImportMeta {
 }
 
 declare const __SIMPLE_MODE__: boolean;
+declare const __IGO_BUILD_ID__: string;
 declare const __DISABLED_TOOLS__: string[];

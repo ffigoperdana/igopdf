@@ -23,6 +23,11 @@ ENV COMPRESSION_MODE=$COMPRESSION_MODE
 ARG BASE_URL
 ENV BASE_URL=$BASE_URL
 
+# Stamps the service worker/cache with the immutable CI revision. This must be
+# a build argument, not a runtime environment value, because Vite inlines it.
+ARG VITE_BUILD_ID
+ENV VITE_BUILD_ID=$VITE_BUILD_ID
+
 # WASM module URLs (pre-configured defaults)
 # Override these for air-gapped or self-hosted WASM deployments
 ARG VITE_WASM_PYMUPDF_URL

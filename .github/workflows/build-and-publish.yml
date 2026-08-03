@@ -101,6 +101,8 @@ jobs:
           push: false
           platforms: linux/amd64
           tags: ghcr.io/${{ github.repository_owner }}/${{ env.FRONTEND_IMAGE }}:ci
+          build-args: |
+            VITE_BUILD_ID=ci-${{ github.sha }}
           cache-from: type=gha,scope=igov2-frontend
 
       - name: Build backend Docker image
@@ -167,6 +169,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
+          build-args: |
+            VITE_BUILD_ID=${{ github.sha }}
           cache-from: type=gha,scope=igov2-frontend
           cache-to: type=gha,mode=max,scope=igov2-frontend
 

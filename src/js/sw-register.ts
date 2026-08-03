@@ -10,6 +10,51 @@
 // Production builds — including the Docker image served at localhost:8099 —
 // register the SW so the app is installable/offline-capable (PWA).
 const isDevelopment = import.meta.env.DEV;
+const BUILD_ID = __IGO_BUILD_ID__;
+const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+let promptedWorker: ServiceWorker | null = null;
+let reloadForUpdate = false;
+
+async function checkDeploymentVersion(): Promise<boolean> {
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}version.json`, {
+      cache: 'no-store',
+    });
+    if (!response.ok) return false;
+
+    const payload: unknown = await response.json();
+    if (
+      !payload ||
+      typeof payload !== 'object' ||
+      !('buildId' in payload) ||
+      typeof payload.buildId !== 'string' ||
+      payload.buildId === BUILD_ID
+    ) {
+      return false;
+    }
+
+    console.info('[SW] A newer deployment was detected');
+    return true;
+  } catch (error) {
+    console.warn('[SW] Deployment-version check failed:', error);
+    return false;
+  }
+}
+
+function offerUpdate(worker: ServiceWorker) {
+  if (!navigator.serviceWorker.controller || promptedWorker === worker) {
+    return;
+  }
+
+  promptedWorker = worker;
+  console.log('[SW] New version available! Reload to update.');
+  if (confirm('A new version of igo is available. Reload to update?')) {
+    // Do not reload immediately: the new worker must take control first so
+    // the page cannot accidentally boot with an old cache.
+    reloadForUpdate = true;
+    worker.postMessage({ type: 'SKIP_WAITING' });
+  }
+}
 
 function collectTrustedWasmHosts(): string[] {
   const hosts = new Set<string>();
@@ -61,12 +106,29 @@ if (isDevelopment) {
           registration.active || registration.waiting || registration.installing
         );
 
-        setInterval(
-          () => {
-            registration.update();
-          },
-          24 * 60 * 60 * 1000
-        );
+        const checkForUpdates = async () => {
+          const newerDeployment = await checkDeploymentVersion();
+          try {
+            await registration.update();
+            if (registration.waiting) {
+              if (newerDeployment) {
+                console.info('[SW] A deployment update is ready to apply');
+              }
+              offerUpdate(registration.waiting);
+            }
+          } catch (error) {
+            console.warn('[SW] Update check failed:', error);
+          }
+        };
+
+        checkForUpdates();
+        window.setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
+        window.addEventListener('focus', checkForUpdates);
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            checkForUpdates();
+          }
+        });
 
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
@@ -79,16 +141,7 @@ if (isDevelopment) {
                 newWorker.state === 'installed' &&
                 navigator.serviceWorker.controller
               ) {
-                console.log('[SW] New version available! Reload to update.');
-
-                if (
-                  confirm(
-                    'A new version of igo is available. Reload to update?'
-                  )
-                ) {
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
-                  window.location.reload();
-                }
+                offerUpdate(newWorker);
               }
             });
           }
@@ -103,8 +156,10 @@ if (isDevelopment) {
     });
 
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('[SW] New service worker activated, reloading...');
-      window.location.reload();
+      if (reloadForUpdate) {
+        console.log('[SW] New service worker activated, reloading...');
+        window.location.reload();
+      }
     });
   });
 }

@@ -9,7 +9,7 @@
 // (icons, manifest, config) — activate() below deletes every older cache, so
 // clients stop serving stale copies (e.g. the old PWA icon on Add to Home
 // Screen). Hashed /assets/* don't need this; their filenames change instead.
-const CACHE_VERSION = 'igo-v3';
+const CACHE_VERSION = 'igo-__IGO_BUILD_ID__';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
 const LEGACY_CACHE_PREFIX = 'bento' + 'pdf-';
 const WASM_PACKAGE_SCOPE = '@' + 'bento' + 'pdf';
@@ -36,11 +36,6 @@ self.addEventListener('install', (event) => {
       .then((cache) => {
         // console.log('[ServiceWorker] Caching critical assets...');
         return cacheInBatches(cache, CRITICAL_ASSETS, 5);
-      })
-      .then(() => {
-        // console.log('✅ [ServiceWorker] All critical assets cached successfully!');
-        // console.log('⏭️  [ServiceWorker] Skipping waiting, activating immediately...');
-        return self.skipWaiting();
       })
       .catch((error) => {
         console.error('[ServiceWorker] Cache installation failed:', error);
@@ -123,7 +118,8 @@ self.addEventListener('fetch', (event) => {
       // screen icon); network-first keeps them fresh with an offline fallback.
       url.pathname.includes('/images/') ||
       url.pathname.endsWith('/site.webmanifest') ||
-      url.pathname.endsWith('/config.json'))
+      url.pathname.endsWith('/config.json') ||
+      url.pathname.endsWith('/version.json'))
   ) {
     event.respondWith(networkFirstStrategy(event.request));
   } else if (shouldCache(url.pathname, isCDN)) {
