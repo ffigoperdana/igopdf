@@ -3,17 +3,20 @@ import tempfile
 import unittest
 
 from docx import Document
+from docx.oxml.ns import qn
 from docx.shared import Inches
 
 try:
     from .docx_convert import (
         is_nota_dinas,
+        is_nota_riil,
         repair_editable_docx,
         restore_missing_spaces,
     )
 except ImportError:
     from docx_convert import (
         is_nota_dinas,
+        is_nota_riil,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -28,6 +31,20 @@ class DocxConvertTextRepairTest(unittest.TestCase):
         )
         self.assertFalse(
             is_nota_dinas(["SURAT UNDANGAN\nNOMOR UND-63/BPDP.100/2026"])
+        )
+
+    def test_detects_nota_riil_expense_form_without_matching_generic_tables(self):
+        self.assertTrue(
+            is_nota_riil(
+                [
+                    "DAFTAR PENGELUARAN RIIL\n"
+                    "No Uraian Jumlah\n"
+                    "Transportasi Dalam Kota"
+                ]
+            )
+        )
+        self.assertFalse(
+            is_nota_riil(["No Uraian Jumlah\nRekap biaya perjalanan"])
         )
 
     def test_restores_realistic_nd_prose_from_pdf_whitespace(self):
@@ -281,6 +298,172 @@ class DocxConvertTextRepairTest(unittest.TestCase):
                     ["2.", "Penerima kedua"],
                     ["3.", "Penerima ketiga"],
                 ],
+            )
+
+    def test_restores_visible_auto_colored_grid_for_nota_riil_expense_table(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "nota-riil.docx")
+            document = Document()
+            outer = document.add_table(rows=1, cols=1)
+            table = outer.cell(0, 0).add_table(rows=3, cols=5)
+            table.cell(0, 0).text = "No"
+            table.cell(0, 1).merge(table.cell(0, 3)).text = "Uraian"
+            table.cell(0, 4).text = "Jumlah"
+            table.cell(1, 0).text = "1."
+            table.cell(1, 1).merge(table.cell(1, 3)).text = "Transportasi Dalam Kota (PP)"
+            table.cell(1, 4).text = "Rp. 170,000"
+            table.cell(2, 0).text = "Jumlah"
+            table.cell(2, 1).text = "1 x"
+            table.cell(2, 2).text = "170,000.0 x"
+            table.cell(2, 3).text = "100%"
+            table.cell(2, 4).text = "Rp 170,000"
+            document.save(path)
+
+            repaired = repair_editable_docx(
+                path,
+                ["DAFTAR PENGELUARAN RIIL\nNo Uraian Jumlah"],
+                nota_riil=True,
+            )
+
+            result = Document(path)
+            expense_table = result.tables[0].cell(0, 0).tables[0]
+            table_borders = expense_table._tbl.tblPr.first_child_found_in(
+                "w:tblBorders"
+            )
+            self.assertEqual(repaired, 0)
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[1].cells],
+                [
+                    "1.",
+                    "Transportasi Dalam Kota (PP)\n1 x 170,000.0 x 100%",
+                    "Transportasi Dalam Kota (PP)\n1 x 170,000.0 x 100%",
+                    "Transportasi Dalam Kota (PP)\n1 x 170,000.0 x 100%",
+                    "Rp. 170,000",
+                ],
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[2].cells],
+                ["Jumlah", "Jumlah", "Jumlah", "Jumlah", "Rp 170,000"],
+            )
+            item_height = expense_table.rows[1]._tr.trPr.find(qn("w:trHeight"))
+            self.assertEqual(item_height.get(qn("w:val")), "720")
+            self.assertEqual(item_height.get(qn("w:hRule")), "atLeast")
+            for edge in ("top", "start", "bottom", "end", "insideH", "insideV"):
+                border = table_borders.find(qn(f"w:{edge}"))
+                self.assertIsNotNone(border)
+                self.assertEqual(border.get(qn("w:val")), "single")
+                self.assertEqual(border.get(qn("w:color")), "auto")
+
+    def test_repairs_multi_item_nota_riil_table_without_touching_prior_items(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "nota-riil-multi.docx")
+            document = Document()
+            outer = document.add_table(rows=1, cols=1)
+            table = outer.cell(0, 0).add_table(rows=4, cols=5)
+            table.cell(0, 0).text = "No"
+            table.cell(0, 1).merge(table.cell(0, 3)).text = "Uraian"
+            table.cell(0, 4).text = "Jumlah"
+            table.cell(1, 0).text = "1."
+            table.cell(1, 1).merge(table.cell(1, 3)).text = "Taksi bandara"
+            table.cell(1, 4).text = "Rp. 120,000"
+            table.cell(2, 0).text = "2."
+            table.cell(2, 1).merge(table.cell(2, 3)).text = "Transportasi Dalam Kota (PP)"
+            table.cell(2, 4).text = "Rp. 200,000"
+            table.cell(3, 0).text = "Jumlah"
+            table.cell(3, 1).text = "2 x"
+            table.cell(3, 2).text = "100,000 x"
+            table.cell(3, 3).text = "100%"
+            table.cell(3, 4).text = "Rp 320,000"
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["DAFTAR PENGELUARAN RIIL\nNo Uraian Jumlah"],
+                nota_riil=True,
+            )
+
+            result = Document(path)
+            expense_table = result.tables[0].cell(0, 0).tables[0]
+            self.assertEqual(
+                expense_table.rows[1].cells[1].text,
+                "Taksi bandara",
+            )
+            self.assertEqual(
+                expense_table.rows[2].cells[1].text,
+                "Transportasi Dalam Kota (PP)\n2 x 100,000 x 100%",
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[3].cells],
+                ["Jumlah", "Jumlah", "Jumlah", "Jumlah", "Rp 320,000"],
+            )
+            second_item_height = expense_table.rows[2]._tr.trPr.find(
+                qn("w:trHeight")
+            )
+            self.assertEqual(second_item_height.get(qn("w:val")), "720")
+            self.assertEqual(second_item_height.get(qn("w:hRule")), "atLeast")
+
+    def test_rebuilds_tab_collapsed_nota_riil_table_as_editable_grid(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "nota-riil-collapsed.docx")
+            document = Document()
+            outer = document.add_table(rows=1, cols=1)
+            collapsed = outer.cell(0, 0).add_table(rows=1, cols=1)
+            collapsed.cell(0, 0).text = (
+                "No\tUraian\tJumlah\n"
+                "1. Penginapan\tRp. 500,000\n"
+                "2 malam x\t250,000.0 x\t100%\n"
+                "2. Transportasi\tRp. 200,000\n"
+                "1 x\t200,000.0 x\t100%\n"
+                "Jumlah\tRp 700,000"
+            )
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["DAFTAR PENGELUARAN RIIL\nNo Uraian Jumlah"],
+                nota_riil=True,
+            )
+
+            result = Document(path)
+            candidates = []
+
+            def collect(table):
+                candidates.append(table)
+                seen = set()
+                for row in table.rows:
+                    for cell in row.cells:
+                        if cell._tc in seen:
+                            continue
+                        seen.add(cell._tc)
+                        for nested in cell.tables:
+                            collect(nested)
+
+            for table in result.tables:
+                collect(table)
+            expense_table = next(
+                table
+                for table in candidates
+                if len(table.rows) == 4
+                and len(table.columns) == 3
+                and table.cell(0, 1).text == "Uraian"
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[1].cells],
+                ["1.", "Penginapan\n2 malam x 250,000.0 x 100%", "Rp. 500,000"],
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[2].cells],
+                ["2.", "Transportasi\n1 x 200,000.0 x 100%", "Rp. 200,000"],
+            )
+            self.assertEqual(
+                [cell.text for cell in expense_table.rows[3].cells],
+                ["Jumlah", "Jumlah", "Rp 700,000"],
+            )
+            table_borders = expense_table._tbl.tblPr.first_child_found_in(
+                "w:tblBorders"
+            )
+            self.assertEqual(
+                table_borders.find(qn("w:insideV")).get(qn("w:color")), "auto"
             )
 
 

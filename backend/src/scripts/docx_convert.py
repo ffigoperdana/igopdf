@@ -14,6 +14,8 @@ import fitz
 import pytesseract
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docx.shared import Inches
 from pdf2docx import Converter
 from PIL import Image
@@ -78,6 +80,15 @@ def is_nota_dinas(reference_pages):
     return (
         "NOTA DINAS" in normalized
         and re.search(r"\bNOMOR\s+ND\s*[-/]", normalized) is not None
+    )
+
+
+def is_nota_riil(reference_pages):
+    """Identify the BPDP expense-statement form with an editable expense grid."""
+    normalized = " ".join(reference_pages).upper()
+    return (
+        "DAFTAR PENGELUARAN RIIL" in normalized
+        and all(label in normalized for label in ("NO", "URAIAN", "JUMLAH"))
     )
 
 
@@ -308,6 +319,430 @@ def iter_document_paragraphs(document):
     seen = set()
     for table in document.tables:
         yield from _iter_table_paragraphs(table, seen)
+
+
+def _iter_nested_tables(table, seen):
+    table_key = table._tbl
+    if table_key in seen:
+        return
+    seen.add(table_key)
+    yield table
+    for row in table.rows:
+        cell_seen = set()
+        for cell in row.cells:
+            cell_key = cell._tc
+            if cell_key in cell_seen:
+                continue
+            cell_seen.add(cell_key)
+            for nested_table in cell.tables:
+                yield from _iter_nested_tables(nested_table, seen)
+
+
+def iter_document_tables(document):
+    seen = set()
+    for table in document.tables:
+        yield from _iter_nested_tables(table, seen)
+
+
+def _normalized_table_text(table):
+    return " ".join(
+        cell.text
+        for row in table.rows
+        for cell in row.cells
+    ).upper()
+
+
+def _normalized_label(text):
+    return re.sub(r"[^a-z]", "", text.casefold())
+
+
+def _expense_header_index(table):
+    """Find a No / Uraian / Jumlah header even when Word cells are merged."""
+    for index, row in enumerate(table.rows):
+        labels = [_normalized_label(cell.text) for cell in _logical_row_cells(row)]
+        if len(labels) >= 3 and labels[0] == "no" and labels[-1] == "jumlah":
+            if any(label == "uraian" for label in labels[1:-1]):
+                return index
+    return None
+
+
+def _is_nota_riil_expense_table(table):
+    return (
+        len(table.rows) >= 2
+        and len(table.columns) >= 3
+        and _expense_header_index(table) is not None
+    )
+
+
+def _set_border(border, edge):
+    border.set(qn("w:val"), "single")
+    border.set(qn("w:sz"), "6")
+    border.set(qn("w:space"), "0")
+    # "auto" adapts to Word's dark page canvas while remaining a normal
+    # black border on paper/light mode. Hard-coded dark gray disappeared in
+    # Office dark mode on the affected form.
+    border.set(qn("w:color"), "auto")
+
+
+def _set_table_grid_borders(table):
+    """Restore editable grid borders dropped by pdf2docx on thin-lined forms."""
+    table_properties = table._tbl.tblPr
+    borders = table_properties.first_child_found_in("w:tblBorders")
+    if borders is None:
+        borders = OxmlElement("w:tblBorders")
+        table_properties.append(borders)
+    for edge in ("top", "start", "bottom", "end", "insideH", "insideV"):
+        border = borders.find(qn(f"w:{edge}"))
+        if border is None:
+            border = OxmlElement(f"w:{edge}")
+            borders.append(border)
+        _set_border(border, edge)
+
+    # pdf2docx emits empty tcBorders for this PDF. Explicit cell borders keep
+    # the grid visible even in Word builds that do not inherit tblBorders from
+    # a nested fixed-layout table.
+    seen_cells = set()
+    for row in table.rows:
+        for cell in row.cells:
+            cell_key = cell._tc
+            if cell_key in seen_cells:
+                continue
+            seen_cells.add(cell_key)
+            cell_properties = cell._tc.get_or_add_tcPr()
+            cell_borders = cell_properties.first_child_found_in("w:tcBorders")
+            if cell_borders is None:
+                cell_borders = OxmlElement("w:tcBorders")
+                cell_properties.append(cell_borders)
+            for edge in ("top", "start", "bottom", "end"):
+                border = cell_borders.find(qn(f"w:{edge}"))
+                if border is None:
+                    border = OxmlElement(f"w:{edge}")
+                    cell_borders.append(border)
+                _set_border(border, edge)
+
+
+def _set_cell_width(cell, width):
+    cell_properties = cell._tc.get_or_add_tcPr()
+    cell_width = cell_properties.find(qn("w:tcW"))
+    if cell_width is None:
+        cell_width = OxmlElement("w:tcW")
+        cell_properties.append(cell_width)
+    cell_width.set(qn("w:type"), "dxa")
+    cell_width.set(qn("w:w"), str(width))
+
+
+def _set_table_geometry(table, widths):
+    """Give reconstructed tables deterministic Word widths, not autofit."""
+    total_width = sum(widths)
+    table_properties = table._tbl.tblPr
+    table_width = table_properties.first_child_found_in("w:tblW")
+    if table_width is None:
+        table_width = OxmlElement("w:tblW")
+        table_properties.insert(0, table_width)
+    table_width.set(qn("w:type"), "dxa")
+    table_width.set(qn("w:w"), str(total_width))
+
+    layout = table_properties.first_child_found_in("w:tblLayout")
+    if layout is None:
+        layout = OxmlElement("w:tblLayout")
+        table_properties.append(layout)
+    layout.set(qn("w:type"), "fixed")
+
+    grid = table._tbl.tblGrid
+    for column in list(grid):
+        grid.remove(column)
+    for width in widths:
+        column = OxmlElement("w:gridCol")
+        column.set(qn("w:w"), str(width))
+        grid.append(column)
+
+    for row in table.rows:
+        seen = set()
+        column_index = 0
+        for cell in row.cells:
+            cell_key = cell._tc
+            if cell_key in seen:
+                continue
+            seen.add(cell_key)
+            cell_width = widths[min(column_index, len(widths) - 1)]
+            grid_span = cell._tc.tcPr.find(qn("w:gridSpan"))
+            if grid_span is not None:
+                cell_width = sum(
+                    widths[column_index:column_index + int(grid_span.get(qn("w:val"), "1"))]
+                )
+            _set_cell_width(cell, cell_width)
+            column_index += 1 if grid_span is None else int(
+                grid_span.get(qn("w:val"), "1")
+            )
+
+
+def _split_collapsed_cells(line):
+    return [part.strip() for part in re.split(r"\t+", line) if part.strip()]
+
+
+def _parse_collapsed_nota_riil_table(text):
+    """Parse a pdf2docx one-cell table whose rows survived as tabbed text."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    header_index = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if re.search(r"\bNo\s*\t+Uraian\s*\t+Jumlah\b", line, re.IGNORECASE)
+        ),
+        None,
+    )
+    if header_index is None:
+        return None
+
+    items = []
+    total = None
+    active_item = None
+    for line in lines[header_index + 1:]:
+        cells = _split_collapsed_cells(line)
+        if not cells:
+            continue
+        if _is_total_label(cells[0]):
+            if len(cells) < 2:
+                return None
+            total = (cells[0], cells[-1])
+            break
+
+        item_match = re.match(r"^(\d+[.)])\s+(.+)$", cells[0])
+        if item_match and len(cells) >= 2:
+            active_item = {
+                "number": item_match.group(1),
+                "description": item_match.group(2).strip(),
+                "amount": cells[-1],
+            }
+            items.append(active_item)
+            continue
+
+        continuation = " ".join(cells).strip()
+        if active_item is None or not continuation:
+            return None
+        active_item["description"] += "\n" + continuation
+
+    if not items or total is None:
+        return None
+    return {"items": items, "total": total}
+
+
+def _replace_collapsed_nota_riil_table(table, parsed):
+    """Replace a collapsed one-cell nested table with a real editable grid."""
+    parent_cell = table._parent
+    template_cell = table.cell(0, 0)
+    row_count = len(parsed["items"]) + 2
+    rebuilt = parent_cell.add_table(rows=row_count, cols=3)
+    # The source form's No / Uraian / Jumlah proportions. The collapsed
+    # table's own one-column grid supplies the containing width.
+    source_width = sum(
+        int(column.get(qn("w:w"), "0")) for column in table._tbl.tblGrid
+    ) or 9840
+    widths = [
+        round(source_width * 0.08),
+        round(source_width * 0.55),
+        source_width - round(source_width * 0.08) - round(source_width * 0.55),
+    ]
+    _set_table_geometry(rebuilt, widths)
+
+    header = ("No", "Uraian", "Jumlah")
+    for column, value in enumerate(header):
+        cell = rebuilt.cell(0, column)
+        _set_cell_text_like(cell, value, template_cell)
+        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    _set_row_height(rebuilt.rows[0], 420)
+
+    for offset, item in enumerate(parsed["items"], start=1):
+        row = rebuilt.rows[offset]
+        _set_cell_text_like(row.cells[0], item["number"], template_cell)
+        _set_cell_text_like(row.cells[1], item["description"], template_cell)
+        _set_cell_text_like(row.cells[2], item["amount"], template_cell)
+        row.cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        _set_row_height(row, _minimum_expense_row_height(row))
+
+    total_row = rebuilt.rows[-1]
+    merged_total = total_row.cells[0].merge(total_row.cells[1])
+    _set_cell_text_like(merged_total, parsed["total"][0], template_cell)
+    _set_cell_text_like(total_row.cells[2], parsed["total"][1], template_cell)
+    total_row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    _set_row_height(total_row, 420)
+    _set_table_grid_borders(rebuilt)
+
+    # add_table appends at the end of the parent cell. Move it into the exact
+    # original position, then remove the collapsed source table.
+    table._tbl.addprevious(rebuilt._tbl)
+    table._tbl.getparent().remove(table._tbl)
+    return rebuilt
+
+
+def _recover_collapsed_nota_riil_tables(document):
+    recovered = 0
+    for table in list(iter_document_tables(document)):
+        if len(table.rows) != 1 or len(table.columns) != 1:
+            continue
+        parsed = _parse_collapsed_nota_riil_table(table.cell(0, 0).text)
+        if parsed is None:
+            continue
+        _replace_collapsed_nota_riil_table(table, parsed)
+        recovered += 1
+    return recovered
+
+
+def _logical_row_cells(row):
+    cells = []
+    seen = set()
+    for cell in row.cells:
+        cell_key = cell._tc
+        if cell_key in seen:
+            continue
+        seen.add(cell_key)
+        cells.append(cell)
+    return cells
+
+
+def _set_row_height(row, twips):
+    row_properties = row._tr.get_or_add_trPr()
+    height = row_properties.find(qn("w:trHeight"))
+    if height is None:
+        height = OxmlElement("w:trHeight")
+        row_properties.append(height)
+    height.set(qn("w:val"), str(twips))
+    # Keep the source proportions but never clip editable text if Word uses a
+    # substituted font.
+    height.set(qn("w:hRule"), "atLeast")
+
+
+def _append_cell_text_like(cell, text):
+    template_paragraph = cell.paragraphs[-1]
+    template_run = next(
+        (run for run in template_paragraph.runs if run.text),
+        None,
+    )
+    paragraph = cell.add_paragraph()
+    if template_paragraph._p.pPr is not None:
+        if paragraph._p.pPr is not None:
+            paragraph._p.remove(paragraph._p.pPr)
+        paragraph._p.insert(0, deepcopy(template_paragraph._p.pPr))
+    run = paragraph.add_run(text)
+    if template_run is not None and template_run._r.rPr is not None:
+        run._r.insert(0, deepcopy(template_run._r.rPr))
+
+
+def _is_item_number(text):
+    return re.fullmatch(r"\s*\d+[.)]\s*", text) is not None
+
+
+def _is_total_label(text):
+    return _normalized_label(text) in {"jumlah", "total"}
+
+
+def _looks_like_calculation(text):
+    return re.search(r"\d+\s*[x\u00d7]\s*\d", text, re.IGNORECASE) is not None
+
+
+def _find_total_row_index(table, header_index):
+    for index in range(header_index + 1, len(table.rows)):
+        cells = _logical_row_cells(table.rows[index])
+        if cells and _is_total_label(cells[0].text):
+            return index
+    return None
+
+
+def _set_row_minimum_height(row, twips):
+    row_properties = row._tr.get_or_add_trPr()
+    height = row_properties.find(qn("w:trHeight"))
+    existing = 0
+    if height is not None:
+        try:
+            existing = int(height.get(qn("w:val"), "0"))
+        except ValueError:
+            existing = 0
+    _set_row_height(row, max(existing, twips))
+
+
+def _minimum_expense_row_height(row, default=360):
+    line_count = max(
+        (cell.text.count("\n") + 1 for cell in _logical_row_cells(row)),
+        default=1,
+    )
+    return max(default, 360 * line_count)
+
+
+def _repair_nota_riil_row_layout(table):
+    """Repair any-length Nota Riil tables without assuming one expense row."""
+    header_index = _expense_header_index(table)
+    if header_index is None:
+        return 0
+    total_index = _find_total_row_index(table, header_index)
+    if total_index is None or total_index <= header_index + 1:
+        return 0
+
+    item_rows = []
+    for index in range(header_index + 1, total_index):
+        cells = _logical_row_cells(table.rows[index])
+        if len(cells) >= 3 and _is_item_number(cells[0].text):
+            item_rows.append((index, cells))
+    if not item_rows:
+        return 0
+
+    changes = 0
+    total_row = table.rows[total_index]
+    total_cells = _logical_row_cells(total_row)
+    total_label = total_cells[0].text.strip()
+    middle_cells = total_cells[1:-1]
+    calculation = " ".join(
+        cell.text.strip() for cell in middle_cells if cell.text.strip()
+    )
+    moved_calculation = False
+    if len(total_cells) >= 4 and _looks_like_calculation(calculation):
+        # pdf2docx may split the final item's calculation across surplus grid
+        # columns in the total row. The source keeps it under Uraian.
+        description = item_rows[-1][1][1]
+        existing_description = re.sub(r"\s+", " ", description.text).strip()
+        if calculation not in existing_description:
+            _append_cell_text_like(description, calculation)
+            changes += 1
+        moved_calculation = True
+
+    middle_has_content = any(cell.text.strip() for cell in middle_cells)
+    if (
+        len(total_cells) >= 3
+        and (moved_calculation or not middle_has_content)
+        and total_row.cells[0]._tc is not total_row.cells[-2]._tc
+    ):
+        # The source's final label spans the number and description columns.
+        merged_total = total_row.cells[0].merge(total_row.cells[-2])
+        _set_cell_text_like(merged_total, total_label, merged_total)
+        changes += 1
+
+    # pdf2docx exports exact short rows. Make them source-sized minimums so
+    # added lines and future multi-item forms can expand instead of clipping.
+    if moved_calculation:
+        _set_row_height(table.rows[header_index], 420)
+    else:
+        _set_row_minimum_height(table.rows[header_index], 420)
+    for index, _ in item_rows:
+        target_height = _minimum_expense_row_height(table.rows[index])
+        if moved_calculation:
+            _set_row_height(table.rows[index], target_height)
+        else:
+            _set_row_minimum_height(table.rows[index], target_height)
+    if moved_calculation:
+        _set_row_height(table.rows[total_index], 420)
+    else:
+        _set_row_minimum_height(table.rows[total_index], 420)
+    return changes
+
+
+def _repair_nota_riil_expense_tables(document):
+    repaired = _recover_collapsed_nota_riil_tables(document)
+    for table in iter_document_tables(document):
+        if not _is_nota_riil_expense_table(table):
+            continue
+        _set_table_grid_borders(table)
+        repaired += 1 + _repair_nota_riil_row_layout(table)
+    return repaired
 
 
 def _repair_paragraph_runs(
@@ -559,7 +994,9 @@ def _repair_nd_tembusan_tables(document, reference_pages):
     return 0
 
 
-def repair_editable_docx(output, reference_pages, nota_dinas=False):
+def repair_editable_docx(
+    output, reference_pages, nota_dinas=False, nota_riil=False
+):
     if not reference_pages or not any(page.strip() for page in reference_pages):
         return 0
 
@@ -589,8 +1026,15 @@ def repair_editable_docx(output, reference_pages, nota_dinas=False):
     )
     if nota_dinas:
         normalized += _repair_nd_tembusan_tables(document, reference_pages)
-    if restored or normalized:
+    table_repairs = (
+        _repair_nota_riil_expense_tables(document)
+        if nota_riil
+        else 0
+    )
+    if restored or normalized or table_repairs:
         document.save(output)
+    # Keep the public count compatible with the existing text-repair metric;
+    # grid restoration is a layout-only correction.
     return restored
 
 
@@ -607,7 +1051,12 @@ def _editable_conversion_settings(nota_dinas):
 
 
 def convert_editable(
-    source, output, workspace, reference_pages=None, nota_dinas=False
+    source,
+    output,
+    workspace,
+    reference_pages=None,
+    nota_dinas=False,
+    nota_riil=False,
 ):
     emit({"type": "progress", "stage": "repairing", "progress": 12})
     repaired = normalize_with_qpdf(source, workspace)
@@ -637,7 +1086,10 @@ def convert_editable(
             fail("FONT_OR_LAYOUT_UNSUPPORTED")
     emit({"type": "progress", "stage": "optimizing", "progress": 88})
     repair_editable_docx(
-        output, reference_pages or [], nota_dinas=nota_dinas
+        output,
+        reference_pages or [],
+        nota_dinas=nota_dinas,
+        nota_riil=nota_riil,
     )
 
 
@@ -708,6 +1160,7 @@ def main():
             if args.mode == "editable":
                 reference_pages = extract_reference_pages(document)
                 nota_dinas = is_nota_dinas(reference_pages)
+                nota_riil = is_nota_riil(reference_pages)
                 document.close()
                 convert_editable(
                     args.input,
@@ -715,6 +1168,7 @@ def main():
                     workspace,
                     reference_pages=reference_pages,
                     nota_dinas=nota_dinas,
+                    nota_riil=nota_riil,
                 )
             elif args.mode == "ocr":
                 convert_ocr(document, args.output)
