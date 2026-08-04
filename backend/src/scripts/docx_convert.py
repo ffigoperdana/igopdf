@@ -861,6 +861,122 @@ def _repair_rincian_biaya_shading(document):
     return repaired
 
 
+def _restore_bpdp_header_rule(document, title):
+    """Restore the full-width rule between the BPDP masthead and form title.
+
+    pdf2docx keeps the masthead text but drops its separator rule on some BPDP
+    forms. The masthead itself is often centered with paragraph indents, so a
+    border on that paragraph would only make a short line. Instead, insert a
+    dedicated, unindented paragraph directly after the final TELP/SITUS line.
+    """
+    title_upper = title.upper()
+    paragraphs = document.paragraphs
+    title_index = next(
+        (
+            index
+            for index, paragraph in enumerate(paragraphs)
+            if title_upper in paragraph.text.upper()
+        ),
+        None,
+    )
+    if title_index is None:
+        return 0
+
+    anchor = next(
+        (
+            paragraph
+            for paragraph in reversed(paragraphs[:title_index])
+            if "TELP" in paragraph.text.upper() or "SITUS" in paragraph.text.upper()
+        ),
+        None,
+    )
+    if anchor is None:
+        return 0
+
+    next_element = anchor._p.getnext()
+    if next_element is not None and next_element.tag == qn("w:p"):
+        next_properties = next_element.find(qn("w:pPr"))
+        next_borders = (
+            next_properties.find(qn("w:pBdr"))
+            if next_properties is not None
+            else None
+        )
+        if next_borders is not None and next_borders.find(qn("w:bottom")) is not None:
+            return 0
+
+    rule = document.add_paragraph()
+    properties = rule._p.get_or_add_pPr()
+
+    spacing = properties.find(qn("w:spacing"))
+    if spacing is None:
+        spacing = OxmlElement("w:spacing")
+        properties.append(spacing)
+    spacing.set(qn("w:before"), "0")
+    spacing.set(qn("w:after"), "80")
+    spacing.set(qn("w:line"), "20")
+    spacing.set(qn("w:lineRule"), "exact")
+
+    indent = properties.find(qn("w:ind"))
+    if indent is None:
+        indent = OxmlElement("w:ind")
+        properties.append(indent)
+    indent.set(qn("w:left"), "0")
+    indent.set(qn("w:right"), "0")
+
+    borders = properties.find(qn("w:pBdr"))
+    if borders is None:
+        borders = OxmlElement("w:pBdr")
+        properties.append(borders)
+    bottom = OxmlElement("w:bottom")
+    bottom.set(qn("w:val"), "single")
+    bottom.set(qn("w:sz"), "6")
+    bottom.set(qn("w:space"), "0")
+    bottom.set(qn("w:color"), "000000")
+    borders.append(bottom)
+
+    # document.add_paragraph() appends to the body; move it next to the
+    # masthead so all existing form geometry remains untouched.
+    anchor._p.addnext(rule._p)
+    return 1
+
+
+def _repair_rincian_biaya_payment_band(document):
+    """Make the SPJ payment total's light-gray band span both columns.
+
+    Some conversions retain the gray fill only inside the left nested amount
+    table. The source form uses one continuous band behind both payment
+    amounts, so repair the parent cells only for this very specific signature
+    block rather than touching generic two-column tables.
+    """
+    repaired = 0
+    for table in iter_document_tables(document):
+        if len(table.rows) < 2:
+            continue
+        total_cells = _logical_row_cells(table.rows[0])
+        signature_cells = _logical_row_cells(table.rows[1])
+        if len(total_cells) != 2 or len(signature_cells) != 2:
+            continue
+
+        signature_text = " ".join(cell.text.upper() for cell in signature_cells)
+        if (
+            "BENDAHARA PENGELUARAN" not in signature_text
+            or "YANG MENERIMA" not in signature_text
+            or not any("RP" in cell.text.upper() for cell in total_cells)
+        ):
+            continue
+
+        for cell in total_cells:
+            _set_cell_shading(cell, "E7E6E6")
+            _set_cell_run_color(cell, "000000")
+            for nested_table in cell.tables:
+                for nested_row in nested_table.rows:
+                    for nested_cell in _logical_row_cells(nested_row):
+                        _set_cell_shading(nested_cell, "E7E6E6")
+                        _set_cell_run_color(nested_cell, "000000")
+            repaired += 1
+    return repaired
+
+
 def _restore_form_title_underline(document, title):
     """Restore a short title underline that pdf2docx drops from BPDP forms."""
     repairs = 0
@@ -1433,6 +1549,9 @@ def repair_editable_docx(
         else 0
     )
     if nota_riil:
+        table_repairs += _restore_bpdp_header_rule(
+            document, "DAFTAR PENGELUARAN RIIL"
+        )
         table_repairs += _restore_form_title_underline(
             document, "DAFTAR PENGELUARAN RIIL"
         )
@@ -1442,9 +1561,13 @@ def repair_editable_docx(
         else 0
     )
     if rincian_biaya_perjalanan_dinas:
+        table_repairs += _restore_bpdp_header_rule(
+            document, "RINCIAN BIAYA PERJALANAN DINAS"
+        )
         table_repairs += _restore_form_title_underline(
             document, "RINCIAN BIAYA PERJALANAN DINAS"
         )
+        table_repairs += _repair_rincian_biaya_payment_band(document)
         table_repairs += _remove_rincian_title_placeholder_border(document)
     if restored or normalized or table_repairs:
         document.save(output)

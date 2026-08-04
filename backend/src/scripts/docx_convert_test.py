@@ -670,6 +670,68 @@ class DocxConvertTextRepairTest(unittest.TestCase):
                 borders = cell._tc.tcPr.find(qn("w:tcBorders"))
                 self.assertIsNone(borders.find(qn("w:top")))
 
+    def test_restores_bpdp_header_rule_for_nota_and_spj_forms(self):
+        cases = (
+            (
+                "nota-riil-header.docx",
+                "DAFTAR PENGELUARAN RIIL",
+                {"nota_riil": True},
+            ),
+            (
+                "rincian-biaya-header.docx",
+                "RINCIAN BIAYA PERJALANAN DINAS",
+                {"rincian_biaya_perjalanan_dinas": True},
+            ),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            for filename, title, flags in cases:
+                path = os.path.join(directory, filename)
+                document = Document()
+                document.add_paragraph(
+                    "TELP (021) 84283099, SITUS www.bpdp.or.id"
+                )
+                document.add_paragraph(title)
+                document.save(path)
+
+                repair_editable_docx(path, [title], **flags)
+
+                result = Document(path)
+                rule = result.paragraphs[0]._p.getnext()
+                self.assertEqual(rule.tag, qn("w:p"))
+                properties = rule.find(qn("w:pPr"))
+                bottom = properties.find(qn("w:pBdr")).find(qn("w:bottom"))
+                self.assertEqual(bottom.get(qn("w:val")), "single")
+                self.assertEqual(bottom.get(qn("w:sz")), "6")
+                self.assertEqual(bottom.get(qn("w:color")), "000000")
+
+    def test_restores_full_width_rincian_payment_band(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "rincian-payment-band.docx")
+            document = Document()
+            document.add_paragraph("RINCIAN BIAYA PERJALANAN DINAS")
+            payment = document.add_table(rows=2, cols=2)
+            nested_total = payment.cell(0, 0).add_table(rows=1, cols=1)
+            nested_total.cell(0, 0).text = "Rp 730,000"
+            payment.cell(0, 1).text = "Rp 730,000"
+            payment.cell(1, 0).text = "Bendahara Pengeluaran"
+            payment.cell(1, 1).text = "Yang menerima"
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["RINCIAN BIAYA PERJALANAN DINAS"],
+                rincian_biaya_perjalanan_dinas=True,
+            )
+
+            result = Document(path)
+            payment = result.tables[0]
+            for cell in payment.rows[0].cells:
+                shading = cell._tc.tcPr.find(qn("w:shd"))
+                self.assertEqual(shading.get(qn("w:fill")), "E7E6E6")
+            nested_total = payment.cell(0, 0).tables[0].cell(0, 0)
+            shading = nested_total._tc.tcPr.find(qn("w:shd"))
+            self.assertEqual(shading.get(qn("w:fill")), "E7E6E6")
+
 
 if __name__ == "__main__":
     unittest.main()
