@@ -977,6 +977,42 @@ def _repair_rincian_biaya_payment_band(document):
     return repaired
 
 
+def _repair_rincian_biaya_payment_caption_flow(document):
+    """Keep the left payment caption from flowing onto the date line.
+
+    pdf2docx sometimes places the date, both payment captions, and a trailing
+    ``sebesar`` in one tabbed paragraph. Word then fits the first word
+    (``Telah``) after the date and wraps the rest to the left. A line break
+    before the left caption restores the intended two-column flow while
+    keeping the original tabs, font, and spacing intact.
+    """
+    repaired = 0
+    for paragraph in document.paragraphs:
+        paragraph_upper = paragraph.text.upper()
+        if not all(
+            marker in paragraph_upper
+            for marker in (
+                "TELAH DIBAYAR SEJUMLAH",
+                "TELAH MENERIMA JUMLAH UANG",
+                "SEBESAR",
+            )
+        ):
+            continue
+
+        for run in paragraph.runs:
+            match = re.match(
+                r"^(\s*)(Telah\s+dibayar\s+sejumlah\b.*)$",
+                run.text,
+                re.IGNORECASE,
+            )
+            if match is None or "\n" in match.group(1):
+                continue
+            run.text = f"{match.group(1)}\n{match.group(2)}"
+            repaired += 1
+            break
+    return repaired
+
+
 def _restore_form_title_underline(document, title):
     """Restore a short title underline that pdf2docx drops from BPDP forms."""
     repairs = 0
@@ -1568,6 +1604,7 @@ def repair_editable_docx(
             document, "RINCIAN BIAYA PERJALANAN DINAS"
         )
         table_repairs += _repair_rincian_biaya_payment_band(document)
+        table_repairs += _repair_rincian_biaya_payment_caption_flow(document)
         table_repairs += _remove_rincian_title_placeholder_border(document)
     if restored or normalized or table_repairs:
         document.save(output)

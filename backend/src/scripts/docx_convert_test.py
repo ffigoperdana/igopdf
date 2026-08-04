@@ -732,6 +732,35 @@ class DocxConvertTextRepairTest(unittest.TestCase):
             shading = nested_total._tc.tcPr.find(qn("w:shd"))
             self.assertEqual(shading.get(qn("w:fill")), "E7E6E6")
 
+    def test_keeps_rincian_payment_caption_off_the_date_line(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "rincian-payment-caption.docx")
+            document = Document()
+            document.add_paragraph("RINCIAN BIAYA PERJALANAN DINAS")
+            caption = document.add_paragraph()
+            caption.add_run("\t")
+            caption.add_run("Jakarta, 17 July 2026 ")
+            caption.add_run("Telah dibayar sejumlah ")
+            caption.add_run("\t")
+            caption.add_run("Telah menerima jumlah uang ")
+            caption.add_run("\t")
+            caption.add_run("sebesar")
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["RINCIAN BIAYA PERJALANAN DINAS"],
+                rincian_biaya_perjalanan_dinas=True,
+            )
+
+            result = Document(path)
+            repaired_caption = result.paragraphs[1]
+            self.assertEqual(repaired_caption.runs[1].text, "Jakarta, 17 July 2026 ")
+            self.assertEqual(
+                repaired_caption.runs[2].text,
+                "\nTelah dibayar sejumlah ",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
