@@ -240,6 +240,24 @@ const migrations = [
         ON docx_upload_slots (expires_at);
     `,
   },
+  {
+    name: '010_service_status',
+    sql: `
+      CREATE TABLE IF NOT EXISTS service_status (
+        id SMALLINT PRIMARY KEY CHECK (id = 1),
+        mode VARCHAR(20) NOT NULL DEFAULT 'auto'
+          CHECK (mode IN ('auto', 'maintenance')),
+        message VARCHAR(500),
+        maintenance_until TIMESTAMPTZ,
+        updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      INSERT INTO service_status (id, mode)
+      VALUES (1, 'auto')
+      ON CONFLICT (id) DO NOTHING;
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {

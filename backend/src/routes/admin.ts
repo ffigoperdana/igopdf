@@ -14,6 +14,11 @@ import {
 import { validateCsvContent, validateTxtContent } from '../utils/csvValidator.js';
 import { generateRandomPassword } from '../utils/password.js';
 import { logger } from '../utils/logger.js';
+import {
+  getServiceStatus,
+  updateServiceStatus,
+  type ServiceStatusMode,
+} from '../services/serviceStatusService.js';
 
 const router = Router();
 
@@ -74,6 +79,32 @@ const resetPasswordSchema = z.object({
     .optional(),
 });
 
+const serviceStatusSchema = z
+  .object({
+    mode: z.enum(['auto', 'maintenance']),
+    message: z.string().trim().max(500).nullable().optional(),
+    maintenanceUntil: z.string().trim().max(80).nullable().optional(),
+  })
+  .superRefine((data, context) => {
+    if (!data.maintenanceUntil) return;
+    const timestamp = Date.parse(data.maintenanceUntil);
+    if (!Number.isFinite(timestamp)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['maintenanceUntil'],
+        message: 'Maintenance end time must be a valid date',
+      });
+      return;
+    }
+    if (data.mode === 'maintenance' && timestamp <= Date.now()) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['maintenanceUntil'],
+        message: 'Maintenance end time must be in the future',
+      });
+    }
+  });
+
 router.get('/dashboard', async (_req, res) => {
   try {
     const stats = await getDashboardStats();
@@ -83,6 +114,60 @@ router.get('/dashboard', async (_req, res) => {
     });
   } catch (err) {
     logger.error('Dashboard stats error', err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.get('/service-status', async (_req, res) => {
+  try {
+    const status = await getServiceStatus();
+    res.json({
+      success: true,
+      data: status,
+    });
+  } catch (err) {
+    logger.error('Admin service status read error', err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  }
+});
+
+router.put('/service-status', async (req, res) => {
+  try {
+    const validation = serviceStatusSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid input',
+        details: validation.error.issues,
+      });
+      return;
+    }
+
+    const data = validation.data;
+    const status = await updateServiceStatus(
+      {
+        mode: data.mode as ServiceStatusMode,
+        message: data.message,
+        maintenanceUntil: data.maintenanceUntil
+          ? new Date(data.maintenanceUntil)
+          : null,
+      },
+      req.user!.id
+    );
+
+    res.json({
+      success: true,
+      data: status,
+      message: 'Service status updated successfully',
+    });
+  } catch (err) {
+    logger.error('Admin service status update error', err);
     res.status(500).json({
       success: false,
       error: 'Internal server error',

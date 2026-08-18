@@ -226,6 +226,13 @@
               class="hidden rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300"
             ></div>
 
+            <div
+              id="service-notice"
+              role="status"
+              aria-live="polite"
+              class="hidden rounded-lg border border-vibrant-palm/40 bg-vibrant-palm/10 px-4 py-3 text-sm text-content"
+            ></div>
+
             <button
               type="submit"
               id="login-button"
@@ -262,7 +269,11 @@
     </div>
 
     <script type="module">
-      import { login, getCaptcha } from './src/js/auth/session.js';
+      import {
+        getCaptcha,
+        getServiceStatus,
+        login,
+      } from './src/js/auth/session.js';
       import { initTheme, createThemeToggle } from './src/js/theme.js';
       import {
         initI18n,
@@ -350,7 +361,9 @@
             errorDiv.textContent =
               result.code === 'LDAP_UNREACHABLE'
                 ? t('login.networkError')
-                : result.error || t('login.failed');
+                : result.code === 'LDAP_MAINTENANCE'
+                  ? result.error || t('login.maintenanceNotice')
+                  : result.error || t('login.failed');
             errorDiv.classList.remove('hidden');
             loginBtn.disabled = false;
             loginBtn.textContent = t('login.submit');
@@ -360,35 +373,53 @@
 
       loadCaptcha();
 
-      // Service status pill (reference design): ping /health and color the
-      // dot + label. Green = healthy, orange = slow/degraded, red = down.
-      (async () => {
+      // Service status checks the AD bind path, not only backend liveness. The
+      // endpoint is cached server-side, so polling stays cheap for the login
+      // page while still reflecting an admin maintenance override quickly.
+      async function loadServiceStatus() {
         const dot = document.getElementById('service-status-dot');
         const txt = document.getElementById('service-status-text');
-        if (!dot || !txt) return;
+        const notice = document.getElementById('service-notice');
+        if (!dot || !txt || !notice) return;
         const set = (dotCls, txtCls, label) => {
           dot.className = `h-2 w-2 rounded-full ${dotCls}`;
           txt.className = `font-semibold ${txtCls}`;
           txt.textContent = label;
         };
+
         try {
-          const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 5000);
-          const t0 = performance.now();
-          const res = await fetch('/health', {
-            signal: ctrl.signal,
-            cache: 'no-store',
-          });
-          clearTimeout(timer);
-          const slow = performance.now() - t0 > 2000;
-          if (res.ok && !slow)
-            set('bg-accent-green', 'text-accent-green', 'Operational');
-          else if (res.ok) set('bg-vibrant-palm', 'text-vibrant-palm', 'Warning');
-          else set('bg-red-500', 'text-red-500', 'Error');
+          const result = await getServiceStatus();
+          if (!result.success) throw new Error(result.error || 'status unavailable');
+
+          if (result.data.status === 'maintenance') {
+            set('bg-vibrant-palm', 'text-vibrant-palm', t('login.serviceMaintenance'));
+            const until = result.data.maintenanceUntil
+              ? new Date(result.data.maintenanceUntil).toLocaleTimeString(
+                  document.documentElement.lang === 'en' ? 'en-US' : 'id-ID',
+                  { hour: '2-digit', minute: '2-digit' }
+                )
+              : '';
+            notice.textContent = `${result.data.message || t('login.maintenanceNotice')}${until ? ` ${t('login.maintenanceUntil', { time: until })}` : ''}`;
+            notice.classList.remove('hidden');
+          } else if (result.data.status === 'offline') {
+            set('bg-red-500', 'text-red-500', t('login.serviceOffline'));
+            notice.textContent = t('login.networkError');
+            notice.classList.remove('hidden');
+          } else {
+            set('bg-accent-green', 'text-accent-green', t('login.serviceOperational'));
+            notice.classList.add('hidden');
+            notice.textContent = '';
+          }
         } catch {
-          set('bg-red-500', 'text-red-500', 'Error');
+          set('bg-red-500', 'text-red-500', t('login.serviceOffline'));
+          notice.textContent = t('login.networkError');
+          notice.classList.remove('hidden');
         }
-      })();
+      }
+
+      void loadServiceStatus();
+      window.setInterval(() => void loadServiceStatus(), 30_000);
+      document.addEventListener('igo:languagechange', () => void loadServiceStatus());
     </script>
   </body>
 </html>

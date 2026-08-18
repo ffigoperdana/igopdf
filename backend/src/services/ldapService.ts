@@ -13,6 +13,11 @@ export interface LdapAuthResult {
   code?: 'unreachable';
 }
 
+export interface LdapHealthResult {
+  reachable: boolean;
+  latencyMs: number;
+}
+
 /**
  * Escapes special characters in a value used inside an LDAP search filter,
  * per RFC 4515. Defense in depth — usernames should already be constrained
@@ -252,5 +257,37 @@ export async function authenticateLdap(
     };
   } finally {
     unbindQuietly(searchClient);
+  }
+}
+
+/**
+ * Checks the same service-account bind used by login without attempting a
+ * user authentication. The caller can safely expose only `reachable` and
+ * `latencyMs`; the underlying LDAP error may contain connection details.
+ */
+export async function checkLdapAvailability(): Promise<LdapHealthResult> {
+  const startedAt = Date.now();
+
+  if (
+    !config.ldap.enabled ||
+    !config.ldap.url ||
+    !config.ldap.baseDn ||
+    !config.ldap.bindDn ||
+    !config.ldap.bindPassword
+  ) {
+    return { reachable: false, latencyMs: Date.now() - startedAt };
+  }
+
+  const client = createClient();
+  try {
+    await bindClient(client, config.ldap.bindDn, config.ldap.bindPassword);
+    return { reachable: true, latencyMs: Date.now() - startedAt };
+  } catch (err) {
+    logger.debug('LDAP availability check failed', {
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return { reachable: false, latencyMs: Date.now() - startedAt };
+  } finally {
+    unbindQuietly(client);
   }
 }

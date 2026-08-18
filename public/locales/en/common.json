@@ -13,7 +13,12 @@
     "submit": "Sign in",
     "submitting": "Signing in...",
     "failed": "Login failed",
-    "networkError": "You appear to be outside the office network. AD sign-in requires the internal network — please connect this device to the office network/WiFi first, then try again."
+    "networkError": "You appear to be outside the office network. AD sign-in requires the internal network — please connect this device to the office network/WiFi first, then try again.",
+    "maintenanceNotice": "Active Directory sign-in is currently under maintenance. Please try again after maintenance is complete.",
+    "maintenanceUntil": "Estimated completion at {{time}}.",
+    "serviceOperational": "Operational",
+    "serviceOffline": "Offline",
+    "serviceMaintenance": "Maintenance"
   },
   "nav": {
     "home": "Home",

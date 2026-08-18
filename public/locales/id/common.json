@@ -13,7 +13,12 @@
     "submit": "Masuk",
     "submitting": "Sedang masuk...",
     "failed": "Login gagal",
-    "networkError": "Anda tampaknya berada di luar jaringan kantor. Login akun AD memerlukan koneksi ke jaringan internal — silakan sambungkan perangkat ke jaringan/WiFi kantor terlebih dahulu, lalu coba lagi."
+    "networkError": "Anda tampaknya berada di luar jaringan kantor. Login akun AD memerlukan koneksi ke jaringan internal — silakan sambungkan perangkat ke jaringan/WiFi kantor terlebih dahulu, lalu coba lagi.",
+    "maintenanceNotice": "Login Active Directory sedang maintenance. Silakan coba lagi setelah maintenance selesai.",
+    "maintenanceUntil": "Perkiraan selesai pukul {{time}}.",
+    "serviceOperational": "Operasional",
+    "serviceOffline": "Offline",
+    "serviceMaintenance": "Maintenance"
   },
   "nav": {
     "home": "Beranda",

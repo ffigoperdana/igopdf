@@ -54,6 +54,32 @@
       <div class="grid min-w-0 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
         <aside class="min-w-0 space-y-6">
           <section class="rounded border border-outline-variant bg-paper-white p-5">
+            <h2 class="mb-1 text-lg font-bold text-ink-slate dark:text-content">Status login AD</h2>
+            <p class="mb-4 text-sm text-on-surface-variant">Pilih pengecekan otomatis atau tampilkan maintenance kepada pengguna di halaman login.</p>
+            <div id="admin-service-status" class="mb-4 rounded border border-outline-variant bg-surface-gray px-3 py-2 text-sm">Memuat status layanan...</div>
+            <form id="service-status-form" class="space-y-4">
+              <div>
+                <label for="service-status-mode" class="mb-1 block text-sm font-medium">Mode status</label>
+                <select id="service-status-mode" class="w-full rounded border border-outline-variant px-3 py-2">
+                  <option value="auto">Otomatis — cek AD</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+              <div id="service-maintenance-fields" class="space-y-4">
+                <div>
+                  <label for="service-status-message" class="mb-1 block text-sm font-medium">Pesan untuk pengguna</label>
+                  <textarea id="service-status-message" rows="3" maxlength="500" class="w-full rounded border border-outline-variant px-3 py-2 text-sm" placeholder="Login AD sedang maintenance."></textarea>
+                </div>
+                <div>
+                  <label for="service-status-until" class="mb-1 block text-sm font-medium">Selesai pada (opsional)</label>
+                  <input id="service-status-until" type="datetime-local" class="w-full rounded border border-outline-variant px-3 py-2" />
+                </div>
+              </div>
+              <button id="save-service-status-btn" class="w-full rounded bg-vibrant-palm px-4 py-2 font-semibold text-white hover:bg-orange-600" type="submit">Simpan status</button>
+            </form>
+          </section>
+
+          <section class="rounded border border-outline-variant bg-paper-white p-5">
             <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Tambah user</h2>
             <form id="create-user-form" class="space-y-4">
               <div>
@@ -165,6 +191,63 @@
         return value ? new Date(value).toLocaleString('id-ID') : '-';
       }
 
+      function toDateTimeLocal(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        const pad = (part) => String(part).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      }
+
+      function updateServiceStatusFields() {
+        const mode = document.getElementById('service-status-mode').value;
+        document.getElementById('service-maintenance-fields').classList.toggle('hidden', mode !== 'maintenance');
+      }
+
+      function renderServiceStatus(status) {
+        const stateLabel = status.status === 'maintenance'
+          ? 'Maintenance'
+          : status.status === 'operational'
+            ? 'Operasional'
+            : 'Offline';
+        const adLabel = status.adReachable ? 'AD terjangkau' : 'AD tidak terjangkau';
+        const until = status.maintenanceUntil ? ` sampai ${formatDate(status.maintenanceUntil)}` : '';
+        document.getElementById('admin-service-status').textContent = `${stateLabel} · ${adLabel}${until}`;
+        document.getElementById('service-status-mode').value = status.mode;
+        document.getElementById('service-status-message').value = status.message || '';
+        document.getElementById('service-status-until').value = toDateTimeLocal(status.maintenanceUntil);
+        updateServiceStatusFields();
+      }
+
+      async function loadServiceStatus() {
+        const result = await api('/admin/service-status');
+        renderServiceStatus(result.data);
+      }
+
+      async function saveServiceStatus(event) {
+        event.preventDefault();
+        const button = document.getElementById('save-service-status-btn');
+        const mode = document.getElementById('service-status-mode').value;
+        const untilValue = document.getElementById('service-status-until').value;
+        button.disabled = true;
+        try {
+          const result = await api('/admin/service-status', {
+            method: 'PUT',
+            body: JSON.stringify({
+              mode,
+              message: mode === 'maintenance' ? document.getElementById('service-status-message').value : null,
+              maintenanceUntil: mode === 'maintenance' && untilValue ? new Date(untilValue).toISOString() : null,
+            }),
+          });
+          renderServiceStatus(result.data);
+          showMessage('Status login AD berhasil diperbarui.');
+        } catch (error) {
+          showMessage(error.message || 'Status layanan gagal diperbarui.', false);
+        } finally {
+          button.disabled = false;
+        }
+      }
+
       async function loadStats() {
         const result = await api('/admin/dashboard');
         const stats = result.data;
@@ -218,7 +301,7 @@
       }
 
       async function refreshAll() {
-        await Promise.all([loadStats(), loadUsers()]);
+        await Promise.all([loadStats(), loadUsers(), loadServiceStatus()]);
       }
 
       async function updateUser(id, payload) {
@@ -304,6 +387,9 @@
           showMessage(error.message, false);
         }
       });
+
+      document.getElementById('service-status-mode').addEventListener('change', updateServiceStatusFields);
+      document.getElementById('service-status-form').addEventListener('submit', saveServiceStatus);
 
       document.getElementById('refresh-users-btn').addEventListener('click', refreshAll);
       document.getElementById('user-search').addEventListener('input', (event) => {

@@ -4,6 +4,7 @@ import { sessionConfig } from '../config/session.js';
 import { config } from '../config/index.js';
 import { hashPassword, verifyPassword } from '../utils/password.js';
 import { authenticateLdap } from './ldapService.js';
+import { getServiceStatus } from './serviceStatusService.js';
 import { logger } from '../utils/logger.js';
 import type { User, Session } from '../types/index.js';
 
@@ -43,6 +44,35 @@ function hashToken(token: string): string {
 function toSafeUser(user: User): Omit<User, 'passwordHash'> {
   const { passwordHash, ...safe } = user;
   return safe;
+}
+
+async function getLdapLoginBlock(): Promise<LoginResult | null> {
+  try {
+    const status = await getServiceStatus();
+    if (status.status === 'maintenance') {
+      return {
+        success: false,
+        error:
+          status.message ||
+          'Active Directory login is temporarily under maintenance',
+        code: 'LDAP_MAINTENANCE',
+      };
+    }
+    if (status.status === 'offline') {
+      return {
+        success: false,
+        error: 'Directory server unavailable',
+        code: 'LDAP_UNREACHABLE',
+      };
+    }
+  } catch (err) {
+    // The status table is operational metadata. If it is unavailable during
+    // a migration or database hiccup, let the real LDAP bind decide login.
+    logger.warn('Could not read LDAP service status before login', {
+      message: err instanceof Error ? err.message : String(err),
+    });
+  }
+  return null;
 }
 
 /**
@@ -94,6 +124,9 @@ export async function login(
       return { success: false, error: 'Invalid username or password' };
     }
 
+    const ldapLoginBlock = await getLdapLoginBlock();
+    if (ldapLoginBlock) return ldapLoginBlock;
+
     const ldapResult = await authenticateLdap(typedUsername, password);
     if (!ldapResult.success) {
       // AD unreachable is a NETWORK condition, not a wrong password: don't
@@ -135,6 +168,9 @@ export async function login(
   // using the locally stored argon2 hash exactly as before.
   let passwordValid: boolean;
   if (user.authSource === 'ldap') {
+    const ldapLoginBlock = await getLdapLoginBlock();
+    if (ldapLoginBlock) return ldapLoginBlock;
+
     const ldapResult = await authenticateLdap(typedUsername, password);
     if (!ldapResult.success && ldapResult.code === 'unreachable') {
       // Network condition, not a credential failure — skip the lockout counter.

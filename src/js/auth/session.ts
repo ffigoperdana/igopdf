@@ -19,6 +19,18 @@ interface CaptchaResponse {
   error?: string;
 }
 
+export type ServiceStatusState = 'operational' | 'offline' | 'maintenance';
+
+export interface ServiceStatus {
+  status: ServiceStatusState;
+  mode: 'auto' | 'maintenance';
+  message: string | null;
+  maintenanceUntil: string | null;
+  adReachable: boolean;
+  checkedAt: string;
+  latencyMs: number;
+}
+
 export async function login(
   username: string,
   password: string,
@@ -67,6 +79,20 @@ export async function getCaptcha(): Promise<CaptchaResponse> {
     credentials: 'include',
   });
   return response.json();
+}
+
+export async function getServiceStatus(): Promise<
+  { success: true; data: ServiceStatus } | { success: false; error?: string }
+> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/service-status`, {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    return response.json();
+  } catch {
+    return { success: false, error: 'Service status unavailable' };
+  }
 }
 
 export async function changePassword(

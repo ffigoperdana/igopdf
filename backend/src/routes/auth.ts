@@ -11,8 +11,26 @@ import { loginLimiter } from '../middleware/rateLimiter.js';
 import { sessionConfig } from '../config/session.js';
 import { config } from '../config/index.js';
 import { logger } from '../utils/logger.js';
+import { getServiceStatus } from '../services/serviceStatusService.js';
 
 const router = Router();
+
+router.get('/service-status', async (_req, res) => {
+  try {
+    const status = await getServiceStatus();
+    res.json({
+      success: true,
+      data: status,
+    });
+  } catch (err) {
+    logger.error('Service status check error', err);
+    res.status(503).json({
+      success: false,
+      error: 'Service status unavailable',
+      code: 'SERVICE_STATUS_UNAVAILABLE',
+    });
+  }
+});
 
 const loginSchema = z.object({
   username: z.string().min(3).max(150),
@@ -71,9 +89,12 @@ router.post('/login', loginLimiter, async (req, res) => {
     const result = await login(username, password, ipAddress, userAgent);
 
     if (!result.success || !result.session) {
-      // 503 when AD can't be reached (network/topology issue, not bad creds);
-      // the login page maps this code to a "connect to the office network" hint.
-      res.status(result.code === 'LDAP_UNREACHABLE' ? 503 : 401).json({
+      // 503 when AD is unavailable or deliberately in maintenance (not a
+      // credential failure); the login page maps these codes to a service
+      // notice instead of a generic password error.
+      const isLdapServiceUnavailable =
+        result.code === 'LDAP_UNREACHABLE' || result.code === 'LDAP_MAINTENANCE';
+      res.status(isLdapServiceUnavailable ? 503 : 401).json({
         success: false,
         error: result.error || 'Login failed',
         code: result.code,
