@@ -794,24 +794,41 @@ def _remove_top_level_paragraphs(document, predicate):
 
 def _repair_sk_register_tables(document):
     """Restore the source six-column farmer register geometry and grid."""
-    widths = [500, 2920, 1620, 1840, 1750, 2210]
+    # The source template uses a 542.5 pt grid.  These DXA widths are taken
+    # from the PDF's vertical rules (rather than the equal-ish grid emitted
+    # by pdf2docx), so the editable Word table keeps the same column starts.
+    widths = [475, 3075, 1703, 1927, 1663, 1940]
     repaired = 0
 
-    def normalize_cell(cell, font_size, bold=False):
+    def normalize_cell(
+        cell,
+        font_size,
+        font_name,
+        bold=False,
+        alignment=None,
+        *,
+        cell_top=10,
+        cell_bottom=10,
+        line_spacing=1,
+    ):
         for paragraph in cell.paragraphs:
-            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.alignment = alignment or WD_ALIGN_PARAGRAPH.CENTER
             paragraph.paragraph_format.space_before = Pt(0)
             paragraph.paragraph_format.space_after = Pt(0)
-            paragraph.paragraph_format.line_spacing = 1
+            paragraph.paragraph_format.line_spacing = line_spacing
             paragraph.paragraph_format.left_indent = Pt(0)
             paragraph.paragraph_format.right_indent = Pt(0)
             paragraph.paragraph_format.first_line_indent = Pt(0)
             for run in paragraph.runs:
-                run.font.name = "Times New Roman"
-                run.font.size = Pt(font_size)
-                run.bold = bold
+                _set_sk_run_font(run, font_name, font_size, bold=bold)
         cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
-        _set_cell_margins(cell, top=10, start=25, bottom=10, end=25)
+        _set_cell_margins(
+            cell,
+            top=cell_top,
+            start=25,
+            bottom=cell_bottom,
+            end=25,
+        )
 
     for table in list(document.tables):
         table_text = _normalized_table_text(table)
@@ -822,27 +839,58 @@ def _repair_sk_register_tables(document):
         ):
             continue
         _set_table_geometry(table, widths)
-        _set_table_indent(table, 0)
+        _set_table_indent(table, 30)
         table.autofit = False
         _set_table_grid_borders(table)
         for row_index, row in enumerate(table.rows):
             _set_row_cant_split(row)
+            logical_cells = _logical_row_cells(row)
+            is_total = (
+                row_index >= 2
+                and bool(logical_cells)
+                and _is_total_label(logical_cells[0].text)
+            )
             if row_index in (0, 1):
                 _set_repeat_table_header(row)
-                _set_row_height(row, 300 if row_index == 0 else 220)
+                # Header = 32.3 pt, number register = 7.9 pt in the source.
+                # python-docx cell margins contribute about 35 twips to the
+                # rendered row, so these values compensate to the PDF rules.
+                _set_row_height(row, 602 if row_index == 0 else 93)
             else:
-                logical_cells = _logical_row_cells(row)
-                is_total = _is_total_label(logical_cells[0].text) if logical_cells else False
-                _set_row_height(row, 300 if is_total else 300)
-            for cell in _logical_row_cells(row):
+                # Normal records are 23.1 pt; the final total row is 21.8 pt.
+                _set_row_height(row, 402 if is_total else 427)
+            for column_index, cell in enumerate(logical_cells):
                 if row_index == 0:
-                    normalize_cell(cell, 7.5, bold=True)
+                    normalize_cell(cell, 7.26, "Bookman Old Style", bold=True)
                 elif row_index == 1:
-                    normalize_cell(cell, 7.0)
+                    # This source row is only 7.9 pt high.  Remove the
+                    # surrounding cell padding so Word does not inflate it.
+                    normalize_cell(
+                        cell,
+                        6.6,
+                        "Bookman Old Style",
+                        cell_top=0,
+                        cell_bottom=0,
+                        line_spacing=Pt(7.9),
+                    )
                 elif is_total:
-                    normalize_cell(cell, 8.0, bold=True)
+                    # The last row is [TOTAL + merged label, land, amount].
+                    if column_index == 1:
+                        normalize_cell(cell, 7.92, "Bookman Old Style")
+                    else:
+                        normalize_cell(cell, 7.26, "Bookman Old Style", bold=True)
                 else:
-                    normalize_cell(cell, 8.0)
+                    # The register deliberately mixes Times numerals/names
+                    # with Bookman currency amounts, as in the PDF template.
+                    if column_index == 5:
+                        normalize_cell(
+                            cell,
+                            7.26,
+                            "Bookman Old Style",
+                            alignment=WD_ALIGN_PARAGRAPH.LEFT,
+                        )
+                    else:
+                        normalize_cell(cell, 7.92, "Times New Roman")
         repaired += 1
     return repaired
 
@@ -920,11 +968,11 @@ def _repair_sk_heading_and_signature(document, reference_pages):
     return repaired
 
 
-def _set_sk_run_typography(run, size):
-    """Apply the source decision's Bookman Old Style typography explicitly."""
-    run.font.name = "Bookman Old Style"
+def _set_sk_run_font(run, font_name, size, *, bold=False):
+    """Apply a PDF template font explicitly across all Word font slots."""
+    run.font.name = font_name
     run.font.size = Pt(size)
-    run.bold = False
+    run.bold = bold
     run.italic = False
     run.underline = False
     run.font.all_caps = False
@@ -934,7 +982,12 @@ def _set_sk_run_typography(run, size):
         fonts = OxmlElement("w:rFonts")
         run_properties.insert(0, fonts)
     for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
-        fonts.set(qn(f"w:{attribute}"), "Bookman Old Style")
+        fonts.set(qn(f"w:{attribute}"), font_name)
+
+
+def _set_sk_run_typography(run, size):
+    """Apply the source decision's Bookman Old Style typography explicitly."""
+    _set_sk_run_font(run, "Bookman Old Style", size)
 
 
 def _apply_sk_decision_typography(document):
@@ -998,26 +1051,75 @@ def _apply_sk_decision_typography(document):
     return styled
 
 
+def _apply_sk_register_typography(document):
+    """Apply the source fonts to the attachment/register block as well.
+
+    pdf2docx leaves the three right-aligned attachment lines and the register
+    title in their embedded fallback fonts.  They are outside the decision
+    tables handled above, so style them explicitly to avoid renderer-dependent
+    substitutions (and keep the numeric metadata at the source sizes).
+    """
+    styled = 0
+    for paragraph in document.paragraphs:
+        text = _sk_compact_text(paragraph.text).upper()
+        if not text:
+            continue
+        if text.startswith("LAMPIRAN SURAT KEPUTUSAN") or (
+            text.startswith("NOMOR") and "@NOMORND" in text
+        ) or (
+            text.startswith("TANGGAL") and "@TANGGALND" in text
+        ):
+            for run in paragraph.runs:
+                _set_sk_run_font(run, "Bookman Old Style", 7.26)
+                styled += 1
+            continue
+        if text.startswith("DAFTAR PEKEBUN YANG BERHAK MENERIMA"):
+            for run in paragraph.runs:
+                _set_sk_run_font(run, "Bookman Old Style", 7.26, bold=True)
+                styled += 1
+            continue
+        indent = paragraph.paragraph_format.left_indent
+        if (
+            text.startswith("DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN")
+            and indent is not None
+            and indent >= Inches(2)
+        ) or text.startswith("DITANDATANGANI SECARA ELEKTRONIK") or text == "EDDY ABDURRACHMAN":
+            for run in paragraph.runs:
+                _set_sk_run_font(run, "Bookman Old Style", 7.26, bold=True)
+                styled += 1
+    return styled
+
+
 def _replace_sk_metadata_table(document, original, rows):
     """Use hanging-indent paragraphs for the borderless attachment metadata."""
     rebuilt = []
-    for label, value in rows:
+    for row_index, (label, value) in enumerate(rows):
         paragraph = document.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
         paragraph.paragraph_format.left_indent = Inches(2.5)
         paragraph.paragraph_format.first_line_indent = Inches(-2.5)
         paragraph.paragraph_format.space_before = Pt(0)
-        paragraph.paragraph_format.space_after = Pt(2)
+        # The source leaves roughly 16.5 pt between the last metadata line
+        # and the register table; the other metadata lines stay compact.
+        paragraph.paragraph_format.space_after = Pt(
+            18.4 if row_index == len(rows) - 1 else 2
+        )
         paragraph.paragraph_format.line_spacing = 1
         paragraph.paragraph_format.tab_stops.add_tab_stop(Inches(2.5))
         # The source layout uses a colon for most labels, but the BPDP
         # assistance amount is printed without one.  Keep that distinction
         # so the hanging-indent reconstruction follows the PDF template.
         separator = ":" if label != "DANA BANTUAN BPDP" else ""
-        run = paragraph.add_run(f"{label}\t{separator} {value}".rstrip())
-        run.font.name = "Bookman Old Style"
-        run.font.size = Pt(7.5)
-        run.bold = True
+        label_run = paragraph.add_run(label)
+        _set_sk_run_font(label_run, "Bookman Old Style", 7.26, bold=True)
+        paragraph.add_run("\t")
+        value_run = paragraph.add_run(f"{separator} {value}".rstrip())
+        value_size = (
+            7.92
+            if label in ("SURAT REKOMENDASI NOMOR", "DANA BANTUAN BPDP")
+            else 7.26
+        )
+        _set_sk_run_font(value_run, "Bookman Old Style", value_size, bold=True)
         original._tbl.addprevious(paragraph._p)
         rebuilt.append(paragraph)
     parent = original._tbl.getparent()
@@ -1171,6 +1273,7 @@ def _repair_sk_pekebun_layout(document, reference_pages):
     repaired += _repair_sk_register_tables(document)
     repaired += _repair_sk_heading_and_signature(document, reference_pages)
     repaired += _apply_sk_decision_typography(document)
+    repaired += _apply_sk_register_typography(document)
     return repaired
 
 
