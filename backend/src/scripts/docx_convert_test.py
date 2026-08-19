@@ -13,6 +13,7 @@ try:
         is_nota_riil,
         is_rincian_biaya_perjalanan_dinas,
         is_kak,
+        is_sk_pekebun,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -22,6 +23,7 @@ except ImportError:
         is_nota_riil,
         is_rincian_biaya_perjalanan_dinas,
         is_kak,
+        is_sk_pekebun,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -87,6 +89,28 @@ class DocxConvertTextRepairTest(unittest.TestCase):
         )
         self.assertFalse(
             is_kak(["KAK rapat mingguan\nAgenda dan catatan"])
+        )
+
+    def test_detects_sk_farmer_register_without_matching_generic_decisions(self):
+        self.assertTrue(
+            is_sk_pekebun(
+                [
+                    "KEPUTUSAN DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN\n"
+                    "PEKEBUN YANG BERHAK MENERIMA DANA PEREMAJAAN",
+                    "DAFTAR PEKEBUN",
+                    "NO KARTU KELUARGA\nDANA PPKS",
+                    "NO NAMA PEKEBUN",
+                ]
+            )
+        )
+        self.assertFalse(
+            is_sk_pekebun(
+                [
+                    "KEPUTUSAN DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN",
+                    "DANA PPKS",
+                    "NO NAMA PEKEBUN",
+                ]
+            )
         )
 
     def test_restores_realistic_nd_prose_from_pdf_whitespace(self):

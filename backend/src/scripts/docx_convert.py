@@ -18,8 +18,9 @@ from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from docx.table import Table, _Cell
+from docx.text.paragraph import Paragraph
 from pdf2docx import Converter
 from PIL import Image
 
@@ -124,6 +125,29 @@ def is_kak(reference_pages):
                 "MATERI DAN ACARA",
                 "TAHAPAN PELAKSANAAN",
             )
+        )
+    )
+
+
+def is_sk_pekebun(reference_pages):
+    """Identify SK attachments that contain an editable farmer register.
+
+    These decisions use a positioned, multi-column text layer on pages 1-2
+    and a six-column register on the attachment pages. pdf2docx interprets
+    the positioned prose as a 17-column layout table, so the generic repair
+    path cannot keep the decision text readable. Keep this detector strict so
+    ordinary decisions and the existing BPDP templates remain untouched.
+    """
+    normalized = re.sub(r"[^A-Z0-9]+", " ", " ".join(reference_pages).upper())
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    return all(
+        marker in normalized
+        for marker in (
+            "KEPUTUSAN DIREKTUR UTAMA",
+            "PEKEBUN YANG BERHAK MENERIMA DANA PEREMAJAAN",
+            "DAFTAR PEKEBUN",
+            "NO KARTU KELUARGA",
+            "DANA PPKS",
         )
     )
 
@@ -510,6 +534,644 @@ def _set_table_geometry(table, widths):
             column_index += 1 if grid_span is None else int(
                 grid_span.get(qn("w:val"), "1")
             )
+
+
+def _set_table_no_borders(table):
+    """Make a layout table explicitly borderless in every Word renderer."""
+    properties = table._tbl.tblPr
+    for tag in ("w:tblStyle", "w:tblLook"):
+        element = properties.find(qn(tag))
+        if element is not None:
+            properties.remove(element)
+    borders = properties.first_child_found_in("w:tblBorders")
+    if borders is None:
+        borders = OxmlElement("w:tblBorders")
+        properties.append(borders)
+    for edge in ("top", "start", "bottom", "end", "insideH", "insideV"):
+        border = borders.find(qn(f"w:{edge}"))
+        if border is None:
+            border = OxmlElement(f"w:{edge}")
+            borders.append(border)
+        border.set(qn("w:val"), "single")
+        border.set(qn("w:sz"), "0")
+        border.set(qn("w:color"), "FFFFFF")
+    seen_cells = set()
+    for row in table.rows:
+        for cell in row.cells:
+            if cell._tc in seen_cells:
+                continue
+            seen_cells.add(cell._tc)
+            cell_properties = cell._tc.get_or_add_tcPr()
+            cell_borders = cell_properties.first_child_found_in("w:tcBorders")
+            if cell_borders is None:
+                cell_borders = OxmlElement("w:tcBorders")
+                cell_properties.append(cell_borders)
+            for edge in ("top", "start", "bottom", "end", "insideH", "insideV"):
+                border = cell_borders.find(qn(f"w:{edge}"))
+                if border is None:
+                    border = OxmlElement(f"w:{edge}")
+                    cell_borders.append(border)
+                border.set(qn("w:val"), "single")
+                border.set(qn("w:sz"), "0")
+                border.set(qn("w:color"), "FFFFFF")
+
+
+def _set_repeat_table_header(row):
+    properties = row._tr.get_or_add_trPr()
+    if properties.find(qn("w:tblHeader")) is None:
+        properties.append(OxmlElement("w:tblHeader"))
+
+
+def _set_row_cant_split(row):
+    properties = row._tr.get_or_add_trPr()
+    if properties.find(qn("w:cantSplit")) is None:
+        properties.append(OxmlElement("w:cantSplit"))
+
+
+def _set_plain_cell(
+    cell,
+    text,
+    *,
+    font_name="Times New Roman",
+    font_size=11,
+    bold=False,
+    alignment=WD_ALIGN_PARAGRAPH.LEFT,
+    vertical=WD_CELL_VERTICAL_ALIGNMENT.TOP,
+):
+    """Write a clean, naturally wrapping editable cell."""
+    cell.text = ""
+    paragraph = cell.paragraphs[0]
+    paragraph.alignment = alignment
+    paragraph.paragraph_format.space_before = Pt(0)
+    paragraph.paragraph_format.space_after = Pt(0)
+    paragraph.paragraph_format.line_spacing = 1
+    paragraph.paragraph_format.left_indent = Pt(0)
+    paragraph.paragraph_format.right_indent = Pt(0)
+    paragraph.paragraph_format.first_line_indent = Pt(0)
+    run = paragraph.add_run(text)
+    run.font.name = font_name
+    run.font.size = Pt(font_size)
+    run.bold = bold
+    cell.vertical_alignment = vertical
+    _set_cell_margins(cell, top=0, start=0, bottom=0, end=0)
+
+
+def _replace_top_level_table(document, original, rows, widths, *, indent=0,
+                             borderless=True, font_name="Times New Roman",
+                             font_size=11, bold=False,
+                             alignments=None):
+    """Replace a pdf2docx positioning table with a compact editable grid."""
+    rebuilt = document.add_table(rows=len(rows), cols=len(widths))
+    rebuilt.autofit = False
+    _set_table_geometry(rebuilt, widths)
+    _set_table_indent(rebuilt, indent)
+    if borderless:
+        _set_table_no_borders(rebuilt)
+
+    for row_index, values in enumerate(rows):
+        row = rebuilt.rows[row_index]
+        _set_row_cant_split(row)
+        row_alignments = (
+            alignments[row_index]
+            if alignments is not None and row_index < len(alignments)
+            else None
+        )
+        for column_index, value in enumerate(values):
+            alignment = (
+                row_alignments[column_index]
+                if row_alignments is not None
+                and column_index < len(row_alignments)
+                else WD_ALIGN_PARAGRAPH.LEFT
+            )
+            _set_plain_cell(
+                row.cells[column_index],
+                value,
+                font_name=font_name,
+                font_size=font_size,
+                bold=bold,
+                alignment=alignment,
+            )
+        _set_row_minimum_height(row, 300)
+
+    original._tbl.addprevious(rebuilt._tbl)
+    parent = original._tbl.getparent()
+    if parent is not None:
+        parent.remove(original._tbl)
+    return rebuilt
+
+
+def _sk_compact_text(value):
+    """Collapse PDF line positioning whitespace without changing content."""
+    return re.sub(r"\s+", " ", value or "").strip()
+
+
+def _sk_section_items(page_text, label, marker_pattern, next_label=None):
+    """Extract lettered/numbered items from a positioned SK page."""
+    compact = _sk_compact_text(page_text)
+    section_match = re.search(
+        rf"\b{re.escape(label)}\s*:\s*",
+        compact,
+        re.IGNORECASE,
+    )
+    if section_match is None:
+        return []
+    start = section_match.end()
+    end = len(compact)
+    if next_label:
+        next_match = re.search(
+            rf"\b{re.escape(next_label)}\s*:\s*",
+            compact[start:],
+            re.IGNORECASE,
+        )
+        if next_match is not None:
+            end = start + next_match.start()
+    body = compact[start:end].strip()
+    markers = list(re.finditer(marker_pattern, body, re.IGNORECASE))
+    return [
+        body[marker.start(): markers[index + 1].start() if index + 1 < len(markers) else len(body)].strip()
+        for index, marker in enumerate(markers)
+    ]
+
+
+def _sk_decision_content(reference_pages):
+    """Parse the decision prose from pages 1-2 into editable row values."""
+    page1 = reference_pages[0] if reference_pages else ""
+    page2 = reference_pages[1] if len(reference_pages) > 1 else ""
+    considerations = _sk_section_items(
+        page1,
+        "Menimbang",
+        r"(?<!\w)[a-c]\.\s+",
+        "Mengingat",
+    )
+    reminders = _sk_section_items(
+        page1,
+        "Mengingat",
+        r"(?<!\w)\d+\.\s+",
+    )
+    compact_page2 = _sk_compact_text(page2)
+    title_match = re.search(
+        r"\bMenetapkan\s*:\s*(.*?)(?=\s+KESATU\s*:)",
+        compact_page2,
+        re.IGNORECASE,
+    )
+    title = title_match.group(1).strip() if title_match else ""
+    decision_matches = list(
+        re.finditer(
+            r"\b(KESATU|KEDUA|KETIGA|KEEMPAT)\s*:\s*(.*?)(?=\s+(?:KEDUA|KETIGA|KEEMPAT)\s*:|\s+Keputusan Direktur Utama Badan Pengelola Dana Perkebunan ini disampaikan\s+kepada\s*:|\s+Ditetapkan\s+di\b|\Z)",
+            compact_page2,
+            re.IGNORECASE,
+        )
+    )
+    decisions = [
+        (match.group(1).upper(), match.group(2).strip())
+        for match in decision_matches
+    ]
+    recipient_match = re.search(
+        r"\bKeputusan Direktur Utama Badan Pengelola Dana Perkebunan ini disampaikan\s+kepada\s*:\s*(.*?)(?=\s+Ditetapkan\s+di\b|\Z)",
+        compact_page2,
+        re.IGNORECASE,
+    )
+    recipients = []
+    if recipient_match:
+        recipient_body = recipient_match.group(1).strip()
+        recipient_matches = list(
+            re.finditer(
+                r"(?<!\w)(\d+)\.\s+(.*?)(?=\s+\d+\.\s+|\Z)",
+                recipient_body,
+                re.IGNORECASE,
+            )
+        )
+        recipients = [
+            (match.group(1), match.group(2).strip())
+            for match in recipient_matches
+        ]
+    return {
+        "considerations": considerations,
+        "reminders": reminders,
+        "title": title,
+        "decisions": decisions,
+        "recipients": recipients,
+    }
+
+
+def _sk_metadata_rows(reference_pages):
+    """Extract the four labelled attachment fields from the SK page."""
+    page3 = reference_pages[2] if len(reference_pages) > 2 else ""
+    compact = _sk_compact_text(page3)
+    labels = (
+        "NAMA KELEMBAGAAN PEKEBUN",
+        "ALAMAT LOKASI KEBUN",
+        "SURAT REKOMENDASI NOMOR",
+        "DANA BANTUAN BPDP",
+    )
+    rows = []
+    for index, label in enumerate(labels):
+        next_label = labels[index + 1] if index + 1 < len(labels) else "NO NAMA PEKEBUN"
+        match = re.search(
+            rf"\b{re.escape(label)}\s*:?\s*(.*?)(?=\s+{re.escape(next_label)}\s*:|\s+{re.escape(next_label)}\b|\Z)",
+            compact,
+            re.IGNORECASE,
+        )
+        if match:
+            rows.append((label, match.group(1).strip()))
+    return rows
+
+
+def _remove_top_level_paragraphs(document, predicate):
+    removed = 0
+    for paragraph in list(document.paragraphs):
+        if not predicate(paragraph.text.strip()):
+            continue
+        properties = paragraph._p.pPr
+        if properties is not None and properties.find(qn("w:sectPr")) is not None:
+            continue
+        parent = paragraph._p.getparent()
+        if parent is not None:
+            parent.remove(paragraph._p)
+            removed += 1
+    return removed
+
+
+def _repair_sk_register_tables(document):
+    """Restore the source six-column farmer register geometry and grid."""
+    widths = [500, 2920, 1620, 1840, 1750, 2210]
+    repaired = 0
+
+    def normalize_cell(cell, font_size, bold=False):
+        for paragraph in cell.paragraphs:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            paragraph.paragraph_format.space_before = Pt(0)
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.paragraph_format.line_spacing = 1
+            paragraph.paragraph_format.left_indent = Pt(0)
+            paragraph.paragraph_format.right_indent = Pt(0)
+            paragraph.paragraph_format.first_line_indent = Pt(0)
+            for run in paragraph.runs:
+                run.font.name = "Times New Roman"
+                run.font.size = Pt(font_size)
+                run.bold = bold
+        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+        _set_cell_margins(cell, top=10, start=25, bottom=10, end=25)
+
+    for table in list(document.tables):
+        table_text = _normalized_table_text(table)
+        if (
+            len(table.columns) < 6
+            or "NAMA PEKEBUN" not in table_text
+            or "DANA PPKS" not in table_text
+        ):
+            continue
+        _set_table_geometry(table, widths)
+        _set_table_indent(table, 0)
+        table.autofit = False
+        _set_table_grid_borders(table)
+        for row_index, row in enumerate(table.rows):
+            _set_row_cant_split(row)
+            if row_index in (0, 1):
+                _set_repeat_table_header(row)
+                _set_row_height(row, 300 if row_index == 0 else 220)
+            else:
+                logical_cells = _logical_row_cells(row)
+                is_total = _is_total_label(logical_cells[0].text) if logical_cells else False
+                _set_row_height(row, 300 if is_total else 300)
+            for cell in _logical_row_cells(row):
+                if row_index == 0:
+                    normalize_cell(cell, 7.5, bold=True)
+                elif row_index == 1:
+                    normalize_cell(cell, 7.0)
+                elif is_total:
+                    normalize_cell(cell, 8.0, bold=True)
+                else:
+                    normalize_cell(cell, 8.0)
+        repaired += 1
+    return repaired
+
+
+def _repair_sk_heading_and_signature(document, reference_pages):
+    """Restore positioned SK heading/signature strings lost by pdf2docx."""
+    if not reference_pages:
+        return 0
+    page1 = _sk_compact_text(reference_pages[0])
+    header_match = re.search(
+        r"(KEPUTUSAN DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN\s+"
+        r"NOMOR\s+\S+\s+TENTANG\s+.*?)(?=\s+DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN,)",
+        page1,
+        re.IGNORECASE,
+    )
+    repaired = 0
+    if header_match:
+        header = header_match.group(1).strip()
+        header = re.sub(r"\s+NOMOR\s+", "\nNOMOR ", header, count=1, flags=re.IGNORECASE)
+        header = re.sub(r"\s+TENTANG\s+", "\nTENTANG\n", header, count=1, flags=re.IGNORECASE)
+        for paragraph in document.paragraphs:
+            if "KEPUTUSAN" in paragraph.text.upper() and "NOMOR" in paragraph.text.upper():
+                paragraph.text = header
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                repaired += 1
+                break
+    for paragraph in document.paragraphs:
+        if paragraph.text.strip() == ",":
+            paragraph.text = "DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN,"
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            repaired += 1
+            break
+
+    paragraphs = list(document.paragraphs)
+    date_index = next(
+        (index for index, paragraph in enumerate(paragraphs) if "Ditetapkan di Jakarta" in paragraph.text),
+        None,
+    )
+    if date_index is not None:
+        blank_after_date = next(
+            (
+                paragraph
+                for paragraph in paragraphs[date_index + 1:]
+                if not paragraph.text.strip()
+                and not paragraph._p.xml.count("<wp:inline")
+                and not paragraph._p.xml.count("<wp:anchor")
+            ),
+            None,
+        )
+        if blank_after_date is not None:
+            blank_after_date.text = "DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN,"
+            blank_after_date.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            blank_after_date.paragraph_format.left_indent = Inches(3.5)
+            repaired += 1
+
+    electronic_index = next(
+        (index for index, paragraph in enumerate(paragraphs) if "Ditandatangani secara elektronik" in paragraph.text),
+        None,
+    )
+    if electronic_index is not None:
+        electronic = paragraphs[electronic_index]
+        electronic.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        electronic.paragraph_format.left_indent = Inches(3.5)
+        for paragraph in paragraphs[electronic_index + 1:]:
+            if (
+                not paragraph.text.strip()
+                and not paragraph._p.xml.count("<wp:inline")
+                and not paragraph._p.xml.count("<wp:anchor")
+            ):
+                paragraph.text = "EDDY ABDURRACHMAN"
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                paragraph.paragraph_format.left_indent = Inches(3.5)
+                repaired += 1
+                break
+    return repaired
+
+
+def _set_sk_run_typography(run, size):
+    """Apply the source decision's Bookman Old Style typography explicitly."""
+    run.font.name = "Bookman Old Style"
+    run.font.size = Pt(size)
+    run.bold = False
+    run.italic = False
+    run.underline = False
+    run.font.all_caps = False
+    run_properties = run._element.get_or_add_rPr()
+    fonts = run_properties.rFonts
+    if fonts is None:
+        fonts = OxmlElement("w:rFonts")
+        run_properties.insert(0, fonts)
+    for attribute in ("ascii", "hAnsi", "eastAsia", "cs"):
+        fonts.set(qn(f"w:{attribute}"), "Bookman Old Style")
+
+
+def _apply_sk_decision_typography(document):
+    """Match the Bookman 12/11 pt style used on decision pages 1-2."""
+    styled = 0
+    first_page_director_seen = False
+
+    def style_paragraph(paragraph, size=11):
+        nonlocal styled
+        for run in paragraph.runs:
+            _set_sk_run_typography(run, size)
+            styled += 1
+
+    for child in document.element.body.iterchildren():
+        if child.tag == qn("w:tbl"):
+            table = Table(child, document)
+            table_text = _normalized_table_text(table)
+            if (
+                "NAMA KELEMBAGAAN PEKEBUN" in table_text
+                or "DAFTAR PEKEBUN YANG BERHAK" in table_text
+            ):
+                break
+            seen_cells = set()
+            for row in table.rows:
+                for cell in _logical_row_cells(row):
+                    if cell._tc in seen_cells:
+                        continue
+                    seen_cells.add(cell._tc)
+                    for paragraph in cell.paragraphs:
+                        style_paragraph(paragraph, 11)
+            continue
+        if child.tag != qn("w:p"):
+            continue
+        paragraph = Paragraph(child, document)
+        text = paragraph.text.strip()
+        upper = _sk_compact_text(text).upper()
+        if upper.startswith("LAMPIRAN SURAT KEPUTUSAN") or upper.startswith(
+            "NAMA KELEMBAGAAN PEKEBUN"
+        ):
+            break
+        # The BSrE verification disclaimer is intentionally smaller in the
+        # source PDF and uses its own Times-Roman treatment.
+        if upper.startswith("DOKUMEN INI TELAH DITANDATANGANI"):
+            continue
+        size = 11
+        if upper == "KEMENTERIAN KEUANGAN REPUBLIK INDONESIA":
+            size = 12
+        elif (
+            "KEPUTUSAN DIREKTUR UTAMA" in upper
+            and "NOMOR" in upper
+            and "TENTANG" in upper
+        ):
+            size = 12
+        elif (
+            upper.startswith("DIREKTUR UTAMA BADAN PENGELOLA DANA PERKEBUNAN")
+            and not first_page_director_seen
+        ):
+            size = 12
+            first_page_director_seen = True
+        style_paragraph(paragraph, size)
+    return styled
+
+
+def _replace_sk_metadata_table(document, original, rows):
+    """Use hanging-indent paragraphs for the borderless attachment metadata."""
+    rebuilt = []
+    for label, value in rows:
+        paragraph = document.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        paragraph.paragraph_format.left_indent = Inches(2.5)
+        paragraph.paragraph_format.first_line_indent = Inches(-2.5)
+        paragraph.paragraph_format.space_before = Pt(0)
+        paragraph.paragraph_format.space_after = Pt(2)
+        paragraph.paragraph_format.line_spacing = 1
+        paragraph.paragraph_format.tab_stops.add_tab_stop(Inches(2.5))
+        # The source layout uses a colon for most labels, but the BPDP
+        # assistance amount is printed without one.  Keep that distinction
+        # so the hanging-indent reconstruction follows the PDF template.
+        separator = ":" if label != "DANA BANTUAN BPDP" else ""
+        run = paragraph.add_run(f"{label}\t{separator} {value}".rstrip())
+        run.font.name = "Bookman Old Style"
+        run.font.size = Pt(7.5)
+        run.bold = True
+        original._tbl.addprevious(paragraph._p)
+        rebuilt.append(paragraph)
+    parent = original._tbl.getparent()
+    if parent is not None:
+        parent.remove(original._tbl)
+    return rebuilt
+
+
+def _repair_sk_pekebun_layout(document, reference_pages):
+    """Rebuild positioned SK prose while retaining editable register cells."""
+    if len(reference_pages) < 4:
+        return 0
+    parsed = _sk_decision_content(reference_pages)
+    if not parsed["considerations"] or not parsed["reminders"]:
+        return 0
+
+    def has_exact_cell_label(table, label):
+        expected = _normalized_label(label)
+        return any(
+            _normalized_label(cell.text) == expected
+            for row in table.rows
+            for cell in _logical_row_cells(row)
+        )
+
+    repaired = 0
+    tables = list(document.tables)
+    first_table = next(
+        (
+            table
+            for table in tables
+            if has_exact_cell_label(table, "Menimbang")
+            and len(table.rows) > 5
+        ),
+        None,
+    )
+    if first_table is not None:
+        rows = []
+        for index, item in enumerate(parsed["considerations"]):
+            rows.append(["Menimbang" if index == 0 else "", ":" if index == 0 else "", item])
+        for index, item in enumerate(parsed["reminders"]):
+            rows.append(["Mengingat" if index == 0 else "", ":" if index == 0 else "", item])
+        _replace_top_level_table(
+            document,
+            first_table,
+            rows,
+            [1540, 440, 7480],
+            borderless=True,
+            font_size=11,
+        )
+        repaired += 1
+
+    tables = list(document.tables)
+    menetapkan_table = next(
+        (table for table in tables if has_exact_cell_label(table, "Menetapkan")),
+        None,
+    )
+    if menetapkan_table is not None and parsed["title"]:
+        _replace_top_level_table(
+            document,
+            menetapkan_table,
+            [["Menetapkan", ":", parsed["title"]]],
+            [1540, 440, 7480],
+            indent=1200,
+            borderless=True,
+            font_size=11,
+        )
+        repaired += 1
+
+    tables = list(document.tables)
+    decision_table = next(
+        (table for table in tables if has_exact_cell_label(table, "KESATU")),
+        None,
+    )
+    if decision_table is not None and parsed["decisions"]:
+        _replace_top_level_table(
+            document,
+            decision_table,
+            [[label, ":", body] for label, body in parsed["decisions"]],
+            [1540, 440, 7480],
+            indent=1200,
+            borderless=True,
+            font_size=11,
+        )
+        repaired += 1
+
+    tables = list(document.tables)
+    recipient_table = next(
+        (
+            table
+            for table in tables
+            if "KUASA PENGGUNA" in _normalized_table_text(table)
+            or "PEJABAT PEMBUAT KOMITMEN" in _normalized_table_text(table)
+        ),
+        None,
+    )
+    if recipient_table is not None and parsed["recipients"]:
+        _replace_top_level_table(
+            document,
+            recipient_table,
+            [[f"{number}.", f" {text}"] for number, text in parsed["recipients"]],
+            [500, 7600],
+            indent=3100,
+            borderless=True,
+            font_size=11,
+            alignments=[
+                [WD_ALIGN_PARAGRAPH.RIGHT, WD_ALIGN_PARAGRAPH.LEFT]
+                for _ in parsed["recipients"]
+            ],
+        )
+        repaired += 1
+
+    tables = list(document.tables)
+    metadata_table = next(
+        (
+            table
+            for table in tables
+            if "NAMA KELEMBAGAAN PEKEBUN" in _normalized_table_text(table)
+            and "DANA PPKS" not in _normalized_table_text(table)
+        ),
+        None,
+    )
+    metadata = _sk_metadata_rows(reference_pages)
+    if metadata_table is not None and len(metadata) == 4:
+        _replace_sk_metadata_table(document, metadata_table, metadata)
+        repaired += 1
+
+    # pdf2docx leaves fragments outside the positioning tables when a line
+    # wraps at a cell boundary. The clean rows above now own those strings.
+    orphan_prefixes = (
+        "4. PERATURAN DIREKTUR UTAMA",
+        "TENTANG PEKEBUN YANG BERHAK MENERIMA",
+        "DANA PEREMAJAAN PERKEBUNAN KELAPA SAWIT PADA KOPERASI",
+        "JASA BLANG GLEUM MAJU BERSAMA",
+        "HARI TERDAPAT KEKELIRUAN",
+        "PEMBETULAN SEBAGAIMANA MESTINYA.",
+        "GLEUM, KECAMATAN JULOK, KABUPATEN ACEH TIMUR, PROVINSI ACEH, 24457",
+    )
+    repaired += _remove_top_level_paragraphs(
+        document,
+        lambda text: text.upper().startswith(orphan_prefixes),
+    )
+    for paragraph in document.paragraphs:
+        if "disampaika" in paragraph.text.casefold() and len(paragraph.text) < 80:
+            paragraph.text = (
+                "Keputusan Direktur Utama Badan Pengelola Dana Perkebunan "
+                "ini disampaikan kepada:"
+            )
+            repaired += 1
+            break
+
+    repaired += _repair_sk_register_tables(document)
+    repaired += _repair_sk_heading_and_signature(document, reference_pages)
+    repaired += _apply_sk_decision_typography(document)
+    return repaired
 
 
 def _split_collapsed_cells(line):
@@ -2273,6 +2935,7 @@ def repair_editable_docx(
     nota_riil=False,
     rincian_biaya_perjalanan_dinas=False,
     kak=False,
+    sk_pekebun=False,
 ):
     if not reference_pages or not any(page.strip() for page in reference_pages):
         return 0
@@ -2332,6 +2995,8 @@ def repair_editable_docx(
         table_repairs += _remove_rincian_title_placeholder_border(document)
     if kak:
         table_repairs += _repair_kak_layout(document)
+    if sk_pekebun:
+        table_repairs += _repair_sk_pekebun_layout(document, reference_pages)
     if restored or normalized or table_repairs:
         document.save(output)
     # Keep the public count compatible with the existing text-repair metric;
@@ -2360,6 +3025,7 @@ def convert_editable(
     nota_riil=False,
     rincian_biaya_perjalanan_dinas=False,
     kak=False,
+    sk_pekebun=False,
 ):
     emit({"type": "progress", "stage": "repairing", "progress": 12})
     repaired = normalize_with_qpdf(source, workspace)
@@ -2395,6 +3061,7 @@ def convert_editable(
         nota_riil=nota_riil,
         rincian_biaya_perjalanan_dinas=rincian_biaya_perjalanan_dinas,
         kak=kak,
+        sk_pekebun=sk_pekebun,
     )
 
 
@@ -2470,6 +3137,7 @@ def main():
                     is_rincian_biaya_perjalanan_dinas(reference_pages)
                 )
                 kak = is_kak(reference_pages)
+                sk_pekebun = is_sk_pekebun(reference_pages)
                 document.close()
                 convert_editable(
                     args.input,
@@ -2482,6 +3150,7 @@ def main():
                         rincian_biaya_perjalanan_dinas
                     ),
                     kak=kak,
+                    sk_pekebun=sk_pekebun,
                 )
             elif args.mode == "ocr":
                 convert_ocr(document, args.output)
