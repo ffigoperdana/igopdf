@@ -12,6 +12,7 @@ try:
         is_nota_dinas,
         is_nota_riil,
         is_rincian_biaya_perjalanan_dinas,
+        is_kak,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -20,6 +21,7 @@ except ImportError:
         is_nota_dinas,
         is_nota_riil,
         is_rincian_biaya_perjalanan_dinas,
+        is_kak,
         repair_editable_docx,
         restore_missing_spaces,
     )
@@ -71,6 +73,20 @@ class DocxConvertTextRepairTest(unittest.TestCase):
             is_rincian_biaya_perjalanan_dinas(
                 ["Rincian biaya rapat\nNo Uraian Jumlah"]
             )
+        )
+
+    def test_detects_structured_kak_without_matching_generic_acronyms(self):
+        self.assertTrue(
+            is_kak(
+                [
+                    "KERANGKA ACUAN KERJA\n"
+                    "LINGKUP KEGIATAN\n"
+                    "MATERI DAN ACARA"
+                ]
+            )
+        )
+        self.assertFalse(
+            is_kak(["KAK rapat mingguan\nAgenda dan catatan"])
         )
 
     def test_restores_realistic_nd_prose_from_pdf_whitespace(self):
@@ -760,6 +776,102 @@ class DocxConvertTextRepairTest(unittest.TestCase):
                 repaired_caption.runs[2].text,
                 "\nTelah dibayar sejumlah ",
             )
+
+    def test_rebuilds_kak_split_agenda_tables_and_restores_grid_widths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "kak-agenda.docx")
+            document = Document()
+            masthead = document.add_paragraph(
+                "BADAN PENGELOLA DANA PERKEBUNAN"
+            )
+            document.add_paragraph("KERANGKA ACUAN KERJA")
+            purpose = document.add_paragraph(
+                "III. MAKSUD, TUJUAN DAN PENERIMA MANFAAT "
+            )
+            purpose.add_run("a. Maksud dan Tujuan Kegiatan")
+
+            university_header = document.add_table(rows=1, cols=3)
+            for cell, value in zip(
+                university_header.rows[0].cells,
+                ("No", "Nama Perguruan Tinggi", "Jumlah Kelompok"),
+            ):
+                cell.text = value
+            university_body = document.add_table(rows=2, cols=3)
+            for row, values in zip(
+                university_body.rows,
+                (("1", "Universitas Contoh", "1"), ("2", "Universitas Uji", "2")),
+            ):
+                for cell, value in zip(row.cells, values):
+                    cell.text = value
+
+            def add_half(labels, rows):
+                table = document.add_table(rows=len(rows) + 1, cols=2)
+                for cell, value in zip(table.rows[0].cells, labels):
+                    cell.text = value
+                for row, values in zip(table.rows[1:], rows):
+                    for cell, value in zip(row.cells, values):
+                        cell.text = value
+                return table
+
+            left_one = add_half(
+                ("No", "Waktu"),
+                (("1", "16.00 - 16.30"), ("2", "16.30 - 17.00")),
+            )
+            left_two = add_half(
+                ("No", "Waktu"),
+                (("1", "06.00 - 12.00"), ("2", "12.00 - selesai")),
+            )
+            right_one = add_half(
+                ("Agenda", "Keterangan"),
+                (("\tPengumuman", "Tim Penilai"), ("Penutupan", "MC")),
+            )
+            right_two = add_half(
+                ("Agenda", "Keterangan"),
+                (("Check out", "Peserta"), ("Pulang", "Peserta")),
+            )
+            self.assertIsNotNone(left_one)
+            self.assertIsNotNone(left_two)
+            self.assertIsNotNone(right_one)
+            self.assertIsNotNone(right_two)
+            document.save(path)
+
+            repair_editable_docx(
+                path,
+                ["KERANGKA ACUAN KERJA\nLINGKUP KEGIATAN"],
+                kak=True,
+            )
+
+            result = Document(path)
+            self.assertEqual(len(result.tables), 3)
+            self.assertEqual(len(result.tables[0].rows), 3)
+            repaired_purpose = next(
+                paragraph
+                for paragraph in result.paragraphs
+                if "MAKSUD, TUJUAN DAN PENERIMA MANFAAT" in paragraph.text
+            )
+            self.assertEqual(
+                repaired_purpose.runs[-1].text,
+                "\na. Maksud dan Tujuan Kegiatan",
+            )
+            agenda_tables = result.tables[1:]
+            self.assertTrue(all(len(table.columns) == 4 for table in agenda_tables))
+            self.assertEqual(
+                [cell.text for cell in agenda_tables[0].rows[1].cells],
+                ["1", "16.00 - 16.30", "Pengumuman", "Tim Penilai"],
+            )
+            self.assertEqual(
+                [
+                    int(column.get(qn("w:w")))
+                    for column in agenda_tables[0]._tbl.tblGrid
+                ],
+                [716, 1704, 3696, 2614],
+            )
+            rule = result.paragraphs[0]._p.getnext()
+            self.assertEqual(rule.tag, qn("w:p"))
+            border = rule.find(qn("w:pPr")).find(qn("w:pBdr")).find(
+                qn("w:bottom")
+            )
+            self.assertEqual(border.get(qn("w:color")), "000000")
 
 
 if __name__ == "__main__":

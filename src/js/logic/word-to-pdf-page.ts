@@ -4,6 +4,7 @@ import { state } from '../state.js';
 import { createIcons, icons } from 'lucide';
 import {
   getLibreOfficeConverter,
+  LibreOfficeError,
   type LoadProgress,
 } from '../utils/libreoffice-loader.js';
 import { deduplicateFileName } from '../utils/deduplicate-filename.js';
@@ -190,9 +191,21 @@ document.addEventListener('DOMContentLoaded', () => {
         e instanceof Error ? e.stack : ''
       );
       hideLoader();
+      let message = e instanceof Error ? e.message : String(e);
+
+      if (e instanceof LibreOfficeError) {
+        if (e.code === 'BROWSER_ISOLATION_REQUIRED') {
+          message =
+            'The conversion engine needs a secure HTTPS page with cross-origin isolation. Refresh the page after deployment and try again.';
+        } else if (e.code === 'CONVERSION_ENGINE_TIMEOUT') {
+          message =
+            'The conversion engine took too long to load. Check the network/security headers, refresh the page, and try again.';
+        }
+      }
+
       showAlert(
         'Error',
-        `An error occurred during conversion. Error: ${e instanceof Error ? e.message : String(e)}`
+        `An error occurred during conversion. Error: ${message}`
       );
     }
   };

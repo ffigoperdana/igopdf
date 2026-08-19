@@ -13,6 +13,7 @@ import tempfile
 import fitz
 import pytesseract
 from docx import Document
+from docx.enum.section import WD_SECTION_START
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
@@ -102,6 +103,27 @@ def is_rincian_biaya_perjalanan_dinas(reference_pages):
         and all(
             label in normalized
             for label in ("PERINCIANBIAYA", "JUMLAH", "KETERANGAN")
+        )
+    )
+
+
+def is_kak(reference_pages):
+    """Identify office KAK documents that use structured activity tables.
+
+    This intentionally requires both the KAK title and one of its usual
+    programme sections.  A generic document that merely mentions a KAK is
+    therefore left on the normal editable-conversion path.
+    """
+    normalized = re.sub(r"\s+", " ", " ".join(reference_pages)).upper()
+    return (
+        "KERANGKA ACUAN KERJA" in normalized
+        and any(
+            marker in normalized
+            for marker in (
+                "LINGKUP KEGIATAN",
+                "MATERI DAN ACARA",
+                "TAHAPAN PELAKSANAAN",
+            )
         )
     )
 
@@ -861,7 +883,11 @@ def _repair_rincian_biaya_shading(document):
     return repaired
 
 
-def _restore_bpdp_header_rule(document, title):
+def _restore_bpdp_header_rule(
+    document,
+    title,
+    anchor_markers=("TELP", "SITUS"),
+):
     """Restore the full-width rule between the BPDP masthead and form title.
 
     pdf2docx keeps the masthead text but drops its separator rule on some BPDP
@@ -886,7 +912,7 @@ def _restore_bpdp_header_rule(document, title):
         (
             paragraph
             for paragraph in reversed(paragraphs[:title_index])
-            if "TELP" in paragraph.text.upper() or "SITUS" in paragraph.text.upper()
+            if any(marker in paragraph.text.upper() for marker in anchor_markers)
         ),
         None,
     )
@@ -1156,6 +1182,703 @@ def _set_row_height(row, twips):
     # Keep the source proportions but never clip editable text if Word uses a
     # substituted font.
     height.set(qn("w:hRule"), "atLeast")
+
+
+def _cell_grid_span(cell):
+    properties = cell._tc.tcPr
+    grid_span = (
+        properties.find(qn("w:gridSpan")) if properties is not None else None
+    )
+    if grid_span is None:
+        return 1
+    try:
+        return max(1, int(grid_span.get(qn("w:val"), "1")))
+    except (TypeError, ValueError):
+        return 1
+
+
+def _table_cell_grid_widths(table):
+    """Recover physical grid widths from the source cells' declared widths.
+
+    pdf2docx often retains correct ``tcW`` values but writes an equal-width
+    ``tblGrid``.  Word follows the grid for fixed tables, which is why a
+    readable PDF table can overflow or split in the converted DOCX.
+    """
+    column_count = len(table.columns)
+    if column_count <= 0:
+        return []
+
+    candidates = [[] for _ in range(column_count)]
+    for row in table.rows:
+        column_index = 0
+        seen = set()
+        for cell in row.cells:
+            cell_key = cell._tc
+            if cell_key in seen:
+                continue
+            seen.add(cell_key)
+            span = _cell_grid_span(cell)
+            width = _cell_dxa_width(cell)
+            if width > 0:
+                per_column_width = max(1, round(width / span))
+                for index in range(
+                    column_index,
+                    min(column_count, column_index + span),
+                ):
+                    candidates[index].append((span, per_column_width))
+            column_index += span
+
+    fallback_widths = [
+        _as_dxa(column.get(qn("w:w"))) for column in table._tbl.tblGrid
+    ]
+    widths = []
+    for index in range(column_count):
+        values = candidates[index]
+        if values:
+            # A value from a narrower merged range is more precise.  For
+            # example, a one-cell "c." column is more reliable than a
+            # neighbouring label merged across three grid columns.
+            minimum_span = min(span for span, _ in values)
+            options = sorted(
+                width for span, width in values if span == minimum_span
+            )
+            widths.append(options[len(options) // 2])
+            continue
+        fallback = (
+            fallback_widths[index]
+            if index < len(fallback_widths)
+            else 0
+        )
+        widths.append(fallback)
+
+    if not all(width > 0 for width in widths):
+        return []
+    return widths
+
+
+def _fit_table_widths(widths, maximum):
+    total = sum(widths)
+    if not widths or total <= maximum:
+        return widths
+
+    scale = maximum / total
+    fitted = [max(180, round(width * scale)) for width in widths]
+    difference = maximum - sum(fitted)
+    # Keep the total deterministic so ``tblW`` and ``tblGrid`` agree exactly.
+    fitted[-1] = max(180, fitted[-1] + difference)
+    return fitted
+
+
+def _scaled_kak_reference_widths(reference_widths, maximum):
+    """Scale physical PDF column widths into a safe editable Word grid.
+
+    pdf2docx can preserve the row/cell content of wide KAK tables while
+    losing the source ``tblGrid`` proportions (the fallback is often equal
+    columns).  Keeping the proportions from the PDF is important for tables
+    whose first/description columns are intentionally much wider or narrower
+    than the activity columns.  The result is always fitted to the printable
+    area so it cannot clip on the right edge of an A4 page.
+    """
+    if not reference_widths or any(width <= 0 for width in reference_widths):
+        return []
+    total = sum(reference_widths)
+    if total <= 0:
+        return []
+    scaled = [max(180, round(width * maximum / total)) for width in reference_widths]
+    difference = maximum - sum(scaled)
+    scaled[-1] = max(180, scaled[-1] + difference)
+    return scaled
+
+
+def _is_kak_university_header(table):
+    if len(table.rows) != 1 or len(table.columns) != 3:
+        return False
+    labels = [
+        _normalized_label(cell.text)
+        for cell in _logical_row_cells(table.rows[0])
+    ]
+    return (
+        len(labels) == 3
+        and labels[0] == "no"
+        and labels[1] == "namaperguruantinggi"
+        and labels[2] == "jumlahkelompok"
+    )
+
+
+def _is_kak_university_body(table):
+    if not table.rows or len(table.columns) != 3:
+        return False
+    cells = _logical_row_cells(table.rows[0])
+    if len(cells) != 3:
+        return False
+    return re.fullmatch(r"(?:\d+[A-Z]?|[A-Z])", cells[0].text.strip()) is not None
+
+
+def _merge_kak_university_tables(document):
+    """Join a detached table header and body into one editable grid."""
+    tables = list(document.tables)
+    for header, body in zip(tables, tables[1:]):
+        if not _is_kak_university_header(header) or not _is_kak_university_body(body):
+            continue
+        for row in list(body._tbl.tr_lst):
+            header._tbl.append(deepcopy(row))
+        body._tbl.getparent().remove(body._tbl)
+        return 1
+    return 0
+
+
+def _agenda_half_table(table, labels):
+    if len(table.rows) < 2 or len(table.columns) != 2:
+        return False
+    row_cells = _logical_row_cells(table.rows[0])
+    return [
+        _normalized_label(cell.text) for cell in row_cells
+    ] == list(labels)
+
+
+def _copy_kak_table_cell(source, target):
+    """Clone editable cell contents and visual attributes without rasterising."""
+    _copy_cell_format(source, target)
+    for child in list(target._tc):
+        if child.tag != qn("w:tcPr"):
+            target._tc.remove(child)
+    for child in source._tc:
+        if child.tag != qn("w:tcPr"):
+            target._tc.append(deepcopy(child))
+
+
+def _copy_kak_row_properties(source, target):
+    source_properties = source._tr.trPr
+    target_properties = target._tr.trPr
+    if target_properties is not None:
+        target._tr.remove(target_properties)
+    if source_properties is not None:
+        target._tr.insert(0, deepcopy(source_properties))
+
+
+def _merge_kak_agenda_halves(document):
+    """Restore 4-column agenda tables parsed as separate left/right halves."""
+    left_tables = [
+        table
+        for table in document.tables
+        if _agenda_half_table(table, ("no", "waktu"))
+    ]
+    right_tables = [
+        table
+        for table in document.tables
+        if _agenda_half_table(table, ("agenda", "keterangan"))
+    ]
+    repaired = 0
+    used_right_tables = set()
+    for left in left_tables:
+        right = next(
+            (
+                candidate
+                for candidate in right_tables
+                if candidate._tbl not in used_right_tables
+                and len(candidate.rows) == len(left.rows)
+            ),
+            None,
+        )
+        if right is None:
+            continue
+
+        rebuilt = document.add_table(rows=len(left.rows), cols=4)
+        if left._tbl.tblPr is not None:
+            current_properties = rebuilt._tbl.tblPr
+            if current_properties is not None:
+                rebuilt._tbl.remove(current_properties)
+            rebuilt._tbl.insert(0, deepcopy(left._tbl.tblPr))
+
+        for row_index, (left_row, right_row) in enumerate(
+            zip(left.rows, right.rows)
+        ):
+            target_row = rebuilt.rows[row_index]
+            _copy_kak_row_properties(right_row, target_row)
+            for column_index, source_cell in enumerate(
+                _logical_row_cells(left_row) + _logical_row_cells(right_row)
+            ):
+                _copy_kak_table_cell(
+                    source_cell,
+                    target_row.cells[column_index],
+                )
+
+        _set_table_geometry(rebuilt, [716, 1704, 3696, 2614])
+        _set_table_indent(rebuilt, _table_indent(left))
+        left._tbl.addprevious(rebuilt._tbl)
+        left._tbl.getparent().remove(left._tbl)
+        right._tbl.getparent().remove(right._tbl)
+        used_right_tables.add(right._tbl)
+        repaired += 1
+    return repaired
+
+
+def _normalize_kak_tabs(document):
+    """Use natural Word wrapping instead of PDF-positioning tab stops."""
+    repaired = 0
+    for paragraph in iter_document_paragraphs(document):
+        text = paragraph.text
+        if "\t" not in text or "KERANGKA ACUAN KEGIATAN (KAK)" in text.upper():
+            continue
+
+        previous = ""
+        pending_space = False
+        for run in paragraph.runs:
+            rewritten = []
+            for character in run.text:
+                if character == "\t":
+                    if previous and not previous.isspace():
+                        pending_space = True
+                    repaired += 1
+                    continue
+                if pending_space and not character.isspace():
+                    rewritten.append(" ")
+                    previous = " "
+                pending_space = False
+                rewritten.append(character)
+                previous = character
+            rewritten_text = "".join(rewritten)
+            if rewritten_text != run.text:
+                run.text = rewritten_text
+    return repaired
+
+
+def _kak_umum_table_widths(table):
+    """Keep the KAK summary labels and values on their original columns."""
+    total_width = 0
+    label_width = 0
+    value_width = 0
+    prefix_widths = []
+    for row in table.rows:
+        cells = _logical_row_cells(row)
+        if any("DASAR HUKUM" in cell.text.upper() for cell in cells):
+            break
+        if len(cells) < 2:
+            continue
+        row_width = sum(_cell_dxa_width(cell) for cell in cells)
+        total_width = max(total_width, row_width)
+        if len(cells) < 3:
+            continue
+        label_width = max(label_width, _cell_dxa_width(cells[1]))
+        value_width = max(value_width, _cell_dxa_width(cells[-1]))
+        for cell in cells[1:-1]:
+            if _cell_grid_span(cell) == 1:
+                width = _cell_dxa_width(cell)
+                if width > 0:
+                    prefix_widths.append(width)
+
+    if not all((total_width, label_width, value_width)):
+        return []
+    first_column = max(1, total_width - label_width - value_width)
+    prefix = min(prefix_widths, default=round(label_width / 3))
+    if prefix >= label_width:
+        prefix = round(label_width / 3)
+    remaining = max(2, label_width - prefix)
+    middle_left = round(remaining / 2)
+    return [
+        first_column,
+        prefix,
+        middle_left,
+        remaining - middle_left,
+        value_width,
+    ]
+
+
+def _normalize_kak_agenda_sections(document):
+    """Undo the temporary two-column section used for split agenda halves."""
+    repaired = 0
+    for section in document.sections:
+        properties = section._sectPr
+        columns = properties.find(qn("w:cols"))
+        if columns is None or columns.get(qn("w:num"), "1") == "1":
+            continue
+        properties.remove(columns)
+        section_type = properties.find(qn("w:type"))
+        if (
+            section_type is not None
+            and section_type.get(qn("w:val")) == "nextColumn"
+        ):
+            section_type.set(qn("w:val"), "continuous")
+        repaired += 1
+    return repaired
+
+
+def _kak_body_section_blocks(document):
+    """Return body blocks grouped by the source page section breaks.
+
+    pdf2docx represents each source PDF page with a ``sectPr`` paragraph.
+    Looking at the original block order before tables are merged lets us
+    distinguish a real page break from a paragraph/table that merely spilled
+    one line onto the next page.
+    """
+    sections = []
+    current = []
+    body = document.element.body
+    for block in body.iterchildren():
+        current.append(block)
+        if (
+            block.tag == qn("w:p")
+            and block.find("./" + qn("w:pPr") + "/" + qn("w:sectPr"))
+            is not None
+        ):
+            sections.append(current)
+            current = []
+    if current:
+        sections.append(current)
+    return sections
+
+
+def _kak_xml_block_kind(block):
+    tag = block.tag.rsplit("}", 1)[-1]
+    if tag == "tbl":
+        rows = block.findall("./" + qn("w:tr"))
+        return "tbl", max(
+            (len(row.findall("./" + qn("w:tc"))) for row in rows),
+            default=0,
+        )
+    if tag == "p":
+        text = re.sub(r"\s+", " ", "".join(block.itertext())).strip()
+        return "p", text
+    return tag, ""
+
+
+def _kak_is_body_header_text(text):
+    normalized = re.sub(r"\s+", " ", text).strip().upper()
+    return (
+        "KERANGKA ACUAN KEGIATAN (KAK)" in normalized
+        and "LOMBA RISET TINGKAT MAHASISWA" in normalized
+    )
+
+
+def _kak_section_content(blocks):
+    """Yield non-empty blocks, excluding repeated positioned page headers."""
+    for block in blocks:
+        kind, value = _kak_xml_block_kind(block)
+        if kind == "p":
+            if not value or _kak_is_body_header_text(value):
+                continue
+        elif kind == "tbl":
+            if value <= 0:
+                continue
+        else:
+            continue
+        yield block, kind, value
+
+
+def _kak_section_has_signature(blocks):
+    text = " ".join(
+        value
+        for _, kind, value in _kak_section_content(blocks)
+        if kind == "p"
+    ).casefold()
+    return "ditandatangani" in text or "alfansyah" in text
+
+
+def _normalize_kak_page_sections(document):
+    """Allow genuine cross-page overflow to continue without blank pages.
+
+    A source PDF page break is normally retained as ``NEW_PAGE``.  When a
+    long paragraph or a split table has already consumed the following page,
+    however, retaining that break creates a mostly blank page and pushes the
+    next section one page too far.  We only relax breaks that are recognisable
+    continuations (lower-case prose, an agenda continuation heading/row, or an
+    RAB appendix after the electronic-signature block), leaving ordinary
+    section starts untouched.
+    """
+    sections = _kak_body_section_blocks(document)
+    if len(sections) < 2 or len(document.sections) < 2:
+        return 0
+
+    continuous_indices = set()
+    header_removal_indices = set()
+    for index in range(1, min(len(sections), len(document.sections))):
+        previous = list(_kak_section_content(sections[index - 1]))
+        current = list(_kak_section_content(sections[index]))
+        if not previous or not current:
+            continue
+        previous_block, previous_kind, previous_value = previous[-1]
+        first_block, first_kind, first_value = current[0]
+
+        if previous_kind == "p" and first_kind == "p":
+            first_text = first_value.lstrip()
+            # A lower-case continuation after a non-terminal paragraph is a
+            # reliable signal that the preceding source page overflowed.
+            if (
+                first_text[:1].islower()
+                and not re.search(r"[.!?:;]\s*$", previous_value)
+            ):
+                continuous_indices.add(index)
+                header_removal_indices.add(index)
+
+        if previous_kind == "tbl" and first_kind == "p":
+            first_text = first_value.lstrip()
+            if (
+                re.match(r"[a-z]\s*\.\s*", first_text)
+                or re.match(
+                    r"(?:Ruang\s+Presentasi|Hari\s+\d+|Ballroom(?:\s+Utama)?)",
+                    first_text,
+                    re.IGNORECASE,
+                )
+            ):
+                continuous_indices.add(index)
+                header_removal_indices.add(index)
+
+        if previous_kind == "tbl" and first_kind == "tbl":
+            # Continuation tables start with a row number/blank cell instead
+            # of a column heading.  Do not merge the compact 10-column
+            # schedule's page break; its continuation naturally starts at the
+            # top of the next page and should keep its page header.
+            first_row = first_block.find("./" + qn("w:tr"))
+            first_cell = ""
+            if first_row is not None:
+                first_cell_element = first_row.find("./" + qn("w:tc"))
+                if first_cell_element is not None:
+                    first_cell = re.sub(
+                        r"\s+", " ", "".join(first_cell_element.itertext())
+                    ).strip()
+            if first_value in {3, 4, 8} and (
+                not first_cell or re.match(r"(?:\d+[A-Z]?|[A-Z])$", first_cell)
+            ):
+                continuous_indices.add(index)
+                header_removal_indices.add(index)
+
+        # The RAB appendix follows the signed estimate on the preceding page;
+        # it may be forced onto a new page by Word, but keeping the section
+        # continuous avoids an otherwise empty intermediate page.
+        if (
+            first_kind == "tbl"
+            and first_value == 8
+            and _kak_section_has_signature(sections[index - 1])
+        ):
+            continuous_indices.add(index)
+
+    repaired = 0
+    for index in sorted(continuous_indices):
+        if index >= len(document.sections):
+            continue
+        section = document.sections[index]
+        if section.start_type != WD_SECTION_START.CONTINUOUS:
+            section.start_type = WD_SECTION_START.CONTINUOUS
+            repaired += 1
+
+    # Positioned header text is a body paragraph in pdf2docx, not a real
+    # Word header.  If a continuation section shares a page with its
+    # predecessor, retaining that paragraph would place the header in the
+    # middle of the page.  Remove it only for the continuation patterns above;
+    # normal page-start headers remain available.
+    for index in sorted(header_removal_indices):
+        if index >= len(sections):
+            continue
+        for block in sections[index]:
+            kind, value = _kak_xml_block_kind(block)
+            if kind == "p" and _kak_is_body_header_text(value):
+                parent = block.getparent()
+                if parent is not None:
+                    parent.remove(block)
+                    repaired += 1
+    return repaired
+
+
+def _collapse_kak_signature_spacing(text):
+    """Collapse character-positioned signature text into editable words."""
+    if not text or not re.search(r"\s", text):
+        return text
+    tokens = text.split()
+    if not tokens:
+        return text
+
+    output = []
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        if len(token) != 1 or not token.isalnum():
+            output.append(token)
+            index += 1
+            continue
+        sequence = []
+        while (
+            index < len(tokens)
+            and len(tokens[index]) == 1
+            and tokens[index].isalnum()
+        ):
+            sequence.append(tokens[index])
+            index += 1
+        joined = "".join(sequence)
+        joined = re.sub(r"(?<=\d)(?=[A-Za-z])", " ", joined)
+        joined = re.sub(r"(?<=[A-Za-z])(?=\d)", " ", joined)
+        joined = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", joined)
+        output.append(joined)
+    return " ".join(output)
+
+
+def _normalize_kak_signature_paragraphs(document):
+    """Make positioned electronic-signature blocks readable and editable."""
+    repaired = 0
+    for paragraph in document.paragraphs:
+        raw = re.sub(r"\s+", " ", paragraph.text).strip()
+        spaced_signature = bool(
+            re.search(r"J\s*a\s*k\s*a\s*r\s*t\s*a", raw, re.IGNORECASE)
+            or re.search(r"D\s*i\s*r\s*e\s*k\s*t\s*u\s*r", raw, re.IGNORECASE)
+        )
+        if not (
+            spaced_signature
+            or "ditandatangani secara elektronik" in raw.casefold()
+        ):
+            continue
+
+        for run in paragraph.runs:
+            collapsed = _collapse_kak_signature_spacing(run.text)
+            if collapsed != run.text:
+                run.text = collapsed
+                repaired += 1
+
+        formatting = paragraph.paragraph_format
+        # pdf2docx uses absolute PDF coordinates as a huge left/right indent.
+        # Keep the signature on the right half of the page, but give each line
+        # enough width for an ordinary editable phrase.
+        if formatting.left_indent is not None and formatting.left_indent > Inches(2.5):
+            formatting.left_indent = Inches(3.6)
+            formatting.right_indent = 0
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            repaired += 1
+    return repaired
+
+
+def _normalize_kak_prose_spacing(document):
+    """Keep long 12pt KAK prose on its intended PDF page.
+
+    pdf2docx represents the source's compact Arial lines as 245-twip Word
+    lines.  On a full A4 narrative page that is enough to push only one or
+    two lines to an otherwise empty page.  Restrict the correction to long
+    document-body prose, never tables, headings, or the cover.
+    """
+    repaired = 0
+    for paragraph in document.paragraphs:
+        text = re.sub(r"\s+", " ", paragraph.text).strip()
+        if len(text) < 180 or "KERANGKA ACUAN" in text.upper():
+            continue
+        sizes = [
+            run.font.size.pt
+            for run in paragraph.runs
+            if run.font.size is not None
+        ]
+        if not sizes or max(sizes) < 11.5:
+            continue
+        if paragraph.paragraph_format.line_spacing == 0.98:
+            continue
+        paragraph.paragraph_format.line_spacing = 0.98
+        repaired += 1
+    return repaired
+
+
+def _align_kak_agenda_headings(document):
+    repaired = 0
+    for paragraph in document.paragraphs:
+        if not re.fullmatch(r"\s*BALLROOM(?:\s+UTAMA)?\s*", paragraph.text):
+            continue
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        paragraph.paragraph_format.left_indent = Inches(0.44)
+        paragraph.paragraph_format.right_indent = 0
+        paragraph.paragraph_format.first_line_indent = 0
+        repaired += 1
+    return repaired
+
+
+def _restore_kak_subheading_breaks(document):
+    """Restore a source line break lost when a positioned KAK tab is removed."""
+    repaired = 0
+    anchor = "MAKSUD, TUJUAN DAN PENERIMA MANFAAT"
+    subheading = "a. Maksud dan Tujuan Kegiatan"
+    for paragraph in document.paragraphs:
+        if anchor not in paragraph.text.upper():
+            continue
+        for run in paragraph.runs:
+            if subheading not in run.text or "\n" + subheading in run.text:
+                continue
+            run.text = run.text.replace(subheading, "\n" + subheading, 1)
+            repaired += 1
+            break
+    return repaired
+
+
+def _repair_kak_table_geometry(document):
+    """Apply the original physical column proportions to KAK activity grids."""
+    repaired = 0
+    for table in document.tables:
+        column_count = len(table.columns)
+        if column_count not in {3, 4, 5, 8, 9, 10}:
+            continue
+        table_text = _normalized_table_text(table)
+        if column_count == 10:
+            # The schedule grid has a compact number column, a wide activity
+            # column, and eight narrow week columns.  These are the measured
+            # physical proportions of the source PDF (page 5/6), rather than
+            # the equal-width grid emitted by pdf2docx.
+            widths = _scaled_kak_reference_widths(
+                [25.65, 154.54, 31.70, 30.58, 31.03,
+                 35.05, 35.05, 35.05, 31.15, 35.35],
+                8800,
+            )
+        elif column_count == 8:
+            # RAB attachment tables use eight physical columns.  The second
+            # (Uraian) column is intentionally wide while NO, Hari/Unit and
+            # the monetary columns retain their compact source widths.
+            widths = _scaled_kak_reference_widths(
+                [32.17, 123.50, 33.22, 58.46,
+                 21.90, 48.70, 74.04, 80.46],
+                9200,
+            )
+        else:
+            widths = (
+                _kak_umum_table_widths(table)
+                if column_count == 5 and "UMUM" in table_text
+                else _table_cell_grid_widths(table)
+            )
+        if not widths:
+            continue
+
+        if column_count == 10:
+            maximum_width = 8800
+        elif column_count == 8:
+            maximum_width = 9200
+        elif column_count == 9:
+            maximum_width = 8300
+        elif column_count == 4:
+            maximum_width = 9000
+        elif column_count == 5:
+            maximum_width = 9900
+        else:
+            maximum_width = 8500
+        widths = _fit_table_widths(widths, maximum_width)
+        _set_table_geometry(table, widths)
+
+        # The source spacing is retained where it fits, but never allows a
+        # fixed-layout grid to leave the printable A4 area.
+        available_indent = max(0, 10000 - sum(widths))
+        _set_table_indent(table, min(_table_indent(table), available_indent))
+        repaired += 1
+    return repaired
+
+
+def _repair_kak_layout(document):
+    repaired = _normalize_kak_page_sections(document)
+    repaired += _normalize_kak_signature_paragraphs(document)
+    repaired += _merge_kak_university_tables(document)
+    agenda_repairs = _merge_kak_agenda_halves(document)
+    repaired += agenda_repairs
+    if agenda_repairs:
+        repaired += _normalize_kak_agenda_sections(document)
+    repaired += _normalize_kak_tabs(document)
+    repaired += _restore_kak_subheading_breaks(document)
+    repaired += _normalize_kak_prose_spacing(document)
+    repaired += _align_kak_agenda_headings(document)
+    repaired += _repair_kak_table_geometry(document)
+    repaired += _restore_bpdp_header_rule(
+        document,
+        "KERANGKA ACUAN KERJA",
+        anchor_markers=("BADAN PENGELOLA DANA PERKEBUNAN",),
+    )
+    return repaired
 
 
 def _append_cell_text_like(cell, text):
@@ -1549,6 +2272,7 @@ def repair_editable_docx(
     nota_dinas=False,
     nota_riil=False,
     rincian_biaya_perjalanan_dinas=False,
+    kak=False,
 ):
     if not reference_pages or not any(page.strip() for page in reference_pages):
         return 0
@@ -1565,7 +2289,7 @@ def repair_editable_docx(
             reference_pages,
             min_compact_chars,
             reference_index,
-            nota_dinas,
+            nota_dinas or kak,
         )
         for paragraph in paragraphs
     )
@@ -1606,6 +2330,8 @@ def repair_editable_docx(
         table_repairs += _repair_rincian_biaya_payment_band(document)
         table_repairs += _repair_rincian_biaya_payment_caption_flow(document)
         table_repairs += _remove_rincian_title_placeholder_border(document)
+    if kak:
+        table_repairs += _repair_kak_layout(document)
     if restored or normalized or table_repairs:
         document.save(output)
     # Keep the public count compatible with the existing text-repair metric;
@@ -1633,6 +2359,7 @@ def convert_editable(
     nota_dinas=False,
     nota_riil=False,
     rincian_biaya_perjalanan_dinas=False,
+    kak=False,
 ):
     emit({"type": "progress", "stage": "repairing", "progress": 12})
     repaired = normalize_with_qpdf(source, workspace)
@@ -1667,6 +2394,7 @@ def convert_editable(
         nota_dinas=nota_dinas,
         nota_riil=nota_riil,
         rincian_biaya_perjalanan_dinas=rincian_biaya_perjalanan_dinas,
+        kak=kak,
     )
 
 
@@ -1741,6 +2469,7 @@ def main():
                 rincian_biaya_perjalanan_dinas = (
                     is_rincian_biaya_perjalanan_dinas(reference_pages)
                 )
+                kak = is_kak(reference_pages)
                 document.close()
                 convert_editable(
                     args.input,
@@ -1752,6 +2481,7 @@ def main():
                     rincian_biaya_perjalanan_dinas=(
                         rincian_biaya_perjalanan_dinas
                     ),
+                    kak=kak,
                 )
             elif args.mode == "ocr":
                 convert_ocr(document, args.output)

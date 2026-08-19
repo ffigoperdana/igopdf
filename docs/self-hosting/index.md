@@ -247,8 +247,11 @@ Choose your platform:
 **Cause**: LibreOffice WASM requires `SharedArrayBuffer`, which the browser only enables when the page is **cross-origin isolated** AND served from a **secure context**. That means two things must be true:
 
 1. Every response includes both headers:
-   - `Cross-Origin-Embedder-Policy: require-corp`
+   - `Cross-Origin-Embedder-Policy: require-corp` (or `credentialless`)
    - `Cross-Origin-Opener-Policy: same-origin`
+   Send exactly one COEP value. Duplicate COEP headers (for example one
+   `credentialless` plus one `require-corp` added by two proxies) are treated
+   as an unsafe policy by browsers and disable cross-origin isolation.
 2. The page is served from `https://...` or `http://localhost`. Plain HTTP on a LAN IP (e.g. `http://192.168.x.x`) does NOT count as secure — browsers disable `SharedArrayBuffer` there.
 
 The `00 61 73 6d / 1f 8b 08 08` mismatch is a separate sub-symptom: the pre-compressed `.wasm.gz` / `.data.gz` files are missing the `Content-Encoding: gzip` response header, so the browser receives raw gzip bytes instead of decompressed WASM.

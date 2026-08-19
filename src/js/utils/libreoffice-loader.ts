@@ -18,6 +18,69 @@ export interface LoadProgress {
 
 export type ProgressCallback = (progress: LoadProgress) => void;
 
+export type LibreOfficeErrorCode =
+  | 'BROWSER_ISOLATION_REQUIRED'
+  | 'CONVERSION_ENGINE_TIMEOUT';
+
+export class LibreOfficeError extends Error {
+  readonly code: LibreOfficeErrorCode;
+
+  constructor(code: LibreOfficeErrorCode, message: string) {
+    super(message);
+    this.name = 'LibreOfficeError';
+    this.code = code;
+  }
+}
+
+const CONVERSION_ENGINE_TIMEOUT_MS = 120_000;
+
+function assertBrowserCapabilities(): void {
+  // The converter is a browser-only feature. Keeping this guard out of
+  // non-browser environments also makes the wrapper safe to import in tests
+  // and during the Vite build.
+  if (typeof window === 'undefined') return;
+
+  const runtime = globalThis as typeof globalThis & {
+    crossOriginIsolated?: boolean;
+    isSecureContext?: boolean;
+  };
+
+  if (
+    runtime.isSecureContext !== true ||
+    runtime.crossOriginIsolated !== true ||
+    typeof SharedArrayBuffer === 'undefined'
+  ) {
+    throw new LibreOfficeError(
+      'BROWSER_ISOLATION_REQUIRED',
+      'The conversion engine requires a secure, cross-origin-isolated page.'
+    );
+  }
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(
+        new LibreOfficeError(
+          'CONVERSION_ENGINE_TIMEOUT',
+          'The conversion engine took too long to initialize.'
+        )
+      );
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  }
+}
+
 // Singleton for converter instance
 let converterInstance: LibreOfficeConverter | null = null;
 
@@ -25,6 +88,7 @@ export class LibreOfficeConverter {
   private converter: WorkerBrowserConverter | null = null;
   private initialized = false;
   private initializing = false;
+  private initializationPromise: Promise<void> | null = null;
   private basePath: string;
 
   constructor(basePath?: string) {
@@ -34,66 +98,92 @@ export class LibreOfficeConverter {
   async initialize(onProgress?: ProgressCallback): Promise<void> {
     if (this.initialized) return;
 
-    if (this.initializing) {
-      while (this.initializing) {
-        await new Promise((r) => setTimeout(r, 100));
+    if (this.initializationPromise) return this.initializationPromise;
+
+    this.initializationPromise = this.initializeInternal(onProgress).finally(
+      () => {
+        this.initializationPromise = null;
+        this.initializing = false;
       }
-      return;
-    }
+    );
+
+    return this.initializationPromise;
+  }
+
+  private async initializeInternal(
+    onProgress?: ProgressCallback
+  ): Promise<void> {
+    assertBrowserCapabilities();
 
     this.initializing = true;
-    let progressCallback = onProgress; // Store original callback
+    let progressCallback = onProgress;
+
+    progressCallback?.({
+      phase: 'loading',
+      percent: 0,
+      message: 'Loading conversion engine...',
+    });
+
+    const converter = new WorkerBrowserConverter({
+      sofficeJs: `${this.basePath}soffice.js`,
+      sofficeWasm: `${this.basePath}soffice.wasm.gz`,
+      sofficeData: `${this.basePath}soffice.data.gz`,
+      sofficeWorkerJs: `${this.basePath}soffice.worker.js`,
+      browserWorkerJs: `${this.basePath}browser.worker.global.js`,
+      verbose: false,
+      onProgress: (info: {
+        phase: string;
+        percent: number;
+        message: string;
+      }) => {
+        if (progressCallback && !this.initialized) {
+          const simplifiedMessage = `Loading conversion engine (${Math.round(info.percent)}%)...`;
+          progressCallback({
+            phase: info.phase as LoadProgress['phase'],
+            percent: info.percent,
+            message: simplifiedMessage,
+          });
+        }
+      },
+      onReady: () => {
+        console.log('[LibreOffice] Ready!');
+      },
+      onError: (error: Error) => {
+        console.error('[LibreOffice] Error:', error);
+      },
+    });
+
+    this.converter = converter;
 
     try {
-      progressCallback?.({
-        phase: 'loading',
-        percent: 0,
-        message: 'Loading conversion engine...',
-      });
-
-      this.converter = new WorkerBrowserConverter({
-        sofficeJs: `${this.basePath}soffice.js`,
-        sofficeWasm: `${this.basePath}soffice.wasm.gz`,
-        sofficeData: `${this.basePath}soffice.data.gz`,
-        sofficeWorkerJs: `${this.basePath}soffice.worker.js`,
-        browserWorkerJs: `${this.basePath}browser.worker.global.js`,
-        verbose: false,
-        onProgress: (info: {
-          phase: string;
-          percent: number;
-          message: string;
-        }) => {
-          if (progressCallback && !this.initialized) {
-            const simplifiedMessage = `Loading conversion engine (${Math.round(info.percent)}%)...`;
-            progressCallback({
-              phase: info.phase as LoadProgress['phase'],
-              percent: info.percent,
-              message: simplifiedMessage,
-            });
-          }
-        },
-        onReady: () => {
-          console.log('[LibreOffice] Ready!');
-        },
-        onError: (error: Error) => {
-          console.error('[LibreOffice] Error:', error);
-        },
-      });
-
-      await this.converter.initialize();
+      await withTimeout(
+        converter.initialize(),
+        CONVERSION_ENGINE_TIMEOUT_MS
+      );
       this.initialized = true;
 
-      // Call completion message
       progressCallback?.({
         phase: 'ready',
         percent: 100,
         message: 'Conversion engine ready!',
       });
+    } catch (error) {
+      this.initialized = false;
+      this.converter = null;
 
-      // Null out the callback to prevent any late-firing progress updates
-      progressCallback = undefined;
+      try {
+        await converter.destroy();
+      } catch (destroyError) {
+        console.warn(
+          '[LibreOffice] Cleanup after initialization failure failed:',
+          destroyError
+        );
+      }
+
+      throw error;
     } finally {
-      this.initializing = false;
+      // Prevent late worker progress events from updating a finished loader.
+      progressCallback = undefined;
     }
   }
 
