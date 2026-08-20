@@ -20,6 +20,21 @@ export interface MergeMessage {
   retainPageLabels?: boolean;
 }
 
+export type MergeStage =
+  | 'loading-engine'
+  | 'loading-files'
+  | 'preparing'
+  | 'merging'
+  | 'finalizing';
+
+export interface MergeProgressResponse {
+  status: 'progress';
+  stage: MergeStage;
+  progress: number;
+  current?: number;
+  total?: number;
+}
+
 export interface MergeSuccessResponse {
   status: 'success';
   pdfBytes: ArrayBuffer;
@@ -30,4 +45,7 @@ export interface MergeErrorResponse {
   message: string;
 }
 
-export type MergeResponse = MergeSuccessResponse | MergeErrorResponse;
+export type MergeResponse =
+  | MergeSuccessResponse
+  | MergeErrorResponse
+  | MergeProgressResponse;

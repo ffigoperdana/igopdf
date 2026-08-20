@@ -277,7 +277,17 @@
       "Semua halaman dari PDF yang Anda unggah ditampilkan di bawah.",
       "Cukup seret dan jatuhkan thumbnail halaman satu per satu untuk membuat urutan yang tepat sesuai keinginan kamu untuk file baru."
     ],
-    "mergePdfs": "Gabung PDF"
+    "mergePdfs": "Gabung PDF",
+    "loader": {
+      "preparing": "Menyiapkan penggabungan…",
+      "loadingEngine": "Memuat mesin PDF…",
+      "loadingFile": "Membaca PDF {{current}} dari {{total}}…",
+      "preparingFiles": "Menyiapkan {{count}} file PDF…",
+      "merging": "Menggabungkan {{count}} file PDF…",
+      "finalizing": "Menyelesaikan PDF hasil gabungan…",
+      "stillWorking": "File besar atau kompleks dapat membutuhkan waktu lebih lama. Jangan tutup halaman ini.",
+      "timeout": "Penggabungan terlalu lama. Coba gabungkan lebih sedikit file sekaligus."
+    }
   },
   "common": {
     "page": "Halaman",

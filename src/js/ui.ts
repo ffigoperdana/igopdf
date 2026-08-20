@@ -17,6 +17,7 @@ export const dom = {
   backToGridBtn: document.getElementById('back-to-grid'),
   loaderModal: document.getElementById('loader-modal'),
   loaderText: document.getElementById('loader-text'),
+  loaderDetail: document.getElementById('loader-detail'),
   alertModal: document.getElementById('alert-modal'),
   alertTitle: document.getElementById('alert-title'),
   alertMessage: document.getElementById('alert-message'),
@@ -41,8 +42,21 @@ export const dom = {
   warningConfirmBtn: document.getElementById('warning-confirm-btn'),
 };
 
-export const showLoader = (text = t('common.loading'), progress?: number) => {
+export const showLoader = (
+  text = t('common.loading'),
+  progress?: number,
+  detail?: string
+) => {
   if (dom.loaderText) dom.loaderText.textContent = text;
+  if (dom.loaderDetail) {
+    if (detail) {
+      dom.loaderDetail.textContent = detail;
+      dom.loaderDetail.classList.remove('hidden');
+    } else {
+      dom.loaderDetail.textContent = '';
+      dom.loaderDetail.classList.add('hidden');
+    }
+  }
 
   // Add or update progress bar if progress is provided
   const loaderModal = dom.loaderModal;

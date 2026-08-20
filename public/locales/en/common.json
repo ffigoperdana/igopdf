@@ -277,7 +277,17 @@
       "All pages from your uploaded PDFs are shown below.",
       "Simply drag and drop the individual page thumbnails to create the exact order you want for your new file."
     ],
-    "mergePdfs": "Merge PDFs"
+    "mergePdfs": "Merge PDFs",
+    "loader": {
+      "preparing": "Preparing the merge…",
+      "loadingEngine": "Loading the PDF engine…",
+      "loadingFile": "Reading PDF {{current}} of {{total}}…",
+      "preparingFiles": "Preparing {{count}} PDF files…",
+      "merging": "Merging {{count}} PDF files…",
+      "finalizing": "Finalizing the merged PDF…",
+      "stillWorking": "Large or complex files can take longer. Please keep this page open.",
+      "timeout": "The merge is taking longer than expected. Try merging fewer files at a time."
+    }
   },
   "common": {
     "page": "Page",

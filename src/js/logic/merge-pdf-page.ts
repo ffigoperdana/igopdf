@@ -12,11 +12,18 @@ import {
   showWasmRequiredDialog,
   WasmProvider,
 } from '../utils/wasm-provider.js';
+import { t } from '../i18n/i18n';
 
 import { createIcons, icons } from 'lucide';
 import * as pdfjsLib from 'pdfjs-dist';
 import Sortable from 'sortablejs';
-import type { MergeJob, MergeFile, MergeMessage, MergeResponse } from '@/types';
+import type {
+  MergeJob,
+  MergeFile,
+  MergeMessage,
+  MergeProgressResponse,
+  MergeResponse,
+} from '@/types';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -35,6 +42,7 @@ interface MergeState {
   cachedThumbnails: boolean | null;
   lastFileHash: string | null;
   mergeSuccess: boolean;
+  isMerging: boolean;
 }
 
 const mergeState: MergeState = {
@@ -46,11 +54,8 @@ const mergeState: MergeState = {
   cachedThumbnails: null,
   lastFileHash: null,
   mergeSuccess: false,
+  isMerging: false,
 };
-
-const mergeWorker = new Worker(
-  import.meta.env.BASE_URL + 'workers/merge.worker.js'
-);
 
 function initializeFileListSortable() {
   const fileList = document.getElementById('file-list');
@@ -254,6 +259,7 @@ const resetState = async () => {
   mergeState.cachedThumbnails = null;
   mergeState.lastFileHash = null;
   mergeState.mergeSuccess = false;
+  mergeState.isMerging = false;
 
   const fileList = document.getElementById('file-list');
   if (fileList) fileList.innerHTML = '';
@@ -279,6 +285,205 @@ const resetState = async () => {
   await updateUI();
 };
 
+const mergeLoaderFallbacks = {
+  preparing: 'Preparing the merge…',
+  loadingEngine: 'Loading the PDF engine…',
+  loadingFiles: 'Reading PDF {{current}} of {{total}}…',
+  preparingFiles: 'Preparing {{count}} PDF files…',
+  merging: 'Merging {{count}} PDF files…',
+  finalizing: 'Finalizing the merged PDF…',
+  stillWorking:
+    'Large or complex files can take longer. Please keep this page open.',
+  timeout:
+    'The merge is taking longer than expected. Try merging fewer files at a time.',
+  workerError: 'The merge worker stopped unexpectedly.',
+};
+
+function mergeText(
+  key: string,
+  fallback: string,
+  options?: Record<string, unknown>
+) {
+  try {
+    const translated = t(key, options);
+    return translated && translated !== key ? translated : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getMergeProgressCopy(
+  progress: MergeProgressResponse,
+  totalFiles: number
+) {
+  switch (progress.stage) {
+    case 'loading-engine':
+      return {
+        text: mergeText(
+          'merge.loader.loadingEngine',
+          mergeLoaderFallbacks.loadingEngine
+        ),
+        detail: mergeText(
+          'merge.loader.preparing',
+          mergeLoaderFallbacks.preparing
+        ),
+      };
+    case 'loading-files':
+      return {
+        text: mergeText(
+          'merge.loader.loadingFile',
+          mergeLoaderFallbacks.loadingFiles,
+          {
+            current: progress.current ?? 0,
+            total: progress.total ?? totalFiles,
+          }
+        ),
+        detail: mergeText(
+          'merge.loader.preparingFiles',
+          mergeLoaderFallbacks.preparingFiles,
+          { count: totalFiles }
+        ),
+      };
+    case 'preparing':
+      return {
+        text: mergeText(
+          'merge.loader.preparingFiles',
+          mergeLoaderFallbacks.preparingFiles,
+          { count: totalFiles }
+        ),
+        detail: mergeText(
+          'merge.loader.preparing',
+          mergeLoaderFallbacks.preparing
+        ),
+      };
+    case 'merging':
+      return {
+        text: mergeText('merge.loader.merging', mergeLoaderFallbacks.merging, {
+          count: totalFiles,
+        }),
+        detail: mergeText(
+          'merge.loader.stillWorking',
+          mergeLoaderFallbacks.stillWorking
+        ),
+      };
+    case 'finalizing':
+      return {
+        text: mergeText(
+          'merge.loader.finalizing',
+          mergeLoaderFallbacks.finalizing
+        ),
+        detail: mergeText(
+          'merge.loader.stillWorking',
+          mergeLoaderFallbacks.stillWorking
+        ),
+      };
+  }
+}
+
+function runMergeWorker(
+  message: MergeMessage,
+  transferables: ArrayBuffer[]
+): Promise<ArrayBuffer> {
+  return new Promise<ArrayBuffer>((resolve, reject) => {
+    let worker: Worker;
+    try {
+      worker = new Worker(import.meta.env.BASE_URL + 'workers/merge.worker.js');
+    } catch (error) {
+      reject(
+        error instanceof Error
+          ? error
+          : new Error(mergeLoaderFallbacks.workerError)
+      );
+      return;
+    }
+
+    const totalFiles = message.files.length;
+    const totalBytes = message.files.reduce(
+      (total, file) => total + file.data.byteLength,
+      0
+    );
+    // A merge can legitimately be slow for image-heavy PDFs, but it should
+    // never leave the modal spinning forever if the WASM engine gets stuck.
+    const timeoutMs = Math.min(
+      15 * 60 * 1000,
+      Math.max(
+        3 * 60 * 1000,
+        120 * 1000 + Math.ceil(totalBytes / 1048576) * 2500
+      )
+    );
+    let settled = false;
+    let timeoutId: number | undefined;
+
+    const cleanup = () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      worker.terminate();
+    };
+
+    const fail = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(
+        error instanceof Error
+          ? error
+          : new Error(String(error || mergeLoaderFallbacks.workerError))
+      );
+    };
+
+    const succeed = (bytes: ArrayBuffer) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(bytes);
+    };
+
+    // Attach handlers before postMessage. A worker can complete very quickly
+    // for small PDFs, and assigning them afterwards can lose the terminal
+    // response in some browsers.
+    worker.onmessage = (event: MessageEvent<MergeResponse>) => {
+      const response = event.data;
+      if (!response) {
+        fail(new Error(mergeLoaderFallbacks.workerError));
+        return;
+      }
+
+      if (response.status === 'progress') {
+        const copy = getMergeProgressCopy(response, totalFiles);
+        showLoader(copy.text, response.progress, copy.detail);
+        return;
+      }
+
+      if (response.status === 'success') {
+        succeed(response.pdfBytes);
+      } else {
+        fail(new Error(response.message || mergeLoaderFallbacks.workerError));
+      }
+    };
+
+    worker.onerror = (event) => {
+      fail(
+        new Error(
+          (event as ErrorEvent).message || mergeLoaderFallbacks.workerError
+        )
+      );
+    };
+
+    timeoutId = window.setTimeout(() => {
+      fail(
+        new Error(
+          mergeText('merge.loader.timeout', mergeLoaderFallbacks.timeout)
+        )
+      );
+    }, timeoutMs);
+
+    try {
+      worker.postMessage(message, transferables);
+    } catch (error) {
+      fail(error);
+    }
+  });
+}
+
 export async function merge() {
   // Check if CPDF is configured
   if (!isCpdfAvailable()) {
@@ -286,7 +491,22 @@ export async function merge() {
     return;
   }
 
-  showLoader('Merging PDFs...');
+  if (mergeState.isMerging) return;
+  mergeState.isMerging = true;
+  const processBtn = document.getElementById(
+    'process-btn'
+  ) as HTMLButtonElement | null;
+  if (processBtn) processBtn.disabled = true;
+
+  showLoader(
+    mergeText('merge.loader.preparing', mergeLoaderFallbacks.preparing),
+    0,
+    mergeText(
+      'merge.loader.preparingFiles',
+      mergeLoaderFallbacks.preparingFiles,
+      { count: state.files.length }
+    )
+  );
   try {
     const jobs: MergeJob[] = [];
     const filesToMerge: MergeFile[] = [];
@@ -374,15 +594,20 @@ export async function merge() {
 
     if (jobs.length === 0) {
       showAlert('Error', 'No files or pages selected to merge.');
-      hideLoader();
       return;
     }
 
     for (const name of uniqueFileNames) {
       const bytes = mergeState.pdfBytes[name];
       if (bytes) {
-        filesToMerge.push({ name, data: bytes });
+        // Transfer a copy so a failed/timeout merge does not detach the
+        // cached ArrayBuffer and prevent the user from retrying.
+        filesToMerge.push({ name, data: bytes.slice(0) });
       }
+    }
+
+    if (filesToMerge.length === 0) {
+      throw new Error('No readable PDF files were selected for merging.');
     }
 
     const retainCheckbox = document.getElementById(
@@ -397,42 +622,29 @@ export async function merge() {
       retainPageLabels: retainCheckbox?.checked ?? false,
     };
 
-    mergeWorker.postMessage(
+    const mergedPdfBytes = await runMergeWorker(
       message,
       filesToMerge.map((f) => f.data)
     );
+    hideLoader();
 
-    mergeWorker.onmessage = (e: MessageEvent<MergeResponse>) => {
-      hideLoader();
-      if (e.data.status === 'success') {
-        const blob = new Blob([e.data.pdfBytes], { type: 'application/pdf' });
-        downloadFile(blob, 'merged.pdf');
-        mergeState.mergeSuccess = true;
-        showAlert(
-          'Success',
-          'PDFs merged successfully!',
-          'success',
-          async () => {
-            await resetState();
-          }
-        );
-      } else {
-        console.error('Worker merge error:', e.data.message);
-        showAlert('Error', e.data.message || 'Failed to merge PDFs.');
-      }
-    };
-
-    mergeWorker.onerror = (e) => {
-      hideLoader();
-      console.error('Worker error:', e);
-      showAlert('Error', 'An unexpected error occurred in the merge worker.');
-    };
+    const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+    downloadFile(blob, 'merged.pdf');
+    mergeState.mergeSuccess = true;
+    showAlert('Success', 'PDFs merged successfully!', 'success', async () => {
+      await resetState();
+    });
   } catch (e) {
     console.error('Merge error:', e);
-    showAlert(
-      'Error',
-      'Failed to merge PDFs. Please check that all files are valid and not password-protected.'
-    );
+    hideLoader();
+    const message =
+      e instanceof Error && e.message
+        ? e.message
+        : 'Failed to merge PDFs. Please check that all files are valid and not password-protected.';
+    showAlert('Error', message);
+  } finally {
+    mergeState.isMerging = false;
+    if (processBtn) processBtn.disabled = false;
     hideLoader();
   }
 }

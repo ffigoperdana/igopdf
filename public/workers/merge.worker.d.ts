@@ -19,6 +19,22 @@ interface MergeMessage {
   files: MergeFile[];
   jobs: MergeJob[];
   cpdfUrl?: string;
+  retainPageLabels?: boolean;
+}
+
+type MergeStage =
+  | 'loading-engine'
+  | 'loading-files'
+  | 'preparing'
+  | 'merging'
+  | 'finalizing';
+
+interface MergeProgressResponse {
+  status: 'progress';
+  stage: MergeStage;
+  progress: number;
+  current?: number;
+  total?: number;
 }
 
 interface MergeSuccessResponse {
@@ -31,4 +47,7 @@ interface MergeErrorResponse {
   message: string;
 }
 
-type MergeResponse = MergeSuccessResponse | MergeErrorResponse;
+type MergeResponse =
+  | MergeSuccessResponse
+  | MergeErrorResponse
+  | MergeProgressResponse;

@@ -50,12 +50,76 @@ const PHOTON_PRESETS = {
   extreme: { scale: 1.0, quality: 0.25 },
 };
 
+// Keep a single rendered page within a predictable browser memory budget. A
+// few scanned PDFs contain unusually large page boxes; rendering those at the
+// normal Photon scale can exceed a browser's canvas limit even when the PDF
+// itself is small. The output page keeps its original dimensions, while only
+// the temporary raster is scaled down when necessary.
+const PHOTON_MAX_RENDER_PIXELS = 24_000_000;
+
+type PhotonProgressStage =
+  | 'preparing'
+  | 'rendering'
+  | 'encoding'
+  | 'embedding'
+  | 'finalizing';
+
+type PhotonProgressCallback = (
+  currentPage: number,
+  totalPages: number,
+  stage: PhotonProgressStage
+) => void;
+
+const yieldToUi = async () => {
+  await new Promise<void>((resolve) => {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => setTimeout(resolve, 0));
+    } else {
+      setTimeout(resolve, 0);
+    }
+  });
+};
+
+const updatePhotonLoader = (
+  title: string,
+  currentPage: number,
+  totalPages: number,
+  stage: PhotonProgressStage
+) => {
+  const safeTotal = Math.max(totalPages, 1);
+  const completedPages = Math.max(0, Math.min(currentPage, safeTotal));
+  const pageFraction =
+    stage === 'rendering'
+      ? Math.max(0, completedPages - 1) / safeTotal
+      : completedPages / safeTotal;
+  const progress =
+    stage === 'preparing'
+      ? 2
+      : stage === 'finalizing'
+        ? 96
+        : Math.min(94, 5 + pageFraction * 89);
+  const stageLabels: Record<PhotonProgressStage, string> = {
+    preparing: 'Preparing PDF pages',
+    rendering: 'Rendering page',
+    encoding: 'Encoding page as JPEG',
+    embedding: 'Adding page to output PDF',
+    finalizing: 'Building the compressed PDF',
+  };
+  const pageLabel =
+    stage === 'preparing' || stage === 'finalizing'
+      ? ''
+      : ` • page ${Math.min(Math.max(currentPage, 1), safeTotal)}/${safeTotal}`;
+
+  showLoader(title, progress, `${stageLabels[stage]}${pageLabel}…`);
+};
+
 interface ServerCompressionConfig {
   enabled: boolean;
   clientThresholdBytes: number;
   balancedMaxBytes: number;
   maxUploadBytes: number;
   uploadChunkBytes: number;
+  jobTimeoutMs: number;
 }
 
 interface ServerCompressionJob {
@@ -79,6 +143,7 @@ const DEFAULT_SERVER_COMPRESSION_CONFIG: ServerCompressionConfig = {
   balancedMaxBytes: 500 * 1024 * 1024,
   maxUploadBytes: 1024 * 1024 * 1024,
   uploadChunkBytes: 25 * 1024 * 1024,
+  jobTimeoutMs: 45 * 60 * 1000,
 };
 
 const PYMUDF_MEMORY_ERROR = /memoryerror|out of memory|fzerror.*memory/i;
@@ -202,62 +267,98 @@ async function performCondenseCompression(
 async function performPhotonCompression(
   arrayBuffer: ArrayBuffer,
   level: string,
-  file?: File
+  file?: File,
+  onProgress?: PhotonProgressCallback
 ) {
-  let pdfJsDoc: PDFDocumentProxy;
+  let pdfJsDoc: PDFDocumentProxy | null = null;
   if (file) {
     hideLoader();
     const result = await loadPdfWithPasswordPrompt(file);
     if (!result) return null;
-    showLoader('Running Photon compression...');
+    showLoader('Running Photon compression...', 0, 'Preparing PDF pages…');
     pdfJsDoc = result.pdf;
   } else {
     pdfJsDoc = await getPDFDocument({ data: arrayBuffer }).promise;
   }
-  const newPdfDoc = await PDFDocument.create();
-  const settings =
-    PHOTON_PRESETS[level as keyof typeof PHOTON_PRESETS] ||
-    PHOTON_PRESETS.balanced;
 
   try {
-    for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+    const newPdfDoc = await PDFDocument.create();
+    const settings =
+      PHOTON_PRESETS[level as keyof typeof PHOTON_PRESETS] ||
+      PHOTON_PRESETS.balanced;
+    const totalPages = pdfJsDoc.numPages;
+
+    onProgress?.(0, totalPages, 'preparing');
+    await yieldToUi();
+
+    for (let i = 1; i <= totalPages; i++) {
       const page = await pdfJsDoc.getPage(i);
-      const viewport = page.getViewport({ scale: settings.scale });
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Could not create a canvas for this PDF');
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      await page.render({ canvasContext: context, viewport, canvas }).promise;
-
-      const jpegBlob = await new Promise<Blob>((resolve, reject) =>
-        canvas.toBlob(
-          (blob) => {
-            if (blob) resolve(blob);
-            else reject(new Error('Could not encode this PDF page'));
-          },
-          'image/jpeg',
-          settings.quality
+      const outputViewport = page.getViewport({ scale: settings.scale });
+      const renderScaleFactor = Math.min(
+        1,
+        Math.sqrt(
+          PHOTON_MAX_RENDER_PIXELS /
+            Math.max(1, outputViewport.width * outputViewport.height)
         )
       );
-      canvas.width = 0;
-      canvas.height = 0;
+      const viewport =
+        renderScaleFactor < 1
+          ? page.getViewport({ scale: settings.scale * renderScaleFactor })
+          : outputViewport;
+      const canvas = document.createElement('canvas');
+      try {
+        onProgress?.(i, totalPages, 'rendering');
+        await yieldToUi();
 
-      const jpegBytes = await jpegBlob.arrayBuffer();
-      const jpegImage = await newPdfDoc.embedJpg(jpegBytes);
-      const newPage = newPdfDoc.addPage([viewport.width, viewport.height]);
-      newPage.drawImage(jpegImage, {
-        x: 0,
-        y: 0,
-        width: viewport.width,
-        height: viewport.height,
-      });
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Could not create a canvas for this PDF');
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context, viewport, canvas }).promise;
+
+        onProgress?.(i, totalPages, 'encoding');
+        await yieldToUi();
+        const jpegBlob = await new Promise<Blob>((resolve, reject) =>
+          canvas.toBlob(
+            (blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error('Could not encode this PDF page'));
+            },
+            'image/jpeg',
+            settings.quality
+          )
+        );
+
+        onProgress?.(i, totalPages, 'embedding');
+        await yieldToUi();
+        const jpegBytes = await jpegBlob.arrayBuffer();
+        const jpegImage = await newPdfDoc.embedJpg(jpegBytes);
+        const newPage = newPdfDoc.addPage([
+          outputViewport.width,
+          outputViewport.height,
+        ]);
+        newPage.drawImage(jpegImage, {
+          x: 0,
+          y: 0,
+          width: outputViewport.width,
+          height: outputViewport.height,
+        });
+      } finally {
+        // Release the backing store after each page; large scans otherwise keep
+        // every canvas alive until the whole PDF has been rebuilt.
+        canvas.width = 0;
+        canvas.height = 0;
+        page.cleanup();
+      }
     }
+
+    onProgress?.(totalPages, totalPages, 'finalizing');
+    await yieldToUi();
     return await newPdfDoc.save();
   } finally {
-    await pdfJsDoc.destroy();
+    await pdfJsDoc?.destroy();
   }
 }
 
@@ -620,6 +721,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const wait = (ms: number) =>
     new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 
+  const formatElapsed = (milliseconds: number): string => {
+    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+    if (totalSeconds < 60) return `${totalSeconds}s`;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`;
+  };
+
   const downloadServerResult = async (
     jobId: string,
     file: File
@@ -839,8 +948,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     activeServerJobId = jobId;
     activeServerUploadSlotId = null;
+    const pollingStartedAt = Date.now();
+    // The backend terminates a job at this limit. Give the client a small
+    // grace period for the final status update, then stop polling instead of
+    // leaving the user on an endless spinner when a worker/container is down.
+    const pollingDeadline =
+      pollingStartedAt + Math.max(serverConfig.jobTimeoutMs, 60_000) + 60_000;
 
     while (activeServerJobId === jobId && !serverJobCancelled) {
+      if (Date.now() >= pollingDeadline) {
+        await fetch(`/api/compression/jobs/${jobId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        }).catch((): undefined => undefined);
+        throw new Error('SERVER_COMPRESSION_TIMEOUT');
+      }
+
       const statusResponse = await fetch(`/api/compression/jobs/${jobId}`, {
         credentials: 'include',
         cache: 'no-store',
@@ -864,7 +987,9 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       } else if (current.status === 'processing') {
         setServerStatus(
-          'Compressing on the server. Keep this page open.',
+          `Compressing on the server (${formatElapsed(
+            Date.now() - pollingStartedAt
+          )} elapsed). Keep this page open.`,
           true,
           null
         );
@@ -990,7 +1115,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let usedMethod: string;
 
         if (algorithm === 'condense') {
-          showLoader('Running Condense compression...');
+          showLoader(
+            'Running Condense compression...',
+            undefined,
+            'Optimizing images and PDF structure…'
+          );
           const result = await performCondenseCompression(
             originalFile,
             level,
@@ -1006,14 +1135,17 @@ document.addEventListener('DOMContentLoaded', () => {
               ' (without image optimization due to unsupported patterns)';
           }
         } else {
-          showLoader('Running Photon compression...');
+          const loaderTitle = 'Running Photon compression...';
+          showLoader(loaderTitle, 0, 'Preparing PDF pages…');
           const arrayBuffer = (await readFileAsArrayBuffer(
             originalFile
           )) as ArrayBuffer;
           const resultBytes = await performPhotonCompression(
             arrayBuffer,
             level,
-            originalFile
+            originalFile,
+            (currentPage, totalPages, stage) =>
+              updatePhotonLoader(loaderTitle, currentPage, totalPages, stage)
           );
           if (!resultBytes) return;
           const buffer = resultBytes.buffer.slice(
@@ -1060,7 +1192,11 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
       } else {
-        showLoader('Compressing multiple PDFs...');
+        showLoader(
+          'Compressing multiple PDFs...',
+          undefined,
+          'Each PDF is processed separately and then added to the ZIP…'
+        );
         const JSZip = (await import('jszip')).default;
         const zip = new JSZip();
         let totalOriginalSize = 0;
@@ -1069,9 +1205,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < state.files.length; i++) {
           const file = state.files[i];
-          showLoader(
-            `Compressing ${i + 1}/${state.files.length}: ${file.name}...`
-          );
+          const loaderTitle = `Compressing ${i + 1}/${state.files.length}: ${file.name}...`;
+          showLoader(loaderTitle, undefined, 'Preparing this PDF…');
           totalOriginalSize += file.size;
 
           let resultBytes: Uint8Array;
@@ -1089,7 +1224,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const photonResult = await performPhotonCompression(
               arrayBuffer,
               level,
-              file
+              file,
+              (currentPage, totalPages, stage) =>
+                updatePhotonLoader(loaderTitle, currentPage, totalPages, stage)
             );
             if (!photonResult) return;
             resultBytes = photonResult;
@@ -1138,6 +1275,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e: unknown) {
       hideLoader();
+      if (activeServerJobId) {
+        await fetch(`/api/compression/jobs/${activeServerJobId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        }).catch((): undefined => undefined);
+      }
       await releaseServerUploadSlot();
       clearServerStatus();
       console.error('[CompressPDF] Error:', e);
@@ -1166,6 +1309,14 @@ document.addEventListener('DOMContentLoaded', () => {
         showAlert(
           'Upload could not be resumed',
           'The connection was retried and resumed automatically, but the upload still could not finish. Please retry the operation once. If it happens again, contact your administrator and include the time of the attempt.'
+        );
+        return;
+      }
+      if (e instanceof Error && e.message === 'SERVER_COMPRESSION_TIMEOUT') {
+        showAlert(
+          'Server compression timed out',
+          'The server worker did not finish within its configured time limit. The job was cancelled and temporary files are being cleaned up. Please retry, or choose Lossless (Server) for this PDF.',
+          'warning'
         );
         return;
       }

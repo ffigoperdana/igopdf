@@ -30,6 +30,11 @@ export async function mergePdfsCpdf(
     );
 
     worker.onmessage = (e: MessageEvent) => {
+      // The shared merge worker reports progress while it is parsing and
+      // combining files. Keep the workflow promise alive until a terminal
+      // success/error response arrives.
+      if (e.data?.status === 'progress') return;
+
       worker.terminate();
       if (e.data.status === 'success') {
         resolve(new Uint8Array(e.data.pdfBytes));
@@ -55,7 +60,8 @@ export async function mergePdfsCpdf(
         cpdfUrl: cpdfBaseUrl + 'coherentpdf.browser.min.js',
         retainPageLabels: options?.retainPageLabels === true,
       },
-      files.map((f) => f.data)
+      // Keep workflow inputs reusable if the worker reports an error.
+      files.map((f) => f.data.slice(0))
     );
   });
 }

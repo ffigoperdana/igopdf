@@ -57,6 +57,7 @@ router.get('/config', (_req, res) => {
       balancedMaxBytes: config.compression.balancedMaxBytes,
       maxUploadBytes: config.compression.maxUploadBytes,
       uploadChunkBytes: config.compression.uploadChunkBytes,
+      jobTimeoutMs: config.compression.jobTimeoutMs,
     },
   });
 });
