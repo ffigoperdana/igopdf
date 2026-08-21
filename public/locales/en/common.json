@@ -30,7 +30,16 @@
     "openMainMenu": "Open main menu",
     "language": "Language",
     "searchLanguage": "Search language…",
-    "noLanguagesFound": "No languages found"
+    "noLanguagesFound": "No languages found",
+    "checkForUpdates": "Check for updates",
+    "checkingForUpdates": "Checking for updates…",
+    "upToDate": "IGO is already up to date.",
+    "updateAvailable": "A new IGO version is available. Reload now? Save any unfinished work first.",
+    "updateApplying": "Applying the update. This page will reload.",
+    "updateComplete": "IGO has been updated to the latest version.",
+    "updatePreparing": "An update was found and is still being prepared. Try again in a moment.",
+    "updateUnsupported": "Update checks are not available in this browser.",
+    "updateCheckFailed": "The update check failed. Please try again later."
   },
   "donation": {
     "message": "Powered by igo engine",

@@ -1,4 +1,5 @@
 import { WasmProvider } from './wasm-provider';
+import { MERGE_WORKER_URL } from './merge-worker-url.js';
 import { wfError } from '../workflow/errors';
 
 export interface MergeFile {
@@ -25,9 +26,7 @@ export async function mergePdfsCpdf(
   }));
 
   return new Promise<Uint8Array>((resolve, reject) => {
-    const worker = new Worker(
-      import.meta.env.BASE_URL + 'workers/merge.worker.js'
-    );
+    const worker = new Worker(MERGE_WORKER_URL);
 
     worker.onmessage = (e: MessageEvent) => {
       // The shared merge worker reports progress while it is parsing and
@@ -49,7 +48,22 @@ export async function mergePdfsCpdf(
 
     worker.onerror = (err) => {
       worker.terminate();
-      reject(new Error(wfError('workerError', { message: err.message })));
+      const details = [
+        err.message,
+        err.filename ? `file: ${err.filename}` : '',
+        err.lineno ? `line: ${err.lineno}` : '',
+      ]
+        .filter(Boolean)
+        .join(' — ');
+      console.error('[Workflow merge] Worker failed to start or crashed', {
+        url: MERGE_WORKER_URL,
+        details: details || 'no browser error details',
+      });
+      reject(
+        new Error(
+          wfError('workerError', { message: details || 'unknown' })
+        )
+      );
     };
 
     worker.postMessage(

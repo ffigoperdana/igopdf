@@ -110,6 +110,11 @@ self.addEventListener('fetch', (event) => {
 
   if (isLocal && isNavigationRequest(event.request, url)) {
     event.respondWith(networkOnlyNavigation(event.request));
+  } else if (isLocal && isMergeWorkerRequest(url)) {
+    // Merge workers are versioned in production and must never be served from
+    // the generic cache-first asset path. This also lets a new UI recover when
+    // an older service worker is still controlling an open tab.
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
   } else if (
     isLocal &&
     (url.pathname.includes('/locales/') ||
@@ -126,6 +131,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(cacheFirstStrategyWithDedup(event.request, isCDN));
   }
 });
+
+function isMergeWorkerRequest(url) {
+  const basePath = getBasePath();
+  const workerPath = `${basePath}/workers/`.replace('//', '/');
+  return url.pathname.startsWith(workerPath);
+}
 
 function isNavigationRequest(request, url) {
   return (

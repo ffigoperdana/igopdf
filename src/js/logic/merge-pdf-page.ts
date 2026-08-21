@@ -8,6 +8,7 @@ import {
 } from '../utils/render-utils.js';
 import { initPagePreview } from '../utils/page-preview.js';
 import { isCpdfAvailable } from '../utils/cpdf-helper.js';
+import { MERGE_WORKER_URL } from '../utils/merge-worker-url.js';
 import {
   showWasmRequiredDialog,
   WasmProvider,
@@ -387,7 +388,7 @@ function runMergeWorker(
   return new Promise<ArrayBuffer>((resolve, reject) => {
     let worker: Worker;
     try {
-      worker = new Worker(import.meta.env.BASE_URL + 'workers/merge.worker.js');
+      worker = new Worker(MERGE_WORKER_URL);
     } catch (error) {
       reject(
         error instanceof Error
@@ -461,11 +462,19 @@ function runMergeWorker(
     };
 
     worker.onerror = (event) => {
-      fail(
-        new Error(
-          (event as ErrorEvent).message || mergeLoaderFallbacks.workerError
-        )
-      );
+      const errorEvent = event as ErrorEvent;
+      const details = [
+        errorEvent.message,
+        errorEvent.filename ? `file: ${errorEvent.filename}` : '',
+        errorEvent.lineno ? `line: ${errorEvent.lineno}` : '',
+      ]
+        .filter(Boolean)
+        .join(' — ');
+      console.error('[Merge] Worker failed to start or crashed', {
+        url: MERGE_WORKER_URL,
+        details: details || 'no browser error details',
+      });
+      fail(new Error(details || mergeLoaderFallbacks.workerError));
     };
 
     timeoutId = window.setTimeout(() => {

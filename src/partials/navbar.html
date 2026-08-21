@@ -20,6 +20,26 @@
       <div class="hidden items-center gap-2.5 md:flex">
         <div id="language-switcher-container"></div>
         <div id="theme-toggle-container"></div>
+        <button
+          id="check-updates-btn"
+          type="button"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-vibrant-palm"
+          data-i18n-title="nav.checkForUpdates"
+          data-i18n-aria-label="nav.checkForUpdates"
+          title="Periksa pembaruan"
+          aria-label="Periksa pembaruan"
+        >
+          <svg
+            class="update-check-icon h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5" />
+          </svg>
+        </button>
         <div id="auth-area" class="flex items-center gap-3"></div>
       </div>
 
@@ -51,6 +71,23 @@
       <a href="/about.html" class="nav-item block" data-i18n="nav.about">Tentang</a>
       <a href="/licensing.html" class="nav-item block" data-i18n="nav.licensing">Lisensi</a>
       <div class="px-3 py-2" id="mobile-language-switcher-container"></div>
+      <button
+        id="check-updates-btn-mobile"
+        type="button"
+        class="flex w-full items-center gap-2 px-3 py-2 text-left text-white transition-colors hover:text-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm"
+      >
+        <svg
+          class="update-check-icon h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5" />
+        </svg>
+        <span data-i18n="nav.checkForUpdates">Periksa pembaruan</span>
+      </button>
       <div id="mobile-auth-menu" class="border-t border-white/10 pt-2"></div>
     </div>
   </div>

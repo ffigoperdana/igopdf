@@ -14,6 +14,22 @@ const BUILD_ID = __IGO_BUILD_ID__;
 const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 let promptedWorker: ServiceWorker | null = null;
 let reloadForUpdate = false;
+let activeRegistration: ServiceWorkerRegistration | null = null;
+let registrationPromise: Promise<ServiceWorkerRegistration | null> | null = null;
+let registrationListenersInstalled = false;
+let manualCheckInProgress = false;
+
+export type ManualUpdateStatus =
+  | 'unsupported'
+  | 'up-to-date'
+  | 'available'
+  | 'preparing'
+  | 'error';
+
+export interface ManualUpdateResult {
+  status: ManualUpdateStatus;
+  registration?: ServiceWorkerRegistration;
+}
 
 async function checkDeploymentVersion(): Promise<boolean> {
   try {
@@ -42,18 +58,46 @@ async function checkDeploymentVersion(): Promise<boolean> {
 }
 
 function offerUpdate(worker: ServiceWorker) {
-  if (!navigator.serviceWorker.controller || promptedWorker === worker) {
+  if (
+    manualCheckInProgress ||
+    !navigator.serviceWorker.controller ||
+    promptedWorker === worker
+  ) {
     return;
   }
 
   promptedWorker = worker;
   console.log('[SW] New version available! Reload to update.');
   if (confirm('A new version of igo is available. Reload to update?')) {
-    // Do not reload immediately: the new worker must take control first so
-    // the page cannot accidentally boot with an old cache.
-    reloadForUpdate = true;
-    worker.postMessage({ type: 'SKIP_WAITING' });
+    applyWaitingUpdate(worker);
   }
+}
+
+function applyWaitingUpdate(worker: ServiceWorker): void {
+  // Do not reload immediately: the new worker must take control first so the
+  // page cannot accidentally boot with an old cache.
+  reloadForUpdate = true;
+  try {
+    sessionStorage.setItem('igo-update-applied', '1');
+  } catch {
+    // The reload still works when storage is unavailable.
+  }
+  worker.postMessage({ type: 'SKIP_WAITING' });
+}
+
+async function waitForWaitingWorker(
+  registration: ServiceWorkerRegistration,
+  timeoutMs = 10_000
+): Promise<ServiceWorker | null> {
+  if (registration.waiting) return registration.waiting;
+
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    if (registration.waiting) return registration.waiting;
+    await new Promise((resolve) => window.setTimeout(resolve, 100));
+  }
+
+  return registration.waiting;
 }
 
 function collectTrustedWasmHosts(): string[] {
@@ -87,79 +131,157 @@ function sendTrustedHostsToSw(target: ServiceWorker | null | undefined) {
   target.postMessage({ type: 'SET_TRUSTED_CDN_HOSTS', hosts });
 }
 
+async function runBackgroundUpdateCheck(
+  registration: ServiceWorkerRegistration
+): Promise<void> {
+  const newerDeployment = await checkDeploymentVersion();
+  try {
+    await registration.update();
+    if (registration.waiting) {
+      if (newerDeployment) {
+        console.info('[SW] A deployment update is ready to apply');
+      }
+      offerUpdate(registration.waiting);
+    }
+  } catch (error) {
+    console.warn('[SW] Update check failed:', error);
+  }
+}
+
+function installRegistrationListeners(
+  registration: ServiceWorkerRegistration
+): void {
+  if (registrationListenersInstalled) return;
+  registrationListenersInstalled = true;
+
+  sendTrustedHostsToSw(
+    registration.active || registration.waiting || registration.installing
+  );
+
+  void runBackgroundUpdateCheck(registration);
+  window.setInterval(
+    (): void => {
+      void runBackgroundUpdateCheck(registration);
+    },
+    UPDATE_CHECK_INTERVAL_MS
+  );
+  window.addEventListener('focus', () => void runBackgroundUpdateCheck(registration));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      void runBackgroundUpdateCheck(registration);
+    }
+  });
+
+  registration.addEventListener('updatefound', () => {
+    const newWorker = registration.installing;
+    if (!newWorker) return;
+
+    newWorker.addEventListener('statechange', () => {
+      if (newWorker.state === 'activated') {
+        sendTrustedHostsToSw(newWorker);
+      }
+      if (
+        newWorker.state === 'installed' &&
+        navigator.serviceWorker.controller
+      ) {
+        offerUpdate(newWorker);
+      }
+    });
+  });
+}
+
+function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (isDevelopment || !('serviceWorker' in navigator)) {
+    return Promise.resolve(null);
+  }
+  if (registrationPromise) return registrationPromise;
+
+  const swPath = `${import.meta.env.BASE_URL}sw.js`;
+  console.log('[SW] Registering Service Worker at:', swPath);
+  registrationPromise = navigator.serviceWorker
+    .register(swPath)
+    .then((registration) => {
+      activeRegistration = registration;
+      console.log(
+        '[SW] Service Worker registered successfully:',
+        registration.scope
+      );
+      installRegistrationListeners(registration);
+      return registration;
+    })
+    .catch((error): ServiceWorkerRegistration | null => {
+      console.error('[SW] Service Worker registration failed:', error);
+      registrationPromise = null;
+      return null;
+    });
+
+  void navigator.serviceWorker.ready.then((registration) => {
+    sendTrustedHostsToSw(registration.active);
+  });
+
+  return registrationPromise;
+}
+
+export async function checkForUpdates(): Promise<ManualUpdateResult> {
+  manualCheckInProgress = true;
+  const registration = await registerServiceWorker();
+  if (!registration) {
+    manualCheckInProgress = false;
+    return { status: isDevelopment ? 'up-to-date' : 'unsupported' };
+  }
+
+  try {
+    const newerDeployment = await checkDeploymentVersion();
+    await registration.update();
+    const waiting = await waitForWaitingWorker(registration);
+    if (waiting) {
+      return { status: 'available', registration };
+    }
+    return { status: newerDeployment ? 'preparing' : 'up-to-date', registration };
+  } catch (error) {
+    console.warn('[SW] Manual update check failed:', error);
+    return { status: 'error', registration };
+  } finally {
+    manualCheckInProgress = false;
+  }
+}
+
+export function applyAvailableUpdate(
+  registration?: ServiceWorkerRegistration
+): boolean {
+  const worker = registration?.waiting || activeRegistration?.waiting;
+  if (!worker) return false;
+  applyWaitingUpdate(worker);
+  return true;
+}
+
+export function consumeUpdateNotice(): boolean {
+  try {
+    if (sessionStorage.getItem('igo-update-applied') !== '1') return false;
+    sessionStorage.removeItem('igo-update-applied');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 if (isDevelopment) {
   console.log('[Dev Mode] Service Worker registration skipped in development');
   console.log('Service Worker will be active in production builds');
 } else if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    const swPath = `${import.meta.env.BASE_URL}sw.js`;
-    console.log('[SW] Registering Service Worker at:', swPath);
-    navigator.serviceWorker
-      .register(swPath)
-      .then((registration) => {
-        console.log(
-          '[SW] Service Worker registered successfully:',
-          registration.scope
-        );
+  const register = (): void => {
+    void registerServiceWorker();
+  };
+  if (document.readyState === 'loading') {
+    window.addEventListener('load', register, { once: true });
+  } else {
+    register();
+  }
 
-        sendTrustedHostsToSw(
-          registration.active || registration.waiting || registration.installing
-        );
-
-        const checkForUpdates = async () => {
-          const newerDeployment = await checkDeploymentVersion();
-          try {
-            await registration.update();
-            if (registration.waiting) {
-              if (newerDeployment) {
-                console.info('[SW] A deployment update is ready to apply');
-              }
-              offerUpdate(registration.waiting);
-            }
-          } catch (error) {
-            console.warn('[SW] Update check failed:', error);
-          }
-        };
-
-        checkForUpdates();
-        window.setInterval(checkForUpdates, UPDATE_CHECK_INTERVAL_MS);
-        window.addEventListener('focus', checkForUpdates);
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            checkForUpdates();
-          }
-        });
-
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'activated') {
-                sendTrustedHostsToSw(newWorker);
-              }
-              if (
-                newWorker.state === 'installed' &&
-                navigator.serviceWorker.controller
-              ) {
-                offerUpdate(newWorker);
-              }
-            });
-          }
-        });
-      })
-      .catch((error) => {
-        console.error('[SW] Service Worker registration failed:', error);
-      });
-
-    navigator.serviceWorker.ready.then((registration) => {
-      sendTrustedHostsToSw(registration.active);
-    });
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (reloadForUpdate) {
-        console.log('[SW] New service worker activated, reloading...');
-        window.location.reload();
-      }
-    });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloadForUpdate) {
+      console.log('[SW] New service worker activated, reloading...');
+      window.location.reload();
+    }
   });
 }

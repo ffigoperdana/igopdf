@@ -28,6 +28,7 @@ import { initAuth, requireAuth, getUser } from './auth/guard.js';
 import { initTheme, createThemeToggle } from './theme.js';
 import { initPwaInstallPrompt } from './pwa-install.js';
 import { initFloatingNews } from './floating-news.js';
+import { initUpdateControls } from './update-controls.js';
 declare const __BRAND_NAME__: string;
 
 // Lucide is loaded lazily (its own chunk) so its full icon set stays out of the
@@ -112,6 +113,7 @@ const init = async () => {
   // Logged in → offer the one-time "install as app" prompt (shows once, ever).
   initPwaInstallPrompt();
   initFloatingNews();
+  initUpdateControls();
 
   // Usage beacon for the admin Reports dashboard: record which tool page this
   // authed user opened. Shell pages are skipped; fire-and-forget.

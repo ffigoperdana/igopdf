@@ -30,7 +30,16 @@
     "openMainMenu": "Buka menu utama",
     "language": "Bahasa",
     "searchLanguage": "Cari bahasa…",
-    "noLanguagesFound": "Bahasa tidak ditemukan"
+    "noLanguagesFound": "Bahasa tidak ditemukan",
+    "checkForUpdates": "Periksa pembaruan",
+    "checkingForUpdates": "Memeriksa pembaruan…",
+    "upToDate": "IGO sudah menggunakan versi terbaru.",
+    "updateAvailable": "Versi baru IGO tersedia. Muat ulang sekarang? Pekerjaan yang belum disimpan akan tetap aman jika Anda menyimpannya terlebih dahulu.",
+    "updateApplying": "Pembaruan sedang diterapkan. Halaman akan dimuat ulang.",
+    "updateComplete": "IGO sudah diperbarui ke versi terbaru.",
+    "updatePreparing": "Pembaruan ditemukan dan sedang disiapkan. Silakan coba lagi sebentar.",
+    "updateUnsupported": "Pemeriksaan pembaruan tidak tersedia di browser ini.",
+    "updateCheckFailed": "Pemeriksaan pembaruan gagal. Coba lagi nanti."
   },
   "donation": {
     "message": "Didukung oleh mesin igo",

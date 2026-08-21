@@ -83,6 +83,25 @@ function deploymentVersionPlugin(buildId: string): Plugin {
         serviceWorkerPath,
         serviceWorker.replaceAll(buildToken, buildId)
       );
+
+      // The merge worker is loaded from a public, non-bundled path. Give each
+      // production build its own filename so a tab controlled by an older
+      // service worker can never receive a worker from a previous release.
+      // Keep the stable file as a compatibility fallback for development and
+      // older links; production code points at this immutable copy.
+      const mergeWorkerPath = resolve(
+        __dirname,
+        'dist',
+        'workers',
+        'merge.worker.js'
+      );
+      if (!fs.existsSync(mergeWorkerPath)) {
+        throw new Error('Merge worker asset is missing from the build output');
+      }
+      fs.copyFileSync(
+        mergeWorkerPath,
+        resolve(__dirname, 'dist', 'workers', `merge.worker-${buildId}.js`)
+      );
     },
   };
 }
