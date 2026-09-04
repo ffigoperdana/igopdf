@@ -15,6 +15,30 @@ interface SummaryData {
   eventsToday: number;
 }
 
+interface StorageStatusData {
+  disk: {
+    totalBytes: number;
+    usedBytes: number;
+    availableBytes: number;
+    availablePercent: number;
+    minimumFreeBytes: number;
+    state: 'ok' | 'warning' | 'critical';
+  };
+  trackedFiles: {
+    guideBytes: number;
+    guideFiles: number;
+    complaintBytes: number;
+    complaintFiles: number;
+  };
+  malwareScan: {
+    enabled: boolean;
+    required: boolean;
+    available: boolean | null;
+    maxBytes: number;
+  };
+  updatedAt: string;
+}
+
 interface DailyRow {
   date: string;
   activeUsers: number;
@@ -146,6 +170,14 @@ function formatDecimal(value: number): string {
   return decimalFormatter.format(value);
 }
 
+function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const value = bytes / 1024 ** index;
+  return `${formatDecimal(value)} ${units[index]}`;
+}
+
 function formatShortDate(date: string): string {
   return `${date.slice(8, 10)}/${date.slice(5, 7)}`;
 }
@@ -269,6 +301,90 @@ async function loadDashboard(): Promise<void> {
   setText('stat-events', formatNumber(summary.eventsToday));
   renderDailyChart(days);
   renderFeatures(features);
+}
+
+function storageStateLabel(state: StorageStatusData['disk']['state']): string {
+  if (state === 'critical') return 'Kritis';
+  if (state === 'warning') return 'Perlu perhatian';
+  return 'Aman';
+}
+
+function storageStateClasses(state: StorageStatusData['disk']['state']): string[] {
+  if (state === 'critical') return ['bg-red-100', 'text-red-700'];
+  if (state === 'warning') return ['bg-amber-100', 'text-amber-800'];
+  return ['bg-green-100', 'text-green-800'];
+}
+
+async function loadStorageStatus(): Promise<void> {
+  const button = byId<HTMLButtonElement>('refresh-storage-status');
+  button.disabled = true;
+  setText('storage-status', 'Memuat status penyimpanan...');
+
+  try {
+    const storage = await apiGet<StorageStatusData>('/api/admin/reports/storage');
+    const usedPercent = Math.min(100, Math.max(0, 100 - storage.disk.availablePercent));
+    const trackedGuideDetail = `${formatNumber(storage.trackedFiles.guideFiles)} file`;
+    const trackedComplaintDetail = `${formatNumber(storage.trackedFiles.complaintFiles)} file aktif`;
+    const scannerLabel = !storage.malwareScan.enabled
+      ? 'Tidak aktif'
+      : storage.malwareScan.available
+        ? 'Aktif'
+        : 'Tidak tersedia';
+    const scannerDetail = !storage.malwareScan.enabled
+      ? 'Upload belum dipindai AV'
+      : `${storage.malwareScan.required ? 'Wajib' : 'Opsional'} · maks. ${formatBytes(storage.malwareScan.maxBytes)}`;
+
+    setText('storage-free', formatBytes(storage.disk.availableBytes));
+    setText(
+      'storage-free-detail',
+      `${formatDecimal(storage.disk.availablePercent)}% dari ${formatBytes(storage.disk.totalBytes)}`
+    );
+    setText('storage-guide', formatBytes(storage.trackedFiles.guideBytes));
+    setText('storage-guide-detail', trackedGuideDetail);
+    setText('storage-complaint', formatBytes(storage.trackedFiles.complaintBytes));
+    setText('storage-complaint-detail', trackedComplaintDetail);
+    setText('storage-malware', scannerLabel);
+    setText('storage-malware-detail', scannerDetail);
+    setText(
+      'storage-capacity-detail',
+      `${formatBytes(storage.disk.usedBytes)} terpakai · batas minimum bebas ${formatBytes(storage.disk.minimumFreeBytes)}`
+    );
+    setText(
+      'storage-status',
+      `Status ${storageStateLabel(storage.disk.state)} · diperbarui ${formatDateTime(storage.updatedAt)}`
+    );
+
+    const usedBar = byId<HTMLDivElement>('storage-used-bar');
+    usedBar.style.width = `${usedPercent}%`;
+    usedBar.classList.remove('bg-accent-green', 'bg-amber-500', 'bg-red-600');
+    usedBar.classList.add(
+      storage.disk.state === 'critical'
+        ? 'bg-red-600'
+        : storage.disk.state === 'warning'
+          ? 'bg-amber-500'
+          : 'bg-accent-green'
+    );
+    byId('storage-used-progress').setAttribute('aria-valuenow', String(Math.round(usedPercent)));
+
+    const badge = byId('storage-health-badge');
+    badge.textContent = storageStateLabel(storage.disk.state);
+    badge.classList.remove(
+      'bg-surface-muted',
+      'text-on-surface-variant',
+      'bg-green-100',
+      'text-green-800',
+      'bg-amber-100',
+      'text-amber-800',
+      'bg-red-100',
+      'text-red-700'
+    );
+    badge.classList.add(...storageStateClasses(storage.disk.state));
+  } catch (err) {
+    console.error('storage status failed', err);
+    setText('storage-status', 'Status penyimpanan gagal dimuat. Coba perbarui lagi.');
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function loadReportMonths(): Promise<void> {
@@ -820,29 +936,44 @@ async function initReportPage(): Promise<void> {
   byId<HTMLButtonElement>('download-user-report').addEventListener('click', () => {
     void downloadUserReport();
   });
+  byId<HTMLButtonElement>('refresh-storage-status').addEventListener('click', () => {
+    void loadStorageStatus();
+  });
 
   const activityTab = byId<HTMLButtonElement>('report-tab-activity');
   const usersTab = byId<HTMLButtonElement>('report-tab-users');
+  const storageTab = byId<HTMLButtonElement>('report-tab-storage');
   const activityPanel = byId('report-panel-activity');
   const usersPanel = byId('report-panel-users');
-  const setTab = (tab: 'activity' | 'users') => {
-    const usersActive = tab === 'users';
-    activityPanel.classList.toggle('hidden', usersActive);
-    usersPanel.classList.toggle('hidden', !usersActive);
-    activityTab.setAttribute('aria-selected', String(!usersActive));
-    usersTab.setAttribute('aria-selected', String(usersActive));
-    activityTab.classList.toggle('border-vibrant-palm', !usersActive);
-    activityTab.classList.toggle('text-vibrant-palm', !usersActive);
-    activityTab.classList.toggle('border-transparent', usersActive);
-    activityTab.classList.toggle('text-on-surface-variant', usersActive);
-    usersTab.classList.toggle('border-vibrant-palm', usersActive);
-    usersTab.classList.toggle('text-vibrant-palm', usersActive);
-    usersTab.classList.toggle('border-transparent', !usersActive);
-    usersTab.classList.toggle('text-on-surface-variant', !usersActive);
-    if (usersActive) void loadUsers(1);
+  const storagePanel = byId('report-panel-storage');
+  const setTab = (tab: 'activity' | 'users' | 'storage') => {
+    const selected = {
+      activity: tab === 'activity',
+      users: tab === 'users',
+      storage: tab === 'storage',
+    };
+    activityPanel.classList.toggle('hidden', !selected.activity);
+    usersPanel.classList.toggle('hidden', !selected.users);
+    storagePanel.classList.toggle('hidden', !selected.storage);
+
+    for (const [button, active] of [
+      [activityTab, selected.activity],
+      [usersTab, selected.users],
+      [storageTab, selected.storage],
+    ] as const) {
+      button.setAttribute('aria-selected', String(active));
+      button.classList.toggle('border-vibrant-palm', active);
+      button.classList.toggle('text-vibrant-palm', active);
+      button.classList.toggle('border-transparent', !active);
+      button.classList.toggle('text-on-surface-variant', !active);
+    }
+
+    if (selected.users) void loadUsers(1);
+    if (selected.storage) void loadStorageStatus();
   };
   activityTab.addEventListener('click', () => setTab('activity'));
   usersTab.addEventListener('click', () => setTab('users'));
+  storageTab.addEventListener('click', () => setTab('storage'));
 
   byId<HTMLSelectElement>('user-report-month-select').addEventListener('change', () => {
     void loadUsers(1);

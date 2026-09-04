@@ -8,6 +8,7 @@ import { authMiddleware } from './middleware/auth.js';
 import {
   apiLimiter,
   compressionUploadLimiter,
+  supportUploadLimiter,
 } from './middleware/rateLimiter.js';
 import authRoutes from './routes/auth.js';
 import captchaRoutes from './routes/captcha.js';
@@ -19,8 +20,16 @@ import compressionRoutes from './routes/compression.js';
 import { compressionTusServer } from './services/compressionTusService.js';
 import docxRoutes from './routes/docx.js';
 import { docxTusServer } from './services/docxTusService.js';
+import { complaintTusServer } from './services/complaintTusService.js';
+import { guideTusServer } from './services/guideTusService.js';
 import { cleanupExpiredSessions } from './services/authService.js';
 import { cleanupExpiredCaptchas } from './services/captchaService.js';
+import { cleanupExpiredComplaintAssets } from './services/complaintService.js';
+import { cleanupExpiredGuideUploadSlots } from './services/guideService.js';
+import complaintRoutes from './routes/complaints.js';
+import adminComplaintRoutes from './routes/adminComplaints.js';
+import guideRoutes from './routes/guides.js';
+import adminGuideRoutes from './routes/adminGuides.js';
 import { logger } from './utils/logger.js';
 
 const app = express();
@@ -62,6 +71,24 @@ app.all(
   }
 );
 
+app.all(
+  ['/api/complaints/uploads', '/api/complaints/uploads/*'],
+  authMiddleware,
+  supportUploadLimiter,
+  (req, res, next) => {
+    void complaintTusServer.handle(req, res).catch(next);
+  }
+);
+
+app.all(
+  ['/api/guides/uploads', '/api/guides/uploads/*'],
+  authMiddleware,
+  supportUploadLimiter,
+  (req, res, next) => {
+    void guideTusServer.handle(req, res).catch(next);
+  }
+);
+
 // Compression control/status polling has its own authenticated limiter. Keep
 // it outside the general API bucket so a long-running job cannot exhaust the
 // user's normal API allowance.
@@ -73,6 +100,10 @@ app.use('/api', apiLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/complaints', complaintRoutes);
+app.use('/api/guides', guideRoutes);
+app.use('/api/admin/complaints', adminComplaintRoutes);
+app.use('/api/admin/guides', adminGuideRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/usage', usageRoutes);
 app.use('/api/admin/reports', reportRoutes);
@@ -117,6 +148,21 @@ const cleanupInterval = setInterval(
   60 * 60 * 1000
 );
 
+// Support assets have an explicit 48-hour retention policy. Run this cleanup
+// more frequently than the general auth maintenance so expired files do not
+// remain on the private volume for an entire extra hour.
+const supportCleanupInterval = setInterval(
+  async () => {
+    try {
+      await cleanupExpiredComplaintAssets();
+      await cleanupExpiredGuideUploadSlots();
+    } catch (err) {
+      logger.error('Support asset cleanup error', err);
+    }
+  },
+  10 * 60 * 1000
+);
+
 async function start() {
   const connected = await testConnection();
   if (!connected) {
@@ -133,6 +179,7 @@ async function start() {
 process.on('SIGINT', async () => {
   logger.info('Shutting down...');
   clearInterval(cleanupInterval);
+  clearInterval(supportCleanupInterval);
   await closePool();
   process.exit(0);
 });
@@ -140,6 +187,7 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
   logger.info('Shutting down...');
   clearInterval(cleanupInterval);
+  clearInterval(supportCleanupInterval);
   await closePool();
   process.exit(0);
 });

@@ -119,7 +119,7 @@ const init = async () => {
   // authed user opened. Shell pages are skipped; fire-and-forget.
   const nonToolPages = [
     'index', 'login', 'about', 'licensing', 'privacy', 'profile', 'admin',
-    'report', '404', 'simple-index',
+    'report', 'guide', 'aduan', 'admin-guide', 'admin-aduan', '404', 'simple-index',
   ];
   const feature = (location.pathname.split('/').pop() || 'index')
     .replace(/\.html$/, '') || 'index';

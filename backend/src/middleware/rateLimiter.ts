@@ -54,6 +54,23 @@ export const compressionUploadLimiter = rateLimit({
   },
 });
 
+// Complaint uploads can legitimately contain up to ten 1 GiB PDF samples.
+// They use 25 MiB resumable chunks, so this allowance is intentionally larger
+// than the conversion-job bucket while still preventing an unbounded request
+// flood from one authenticated account.
+export const supportUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: authenticatedUserKey,
+  message: {
+    success: false,
+    error: 'Too many Guide or Aduan upload chunks. Please resume shortly.',
+    code: 'SUPPORT_UPLOAD_RATE_LIMITED',
+  },
+});
+
 // Keyed by IP + username (not IP alone). Office users often reach the app
 // through a shared address (misconfigured proxy XFF, NAT, future WAF), and a
 // pure per-IP counter pools everyone's failures into one bucket — ten typos

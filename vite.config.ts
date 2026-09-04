@@ -39,6 +39,10 @@ function loadPages(): Set<string> {
     'profile',
     'admin',
     'report',
+    'guide',
+    'aduan',
+    'admin-guide',
+    'admin-aduan',
     'about',
     'privacy',
     'licensing',
@@ -50,6 +54,11 @@ function loadPages(): Set<string> {
 }
 
 const PAGES = loadPages();
+
+const PAGE_ALIASES: Record<string, string> = {
+  aduan: 'aduan',
+  'user-manual': 'guide',
+};
 
 function resolveBuildId(): string {
   const value = (
@@ -75,13 +84,25 @@ function deploymentVersionPlugin(buildId: string): Plugin {
     },
     closeBundle() {
       const serviceWorkerPath = resolve(__dirname, 'dist', 'sw.js');
+      // Vite may leave a previously stamped public asset in `dist` when a
+      // build is retried after an interrupted bundle. Read the checked-in
+      // public source as the canonical template so the build remains
+      // repeatable and never stamps an already-stamped cache name twice.
+      const serviceWorkerTemplatePath = resolve(__dirname, 'public', 'sw.js');
       const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
-      if (!serviceWorker.includes(buildToken)) {
+      const serviceWorkerTemplate = fs.readFileSync(
+        serviceWorkerTemplatePath,
+        'utf8'
+      );
+      const source = serviceWorker.includes(buildToken)
+        ? serviceWorker
+        : serviceWorkerTemplate;
+      if (!source.includes(buildToken)) {
         throw new Error('Service worker build-version token is missing');
       }
       fs.writeFileSync(
         serviceWorkerPath,
-        serviceWorker.replaceAll(buildToken, buildId)
+        source.replaceAll(buildToken, buildId)
       );
 
       // The merge worker is loaded from a public, non-bundled path. Give each
@@ -128,6 +149,22 @@ function createLanguageMiddleware(isDev: boolean): Connect.NextHandleFunction {
 
     if (!pathname.startsWith('/')) {
       pathname = '/' + pathname;
+    }
+
+    const aliasName = pathname.replace(/^\/+|\/+$/g, '');
+    const aliasedPage = PAGE_ALIASES[aliasName];
+    if (aliasedPage) {
+      if (isDev) {
+        const srcPath = resolve(__dirname, 'src/pages', `${aliasedPage}.html`);
+        if (fs.existsSync(srcPath)) {
+          req.url =
+            `/src/pages/${aliasedPage}.html` +
+            (queryString ? `?${queryString}` : '');
+        }
+      } else {
+        req.url = `/${aliasedPage}.html` + (queryString ? `?${queryString}` : '');
+      }
+      return next();
     }
 
     const match = pathname.match(LANG_REGEX);
@@ -488,8 +525,10 @@ function rewriteHtmlPathsPlugin(): Plugin {
 // 'unsafe-inline') and removes the JS timing race that caused intermittent
 // navbar flicker. Mirrors setActiveNavItem()'s path normalization in main.ts.
 function markActiveNavPlugin(): Plugin {
-  const norm = (s: string): string =>
-    (s.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+  const norm = (s: string): string => {
+    const page = (s.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+    return PAGE_ALIASES[page] || page;
+  };
 
   return {
     name: 'mark-active-nav',
@@ -701,6 +740,10 @@ export default defineConfig(() => {
           profile: resolve(__dirname, 'profile.html'),
           admin: resolve(__dirname, 'admin.html'),
           report: resolve(__dirname, 'report.html'),
+          guide: resolve(__dirname, 'src/pages/guide.html'),
+          aduan: resolve(__dirname, 'src/pages/aduan.html'),
+          'admin-guide': resolve(__dirname, 'src/pages/admin-guide.html'),
+          'admin-aduan': resolve(__dirname, 'src/pages/admin-aduan.html'),
           about: resolve(__dirname, 'about.html'),
           privacy: resolve(__dirname, 'privacy.html'),
           licensing: resolve(__dirname, 'licensing.html'),

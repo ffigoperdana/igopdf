@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -203,6 +203,61 @@ export const config = {
       15 * 60 * 1000
     ),
     workerPollMs: positiveInteger(process.env.DOCX_WORKER_POLL_MS, 2000),
+  },
+
+  // Persistent assets for the authenticated Guide and Aduan features. Unlike
+  // conversion jobs, these are intentionally retained for a short, defined
+  // period (complaint attachments) or until an administrator replaces/deletes
+  // them (guide materials). Keep this on a dedicated mounted volume in
+  // production; it must not share a database or a public web root.
+  support: {
+    storageDir: process.env.SUPPORT_STORAGE_DIR || '/var/lib/igo-support',
+    uploadChunkBytes: positiveInteger(
+      process.env.SUPPORT_UPLOAD_CHUNK_BYTES,
+      25 * 1024 * 1024
+    ),
+    uploadIdleTimeoutMs: positiveInteger(
+      process.env.SUPPORT_UPLOAD_IDLE_TIMEOUT_MS,
+      60 * 60 * 1000
+    ),
+    uploadMaxAgeMs: positiveInteger(
+      process.env.SUPPORT_UPLOAD_MAX_AGE_MS,
+      24 * 60 * 60 * 1000
+    ),
+    complaintAttachmentRetentionMs: positiveInteger(
+      process.env.COMPLAINT_ATTACHMENT_RETENTION_MS,
+      48 * 60 * 60 * 1000
+    ),
+    guidePdfMaxBytes: positiveInteger(
+      process.env.GUIDE_PDF_MAX_BYTES,
+      100 * 1024 * 1024
+    ),
+    guideVideoMaxBytes: positiveInteger(
+      process.env.GUIDE_VIDEO_MAX_BYTES,
+      100 * 1024 * 1024
+    ),
+    diskMinimumFreeBytes: positiveInteger(
+      process.env.SUPPORT_DISK_MINIMUM_FREE_BYTES,
+      512 * 1024 * 1024
+    ),
+  },
+
+  // ClamAV is deliberately opt-in so local development does not require a
+  // heavy antivirus daemon. In production, enable it together with a private
+  // clamd service and keep `required` true so an unavailable scanner fails
+  // closed instead of admitting an unscanned upload.
+  malwareScan: {
+    enabled: process.env.MALWARE_SCAN_ENABLED === 'true',
+    required:
+      process.env.MALWARE_SCAN_REQUIRED === undefined ||
+      process.env.MALWARE_SCAN_REQUIRED === 'true',
+    host: process.env.CLAMAV_HOST || 'clamav',
+    port: positiveInteger(process.env.CLAMAV_PORT, 3310),
+    timeoutMs: positiveInteger(process.env.MALWARE_SCAN_TIMEOUT_MS, 15 * 60 * 1000),
+    maxBytes: positiveInteger(
+      process.env.MALWARE_SCAN_MAX_BYTES,
+      1024 * 1024 * 1024
+    ),
   },
 } as const;
 

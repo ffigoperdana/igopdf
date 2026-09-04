@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/rbac.js';
 import { pool } from '../config/database.js';
+import { getSupportStorageStatus } from '../services/supportStorageService.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
@@ -79,6 +80,21 @@ router.get('/summary', async (_req, res) => {
   } catch (err) {
     logger.error('Reports summary error', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// Storage is shown separately from usage analytics because the Docker volume
+// can also contain temporary processing files that are not represented in the
+// application database. Both dimensions help an administrator spot pressure
+// before an upload is rejected for lack of disk space.
+router.get('/storage', async (_req, res) => {
+  try {
+    const storage = await getSupportStorageStatus();
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, data: storage });
+  } catch (err) {
+    logger.error('Reports storage status error', err);
+    res.status(500).json({ success: false, error: 'Storage status unavailable' });
   }
 });
 

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <!-- prettier-ignore -->
+    <script>try{var __m=matchMedia('(prefers-color-scheme: dark)').matches,__s;try{__s=localStorage.getItem('igo-theme')}catch(e){}var __t=__s==='light'||__s==='dark'?__s:__m?'dark':'light';if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aduan - igo</title>
+    <meta name="description" content="Kirim aduan dan masukan untuk pengembangan IGO." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
+    <link href="/src/css/styles.css" rel="stylesheet" />
+  </head>
+  <body class="overflow-x-clip antialiased bg-background text-on-background">
+    {{> navbar }}
+
+    <main class="container mx-auto min-h-screen w-full max-w-4xl px-4 py-8">
+      <div class="mb-8">
+        <p class="text-sm font-semibold uppercase tracking-wide text-vibrant-palm">Aduan</p>
+        <h1 class="mt-1 text-3xl font-bold text-deep-forest dark:text-content">Sampaikan aduan atau masukan</h1>
+        <p class="mt-2 max-w-3xl text-on-surface-variant">
+          Jelaskan kendala sedetail mungkin. Nomor tiket akan ditampilkan setelah aduan berhasil dikirim.
+        </p>
+      </div>
+
+      <section class="rounded-xl border border-outline-variant bg-paper-white p-5 shadow-sm dark:bg-surface-raised md:p-7">
+        <form id="complaint-form" class="space-y-6" novalidate>
+          <div>
+            <label for="complaint-category" class="mb-2 block text-sm font-semibold text-ink-slate dark:text-content">Jenis aduan</label>
+            <select id="complaint-category" class="w-full rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20">
+              <option value="main_feature">Terkait fitur utama</option>
+              <option value="other_feature">Terkait fitur lain</option>
+              <option value="non_feature">Di luar fitur</option>
+            </select>
+          </div>
+
+          <div id="main-feature-group">
+            <label for="main-feature" class="mb-2 block text-sm font-semibold text-ink-slate dark:text-content">Fitur utama yang bermasalah</label>
+            <select id="main-feature" class="w-full rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20"></select>
+            <p class="mt-2 text-xs text-on-surface-variant">Compress PDF menerima PDF sampai 1 GB per file. PDF to DOCX dan Text Editor menerima sampai 500 MB per file.</p>
+          </div>
+
+          <div id="other-feature-group" class="relative hidden">
+            <label for="other-feature-search" class="mb-2 block text-sm font-semibold text-ink-slate dark:text-content">Cari fitur IGO</label>
+            <input id="other-feature-search" type="search" autocomplete="off" placeholder="Ketik nama fitur, misalnya Merge PDF" class="w-full rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" />
+            <div id="other-feature-results" class="absolute left-0 right-0 top-[76px] z-10 hidden max-h-72 overflow-y-auto rounded-lg border border-outline-variant bg-paper-white shadow-lg dark:bg-surface-raised"></div>
+            <p id="selected-other-feature" class="mt-2 text-xs font-medium text-vibrant-palm"></p>
+            <p class="mt-2 text-xs text-on-surface-variant">Daftar ini mengikuti seluruh fitur yang tersedia di codebase. Lampiran untuk aduan terkait fitur hanya PDF, maksimal 10 MB per file.</p>
+          </div>
+
+          <div>
+            <label for="complaint-subject" class="mb-2 block text-sm font-semibold text-ink-slate dark:text-content">Subjek</label>
+            <input id="complaint-subject" name="subject" required minlength="5" maxlength="180" type="text" placeholder="Ringkasan singkat kendala" class="w-full rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-on-background focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" />
+          </div>
+
+          <div>
+            <div class="mb-2 flex items-center justify-between gap-3">
+              <label for="complaint-editor" class="block text-sm font-semibold text-ink-slate dark:text-content">Detail aduan</label>
+              <span id="complaint-editor-count" class="text-xs text-on-surface-variant">0 / minimal 250 karakter</span>
+            </div>
+            <div id="complaint-editor-toolbar" class="flex flex-wrap gap-1 rounded-t-lg border border-b-0 border-outline-variant bg-surface-gray p-2 dark:bg-surface-muted">
+              <button type="button" data-editor-command="bold" aria-label="Tebal" class="rounded px-2 py-1 text-sm font-bold hover:bg-black/10 dark:hover:bg-white/10">B</button>
+              <button type="button" data-editor-command="italic" aria-label="Miring" class="rounded px-2 py-1 text-sm italic hover:bg-black/10 dark:hover:bg-white/10">I</button>
+              <button type="button" data-editor-command="underline" aria-label="Garis bawah" class="rounded px-2 py-1 text-sm underline hover:bg-black/10 dark:hover:bg-white/10">U</button>
+              <button type="button" data-editor-command="insertUnorderedList" aria-label="Daftar" class="rounded px-2 py-1 text-sm hover:bg-black/10 dark:hover:bg-white/10">• List</button>
+              <button type="button" data-editor-command="insertOrderedList" aria-label="Daftar bernomor" class="rounded px-2 py-1 text-sm hover:bg-black/10 dark:hover:bg-white/10">1. List</button>
+              <button type="button" data-editor-command="createLink" aria-label="Tautan" class="rounded px-2 py-1 text-sm hover:bg-black/10 dark:hover:bg-white/10">Link</button>
+            </div>
+            <div id="complaint-editor" class="min-h-52 rounded-b-lg border border-outline-variant bg-background p-4 text-on-background focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Tuliskan kronologi, langkah yang dilakukan, dan hasil yang diharapkan…"></div>
+            <p class="mt-2 text-xs text-on-surface-variant">Minimal 250 karakter. Jangan masukkan password atau data rahasia.</p>
+          </div>
+
+          <div id="complaint-attachment-group">
+            <label for="complaint-attachments" class="mb-2 block text-sm font-semibold text-ink-slate dark:text-content">Lampiran (opsional)</label>
+            <input id="complaint-attachments" type="file" multiple class="block w-full rounded-lg border border-outline-variant bg-background px-3 py-2 text-sm text-on-background file:mr-3 file:rounded file:border-0 file:bg-vibrant-palm file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-orange-600" />
+            <p id="complaint-attachment-info" class="mt-2 text-xs text-on-surface-variant"></p>
+            <ul id="complaint-attachment-list" class="mt-3 space-y-2"></ul>
+          </div>
+
+          <progress id="complaint-upload-progress" class="hidden h-2 w-full accent-vibrant-palm" max="100" value="0"></progress>
+          <p id="complaint-upload-progress-label" class="text-xs text-on-surface-variant"></p>
+          <div id="complaint-form-status" class="hidden" role="status" aria-live="polite"></div>
+
+          <button id="submit-complaint" type="submit" class="w-full rounded-lg bg-vibrant-palm px-5 py-3 font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-vibrant-palm/30 disabled:cursor-not-allowed disabled:opacity-60">Kirim Aduan</button>
+        </form>
+      </section>
+    </main>
+
+    <div id="complaint-success-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 px-4" role="dialog" aria-modal="true" aria-labelledby="complaint-success-title">
+      <div class="w-full max-w-md rounded-xl bg-paper-white p-7 text-center shadow-2xl dark:bg-surface-raised">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">✓</div>
+        <h2 id="complaint-success-title" class="text-2xl font-bold text-ink-slate dark:text-content">Terima kasih</h2>
+        <p class="mt-2 text-sm text-on-surface-variant">Aduan berhasil dicatat. Simpan nomor tiket berikut untuk referensi.</p>
+        <p id="complaint-ticket-number" class="my-5 rounded-lg bg-surface-gray px-4 py-3 font-mono text-lg font-bold tracking-wide text-vibrant-palm dark:bg-surface-muted"></p>
+        <p class="mb-5 text-xs text-on-surface-variant">Halaman akan kembali ke beranda dalam beberapa detik.</p>
+        <button id="complaint-home-button" type="button" class="w-full rounded-lg bg-vibrant-palm px-4 py-2.5 font-semibold text-white hover:bg-orange-600">Kembali ke beranda</button>
+      </div>
+    </div>
+
+    {{> footer }}
+    <script type="module" src="/src/js/utils/lucide-init.ts"></script>
+    <script type="module" src="/src/js/mobileMenu.ts"></script>
+    <script type="module" src="/src/js/support/complaint-page.ts"></script>
+    <script type="module" src="/src/js/main.ts"></script>
+  </body>
+</html>

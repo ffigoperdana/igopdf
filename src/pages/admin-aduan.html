@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <!-- prettier-ignore -->
+    <script>try{var __m=matchMedia('(prefers-color-scheme: dark)').matches,__s;try{__s=localStorage.getItem('igo-theme')}catch(e){}var __t=__s==='light'||__s==='dark'?__s:__m?'dark':'light';if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Aduan - igo</title>
+    <meta name="description" content="Kelola tiket aduan igo." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
+    <link href="/src/css/styles.css" rel="stylesheet" />
+  </head>
+  <body class="overflow-x-clip antialiased bg-background text-on-background">
+    {{> navbar }}
+
+    <main class="container mx-auto min-h-screen w-full max-w-7xl px-4 py-8">
+      <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-vibrant-palm">Admin</p>
+          <h1 class="mt-1 text-3xl font-bold text-deep-forest dark:text-content">Kelola Aduan</h1>
+          <p class="mt-2 text-on-surface-variant">Lihat tiket seperti inbox, ubah status, dan tulis catatan saat aduan selesai.</p>
+        </div>
+        <a href="/aduan" class="inline-flex items-center justify-center rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold hover:border-vibrant-palm">Lihat formulir user</a>
+      </div>
+
+      <section id="admin-complaint-status" class="mb-5 hidden rounded-lg px-4 py-3 text-sm" role="status" aria-live="polite"></section>
+
+      <div class="grid gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
+        <section class="min-w-0 rounded-xl border border-outline-variant bg-paper-white p-4 shadow-sm dark:bg-surface-raised md:p-5">
+          <div class="mb-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
+            <label class="sr-only" for="admin-complaint-search">Cari tiket</label>
+            <input id="admin-complaint-search" type="search" placeholder="Cari nomor, user, subjek…" class="rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-sm focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20" />
+            <label class="sr-only" for="admin-complaint-filter">Filter status</label>
+            <select id="admin-complaint-filter" class="rounded-lg border border-outline-variant bg-background px-3 py-2.5 text-sm focus:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20">
+              <option value="">Semua status</option>
+              <option value="open">Baru</option>
+              <option value="in_progress">Diproses</option>
+              <option value="resolved">Selesai</option>
+            </select>
+          </div>
+          <p id="admin-complaint-count" class="mb-3 text-xs text-on-surface-variant"></p>
+          <div id="admin-complaint-list" class="max-h-[72vh] space-y-2 overflow-y-auto pr-1" aria-live="polite">
+            <p class="text-sm text-on-surface-variant">Memuat tiket…</p>
+          </div>
+        </section>
+
+        <section id="admin-complaint-detail" class="min-w-0 rounded-xl border border-outline-variant bg-paper-white p-5 shadow-sm dark:bg-surface-raised md:p-6">
+          <div class="flex min-h-[420px] items-center justify-center text-center text-sm text-on-surface-variant">
+            Pilih tiket dari daftar untuk melihat detailnya.
+          </div>
+        </section>
+      </div>
+    </main>
+
+    {{> footer }}
+    <script type="module" src="/src/js/utils/lucide-init.ts"></script>
+    <script type="module" src="/src/js/mobileMenu.ts"></script>
+    <script type="module" src="/src/js/support/admin-aduan-page.ts"></script>
+    <script type="module" src="/src/js/main.ts"></script>
+  </body>
+</html>

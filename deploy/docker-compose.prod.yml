@@ -32,6 +32,21 @@ services:
         condition: service_healthy
     restart: 'no'
 
+  storage-init:
+    image: ${IGO_BACKEND_IMAGE}
+    user: '0:0'
+    command:
+      - sh
+      - -ec
+      - |
+        install -d -o 10001 -g 10001 -m 0700 /var/lib/igo-jobs /var/lib/igo-support
+        chown -R 10001:10001 /var/lib/igo-jobs /var/lib/igo-support
+        chmod 0700 /var/lib/igo-jobs /var/lib/igo-support
+    volumes:
+      - pdf_jobs:/var/lib/igo-jobs
+      - support_assets:/var/lib/igo-support
+    restart: 'no'
+
   backend:
     image: ${IGO_BACKEND_IMAGE}
     environment:
@@ -46,6 +61,7 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN}
       SESSION_TIMEOUT_HOURS: ${SESSION_TIMEOUT_HOURS:-3}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-true}
+      SUPPORT_STORAGE_DIR: /var/lib/igo-support
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
       TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-1}
@@ -94,11 +110,27 @@ services:
       DOCX_JOB_TIMEOUT_MS: ${DOCX_JOB_TIMEOUT_MS:-2700000}
       DOCX_RETENTION_MS: ${DOCX_RETENTION_MS:-900000}
       DOCX_WORKER_POLL_MS: ${DOCX_WORKER_POLL_MS:-2000}
+      SUPPORT_UPLOAD_CHUNK_BYTES: ${SUPPORT_UPLOAD_CHUNK_BYTES:-26214400}
+      SUPPORT_UPLOAD_IDLE_TIMEOUT_MS: ${SUPPORT_UPLOAD_IDLE_TIMEOUT_MS:-3600000}
+      SUPPORT_UPLOAD_MAX_AGE_MS: ${SUPPORT_UPLOAD_MAX_AGE_MS:-86400000}
+      COMPLAINT_ATTACHMENT_RETENTION_MS: ${COMPLAINT_ATTACHMENT_RETENTION_MS:-172800000}
+      GUIDE_PDF_MAX_BYTES: ${GUIDE_PDF_MAX_BYTES:-104857600}
+      GUIDE_VIDEO_MAX_BYTES: ${GUIDE_VIDEO_MAX_BYTES:-104857600}
+      SUPPORT_DISK_MINIMUM_FREE_BYTES: ${SUPPORT_DISK_MINIMUM_FREE_BYTES:-536870912}
+      MALWARE_SCAN_ENABLED: ${MALWARE_SCAN_ENABLED:-false}
+      MALWARE_SCAN_REQUIRED: ${MALWARE_SCAN_REQUIRED:-true}
+      CLAMAV_HOST: ${CLAMAV_HOST:-clamav}
+      CLAMAV_PORT: ${CLAMAV_PORT:-3310}
+      MALWARE_SCAN_TIMEOUT_MS: ${MALWARE_SCAN_TIMEOUT_MS:-900000}
+      MALWARE_SCAN_MAX_BYTES: ${MALWARE_SCAN_MAX_BYTES:-1073741824}
     depends_on:
       migrate:
         condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
+      - support_assets:/var/lib/igo-support
     cpus: 0.5
     mem_limit: 512m
     restart: unless-stopped
@@ -127,6 +159,8 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       migrate:
+        condition: service_completed_successfully
+      storage-init:
         condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
@@ -164,6 +198,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
     volumes:
       - pdf_jobs:/var/lib/igo-jobs
     cpus: 1.5
@@ -174,6 +210,24 @@ services:
     image: ${IGO_FRONTEND_IMAGE}
     cpus: 0.25
     mem_limit: 128m
+    restart: unless-stopped
+
+  clamav:
+    image: ${IGO_CLAMAV_IMAGE:-igo-clamav:1.4}
+    build:
+      context: ..
+      dockerfile: deploy/clamav.Dockerfile
+    profiles: ['security']
+    environment:
+      TZ: ${TZ:-Asia/Jakarta}
+      CLAMAV_NO_MILTERD: 'true'
+      FRESHCLAM_CHECKS: ${FRESHCLAM_CHECKS:-12}
+    volumes:
+      - clamav_database:/var/lib/clamav
+    expose:
+      - '3310'
+    cpus: 1.0
+    mem_limit: 4g
     restart: unless-stopped
 
   nginx:
@@ -192,3 +246,5 @@ services:
 volumes:
   postgres_data:
   pdf_jobs:
+  support_assets:
+  clamav_database:

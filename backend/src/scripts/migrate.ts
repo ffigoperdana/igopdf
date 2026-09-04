@@ -258,6 +258,116 @@ const migrations = [
       ON CONFLICT (id) DO NOTHING;
     `,
   },
+  {
+    name: '011_guides_and_complaints',
+    sql: `
+      CREATE TABLE IF NOT EXISTS guide_materials (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title VARCHAR(180) NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        asset_type VARCHAR(10) NOT NULL CHECK (asset_type IN ('pdf', 'video')),
+        asset_status VARCHAR(20) NOT NULL DEFAULT 'pending'
+          CHECK (asset_status IN ('pending', 'uploading', 'ready')),
+        original_filename VARCHAR(255),
+        storage_key UUID,
+        mime_type VARCHAR(120),
+        size_bytes BIGINT CHECK (size_bytes IS NULL OR size_bytes > 0),
+        position INTEGER NOT NULL DEFAULT 0 CHECK (position >= 0),
+        is_published BOOLEAN NOT NULL DEFAULT false,
+        created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_guide_materials_storage_key
+        ON guide_materials(storage_key) WHERE storage_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_guide_materials_published_position
+        ON guide_materials(is_published, asset_status, position, created_at);
+
+      CREATE TABLE IF NOT EXISTS guide_upload_slots (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        guide_id UUID NOT NULL REFERENCES guide_materials(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        original_filename VARCHAR(255) NOT NULL,
+        expected_bytes BIGINT NOT NULL CHECK (expected_bytes > 0),
+        status VARCHAR(20) NOT NULL DEFAULT 'ready'
+          CHECK (status IN ('ready', 'uploading', 'completed')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_guide_upload_slots_active_guide
+        ON guide_upload_slots(guide_id) WHERE status IN ('ready', 'uploading');
+      CREATE INDEX IF NOT EXISTS idx_guide_upload_slots_expiry
+        ON guide_upload_slots(expires_at);
+
+      CREATE TABLE IF NOT EXISTS complaint_tickets (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_number VARCHAR(40) NOT NULL UNIQUE,
+        reporter_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        reporter_username VARCHAR(150) NOT NULL,
+        category VARCHAR(20) NOT NULL
+          CHECK (category IN ('main_feature', 'other_feature', 'non_feature')),
+        feature_id VARCHAR(100),
+        feature_name VARCHAR(180),
+        subject VARCHAR(180) NOT NULL,
+        content_html TEXT NOT NULL,
+        content_text TEXT NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'draft'
+          CHECK (status IN ('draft', 'open', 'in_progress', 'resolved')),
+        upload_expires_at TIMESTAMPTZ NOT NULL,
+        submitted_at TIMESTAMPTZ,
+        resolved_at TIMESTAMPTZ,
+        resolved_by UUID REFERENCES users(id) ON DELETE SET NULL,
+        resolution_html TEXT,
+        resolution_text TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_complaint_tickets_admin_list
+        ON complaint_tickets(status, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_complaint_tickets_reporter
+        ON complaint_tickets(reporter_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_complaint_tickets_draft_expiry
+        ON complaint_tickets(upload_expires_at) WHERE status = 'draft';
+
+      CREATE TABLE IF NOT EXISTS complaint_upload_slots (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_id UUID NOT NULL REFERENCES complaint_tickets(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        original_filename VARCHAR(255) NOT NULL,
+        file_kind VARCHAR(20) NOT NULL,
+        expected_bytes BIGINT NOT NULL CHECK (expected_bytes > 0),
+        status VARCHAR(20) NOT NULL DEFAULT 'ready'
+          CHECK (status IN ('ready', 'uploading', 'completed')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_complaint_upload_slots_ticket
+        ON complaint_upload_slots(ticket_id, status);
+      CREATE INDEX IF NOT EXISTS idx_complaint_upload_slots_expiry
+        ON complaint_upload_slots(expires_at);
+
+      CREATE TABLE IF NOT EXISTS complaint_attachments (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_id UUID NOT NULL REFERENCES complaint_tickets(id) ON DELETE CASCADE,
+        uploader_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        original_filename VARCHAR(255) NOT NULL,
+        storage_key UUID NOT NULL UNIQUE,
+        file_kind VARCHAR(20) NOT NULL,
+        mime_type VARCHAR(120) NOT NULL,
+        size_bytes BIGINT NOT NULL CHECK (size_bytes > 0),
+        uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ NOT NULL,
+        purged_at TIMESTAMPTZ
+      );
+      CREATE INDEX IF NOT EXISTS idx_complaint_attachments_ticket
+        ON complaint_attachments(ticket_id, uploaded_at);
+      CREATE INDEX IF NOT EXISTS idx_complaint_attachments_expiry
+        ON complaint_attachments(expires_at) WHERE purged_at IS NULL;
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {
