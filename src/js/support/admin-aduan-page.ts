@@ -332,7 +332,18 @@ async function resolveTicket(id: string, editor: { getHtml(): string; getCharact
     showStatus(await apiError(response), 'error');
     return;
   }
-  showStatus('Aduan ditandai selesai. Pengiriman email akan ditambahkan pada tahap integrasi email.', 'success');
+  const payload = (await response.json()) as {
+    data?: { notification?: { enabled?: boolean; sent?: boolean } };
+  };
+  const notification = payload.data?.notification;
+  showStatus(
+    notification?.sent === true
+      ? 'Aduan ditandai selesai dan notifikasi email berhasil dikirim.'
+      : notification?.enabled === false
+        ? 'Aduan ditandai selesai. Notifikasi email belum diaktifkan.'
+        : 'Aduan ditandai selesai, tetapi notifikasi email belum berhasil dikirim.',
+    notification?.sent === true ? 'success' : 'info'
+  );
   await loadTickets();
   await loadDetail(id);
 }

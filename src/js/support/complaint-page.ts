@@ -30,6 +30,11 @@ interface Ticket {
   ticketNumber: string;
 }
 
+interface NotificationResult {
+  enabled: boolean;
+  sent: boolean;
+}
+
 interface UploadSlot {
   id: string;
   status: 'ready' | 'uploading' | 'completed';
@@ -85,6 +90,7 @@ const uploadProgress = document.getElementById('complaint-upload-progress') as H
 const uploadProgressLabel = document.getElementById('complaint-upload-progress-label');
 const successModal = document.getElementById('complaint-success-modal');
 const ticketNumber = document.getElementById('complaint-ticket-number');
+const emailStatus = document.getElementById('complaint-email-status');
 const homeButton = document.getElementById('complaint-home-button') as HTMLButtonElement | null;
 const subjectInput = document.getElementById('complaint-subject') as HTMLInputElement | null;
 const editor = document.getElementById('complaint-editor');
@@ -376,8 +382,16 @@ function selectedFeature(): { id: string | null; name: string | null } {
   return { id: null, name: null };
 }
 
-function showSuccess(ticket: Ticket): void {
+function showSuccess(ticket: Ticket, notification?: NotificationResult): void {
   if (ticketNumber) ticketNumber.textContent = ticket.ticketNumber;
+  if (emailStatus) {
+    emailStatus.textContent =
+      notification?.sent === true
+        ? 'Konfirmasi nomor tiket juga dikirim ke email akun AD Anda.'
+        : notification?.enabled === false
+          ? 'Notifikasi email belum diaktifkan; nomor tiket tetap tersimpan.'
+          : 'Nomor tiket tetap tersimpan, tetapi konfirmasi email belum berhasil dikirim.';
+  }
   successModal?.classList.remove('hidden');
   redirectTimer = window.setTimeout(() => {
     window.location.assign('/index.html');
@@ -441,9 +455,11 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
       { method: 'POST', credentials: 'include' }
     );
     if (!submitResponse.ok) throw new Error(await readApiError(submitResponse));
-    const payload = (await submitResponse.json()) as { data?: { ticket?: Ticket } };
+    const payload = (await submitResponse.json()) as {
+      data?: { ticket?: Ticket; notification?: NotificationResult };
+    };
     if (!payload.data?.ticket) throw new Error('Aduan tidak dapat dikirim');
-    showSuccess(payload.data.ticket);
+    showSuccess(payload.data.ticket, payload.data.notification);
   } catch (error) {
     if (uploadProgress) uploadProgress.classList.add('hidden');
     setStatus(

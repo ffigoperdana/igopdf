@@ -16,6 +16,7 @@ import {
 import { FileValidationError } from '../utils/fileValidation.js';
 import { sanitizeRichText } from '../utils/richText.js';
 import { logger } from '../utils/logger.js';
+import { sendComplaintSubmittedEmail } from '../services/emailService.js';
 
 const router = Router();
 const idSchema = z.string().uuid();
@@ -188,7 +189,8 @@ router.post(
     const ticketId = validId(req.params.ticketId, 'ID tiket', res);
     if (!ticketId) return;
     const ticket = await submitComplaint(ticketId, req.user!.id);
-    res.json({ success: true, data: { ticket } });
+    const notification = await sendComplaintSubmittedEmail(ticket);
+    res.json({ success: true, data: { ticket, notification } });
   })
 );
 

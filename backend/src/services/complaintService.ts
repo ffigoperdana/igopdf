@@ -919,7 +919,7 @@ export async function resolveComplaint(
     `UPDATE complaint_tickets
      SET status = 'resolved', resolved_at = NOW(), resolved_by = $2,
          resolution_html = $3, resolution_text = $4, updated_at = NOW()
-     WHERE id = $1 AND status IN ('open', 'in_progress', 'resolved')
+     WHERE id = $1 AND status IN ('open', 'in_progress')
      RETURNING ${TICKET_FIELDS}`,
     [ticketId, adminId, resolutionHtml, resolutionText]
   );

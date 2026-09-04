@@ -14,6 +14,7 @@ import {
 } from '../services/complaintService.js';
 import { sanitizeRichText } from '../utils/richText.js';
 import { logger } from '../utils/logger.js';
+import { sendComplaintResolvedEmail } from '../services/emailService.js';
 
 const router = Router();
 const idSchema = z.string().uuid();
@@ -142,7 +143,8 @@ router.post(
       res.status(404).json({ success: false, error: 'Tiket tidak ditemukan' });
       return;
     }
-    res.json({ success: true, data: { ticket } });
+    const notification = await sendComplaintResolvedEmail(ticket);
+    res.json({ success: true, data: { ticket, notification } });
   })
 );
 

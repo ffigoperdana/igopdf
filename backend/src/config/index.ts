@@ -259,6 +259,37 @@ export const config = {
       1024 * 1024 * 1024
     ),
   },
+
+  // Notifications use the internal Postfix relay. The relay is deliberately
+  // opt-in: leaving EMAIL_ENABLED=false keeps local development completely
+  // side-effect free. Postfix deployments commonly authorize by source IP and
+  // sender address, so no SMTP username/password is expected here.
+  email: {
+    enabled: process.env.EMAIL_ENABLED === 'true',
+    smtpHost: process.env.SMTP_HOST || '',
+    smtpPort: positiveInteger(process.env.SMTP_PORT, 25),
+    smtpSecure: process.env.SMTP_SECURE === 'true',
+    smtpRequireTls: process.env.SMTP_REQUIRE_TLS === 'true',
+    smtpRejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false',
+    connectionTimeoutMs: positiveInteger(
+      process.env.SMTP_CONNECTION_TIMEOUT_MS,
+      10_000
+    ),
+    greetingTimeoutMs: positiveInteger(
+      process.env.SMTP_GREETING_TIMEOUT_MS,
+      10_000
+    ),
+    socketTimeoutMs: positiveInteger(
+      process.env.SMTP_SOCKET_TIMEOUT_MS,
+      15_000
+    ),
+    from: process.env.SMTP_FROM || '',
+    replyTo: process.env.SMTP_REPLY_TO || '',
+    // LDAP currently stores the account name rather than mail attribute. If a
+    // username is not already an email address, notifications use this suffix.
+    userDomain: process.env.EMAIL_DOMAIN || 'bpdp.or.id',
+    appUrl: process.env.APP_PUBLIC_URL || process.env.CORS_ORIGIN || '',
+  },
 } as const;
 
 export type Config = typeof config;
