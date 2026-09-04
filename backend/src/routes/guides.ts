@@ -2,8 +2,16 @@ import { Router } from 'express';
 import type { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
-import { getGuideAsset, guidePublicConfig, listPublishedGuideMaterials } from '../services/guideService.js';
+import {
+  getGuideAsset,
+  guidePublicConfig,
+  listPublishedGuideMaterials,
+} from '../services/guideService.js';
 import { streamInlineMedia } from '../utils/fileStreaming.js';
+import {
+  guideAssetExtension,
+  guideAssetMimeType,
+} from '../utils/fileValidation.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
@@ -14,7 +22,8 @@ type AsyncRoute = (
   res: Response,
   next: NextFunction
 ) => Promise<void>;
-const asyncRoute = (handler: AsyncRoute) =>
+const asyncRoute =
+  (handler: AsyncRoute) =>
   (req: Request, res: Response, next: NextFunction): void => {
     void handler(req, res, next).catch(next);
   };
@@ -52,17 +61,23 @@ router.get(
     }
     await streamInlineMedia(req, res, next, {
       path: guide.storagePath,
-      filename: guide.originalFilename || `guide.${guide.assetType === 'pdf' ? 'pdf' : 'mp4'}`,
-      mimeType: guide.mimeType || (guide.assetType === 'pdf' ? 'application/pdf' : 'video/mp4'),
+      filename:
+        guide.originalFilename ||
+        `guide.${guideAssetExtension(guide.assetType)}`,
+      mimeType: guide.mimeType || guideAssetMimeType(guide.assetType),
     });
   })
 );
 
-router.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  logger.error('Guide route failed', {
-    reason: error instanceof Error ? error.message : 'UNKNOWN',
-  });
-  res.status(500).json({ success: false, error: 'Layanan Guide sedang bermasalah' });
-});
+router.use(
+  (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    logger.error('Guide route failed', {
+      reason: error instanceof Error ? error.message : 'UNKNOWN',
+    });
+    res
+      .status(500)
+      .json({ success: false, error: 'Layanan Guide sedang bermasalah' });
+  }
+);
 
 export default router;

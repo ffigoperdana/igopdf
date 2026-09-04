@@ -18,7 +18,7 @@ export type StoredFileKind =
   | 'webp'
   | 'mp4';
 
-export type GuideAssetType = 'pdf' | 'video';
+export type GuideAssetType = 'pdf' | 'video' | 'pptx';
 
 export interface ValidatedStoredFile {
   fileName: string;
@@ -64,6 +64,15 @@ const OFFICE_MAIN_CONTENT_TYPES: Record<'docx' | 'xlsx' | 'pptx', string> = {
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml',
   pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml',
+};
+
+const GUIDE_ASSET_FORMATS: Record<
+  GuideAssetType,
+  { extension: string; kind: StoredFileKind; mimeType: string }
+> = {
+  pdf: { extension: '.pdf', kind: 'pdf', mimeType: MIME_TYPES.pdf },
+  video: { extension: '.mp4', kind: 'mp4', mimeType: MIME_TYPES.mp4 },
+  pptx: { extension: '.pptx', kind: 'pptx', mimeType: MIME_TYPES.pptx },
 };
 
 function cleanFileName(value: string): string {
@@ -122,17 +131,25 @@ export function validateGuideFileName(
 ): ValidatedStoredFile {
   const safeName = cleanFileName(fileName);
   const extension = path.extname(safeName).toLowerCase();
-  if (assetType === 'pdf' && extension === '.pdf') {
-    return { fileName: safeName, kind: 'pdf', mimeType: MIME_TYPES.pdf };
-  }
-  if (assetType === 'video' && extension === '.mp4') {
-    return { fileName: safeName, kind: 'mp4', mimeType: MIME_TYPES.mp4 };
+  const expected = GUIDE_ASSET_FORMATS[assetType];
+  if (extension === expected.extension) {
+    return { fileName: safeName, ...expected };
   }
   throw new FileValidationError(
     assetType === 'pdf'
       ? 'Materi PDF harus berekstensi .pdf'
-      : 'Materi video harus berekstensi .mp4'
+      : assetType === 'video'
+        ? 'Materi video harus berekstensi .mp4'
+        : 'Materi PowerPoint harus berekstensi .pptx'
   );
+}
+
+export function guideAssetExtension(assetType: GuideAssetType): string {
+  return GUIDE_ASSET_FORMATS[assetType].extension.slice(1);
+}
+
+export function guideAssetMimeType(assetType: GuideAssetType): string {
+  return GUIDE_ASSET_FORMATS[assetType].mimeType;
 }
 
 async function readHeader(filePath: string): Promise<Buffer> {
@@ -160,9 +177,9 @@ function hasJpegSignature(header: Buffer): boolean {
 }
 
 function hasPngSignature(header: Buffer): boolean {
-  return header.subarray(0, 8).equals(
-    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
-  );
+  return header
+    .subarray(0, 8)
+    .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
 }
 
 function hasWebpSignature(header: Buffer): boolean {
@@ -196,7 +213,12 @@ function looksLikeUtf8Text(header: Buffer): boolean {
     let controls = 0;
     for (const character of text) {
       const code = character.codePointAt(0) ?? 0;
-      if (code < 32 && character !== '\n' && character !== '\r' && character !== '\t') {
+      if (
+        code < 32 &&
+        character !== '\n' &&
+        character !== '\r' &&
+        character !== '\t'
+      ) {
         controls += 1;
       }
     }
@@ -252,9 +274,7 @@ async function hasExpectedOfficePackage(
   }
 }
 
-function isOfficeKind(
-  kind: StoredFileKind
-): kind is 'docx' | 'xlsx' | 'pptx' {
+function isOfficeKind(kind: StoredFileKind): kind is 'docx' | 'xlsx' | 'pptx' {
   return kind === 'docx' || kind === 'xlsx' || kind === 'pptx';
 }
 

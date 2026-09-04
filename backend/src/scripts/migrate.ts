@@ -368,6 +368,16 @@ const migrations = [
         ON complaint_attachments(expires_at) WHERE purged_at IS NULL;
     `,
   },
+  {
+    name: '012_add_pptx_guide_materials',
+    sql: `
+      ALTER TABLE guide_materials
+        DROP CONSTRAINT IF EXISTS guide_materials_asset_type_check;
+      ALTER TABLE guide_materials
+        ADD CONSTRAINT guide_materials_asset_type_check
+        CHECK (asset_type IN ('pdf', 'video', 'pptx'));
+    `,
+  },
 ];
 
 async function runMigrations(rollback: boolean = false) {

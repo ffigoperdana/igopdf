@@ -7,20 +7,26 @@ import {
   FileValidationError,
   assertFileMatchesKind,
   validateComplaintFileName,
+  validateGuideFileName,
 } from './fileValidation.js';
 
 const temporaryDirectories: string[] = [];
 
 afterEach(async () => {
   await Promise.all(
-    temporaryDirectories.splice(0).map((directory) =>
-      rm(directory, { recursive: true, force: true })
-    )
+    temporaryDirectories
+      .splice(0)
+      .map((directory) => rm(directory, { recursive: true, force: true }))
   );
 });
 
-async function temporaryFile(filename: string, content: Buffer): Promise<string> {
-  const directory = await mkdtemp(path.join(os.tmpdir(), 'igo-file-validation-'));
+async function temporaryFile(
+  filename: string,
+  content: Buffer
+): Promise<string> {
+  const directory = await mkdtemp(
+    path.join(os.tmpdir(), 'igo-file-validation-')
+  );
   temporaryDirectories.push(directory);
   const filePath = path.join(directory, filename);
   await writeFile(filePath, content);
@@ -29,9 +35,9 @@ async function temporaryFile(filename: string, content: Buffer): Promise<string>
 
 describe('support upload file validation', () => {
   it('requires PDF files for feature-related complaints', async () => {
-    expect(() => validateComplaintFileName('sample.exe', 'main_feature')).toThrow(
-      FileValidationError
-    );
+    expect(() =>
+      validateComplaintFileName('sample.exe', 'main_feature')
+    ).toThrow(FileValidationError);
 
     const fakePdf = await temporaryFile(
       'sample.pdf',
@@ -89,5 +95,32 @@ describe('support upload file validation', () => {
     // Keep the generated fixture observable in the test if a platform writes
     // a different Buffer implementation than expected.
     expect((await readFile(validOffice)).length).toBeGreaterThan(4);
+  });
+
+  it('accepts valid PPTX packages for Guide materials', async () => {
+    const archive = new JSZip();
+    archive.file(
+      '[Content_Types].xml',
+      '<Types><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/></Types>'
+    );
+    archive.file('ppt/presentation.xml', '<presentation/>');
+    const validPptx = await temporaryFile(
+      'guide-material.pptx',
+      await archive.generateAsync({ type: 'nodebuffer' })
+    );
+
+    await expect(
+      assertFileMatchesKind(
+        validPptx,
+        validateGuideFileName('guide-material.pptx', 'pptx')
+      )
+    ).resolves.toMatchObject({
+      kind: 'pptx',
+      mimeType:
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    });
+    expect(() => validateGuideFileName('guide-material.pdf', 'pptx')).toThrow(
+      FileValidationError
+    );
   });
 });

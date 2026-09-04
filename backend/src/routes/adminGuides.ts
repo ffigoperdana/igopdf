@@ -16,6 +16,10 @@ import {
   updateGuideMaterial,
 } from '../services/guideService.js';
 import { streamInlineMedia } from '../utils/fileStreaming.js';
+import {
+  guideAssetExtension,
+  guideAssetMimeType,
+} from '../utils/fileValidation.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
@@ -23,7 +27,7 @@ const idSchema = z.string().uuid();
 const createGuideSchema = z.object({
   title: z.string().trim().min(3).max(180),
   description: z.string().trim().max(2_000).default(''),
-  assetType: z.enum(['pdf', 'video']),
+  assetType: z.enum(['pdf', 'video', 'pptx']),
 });
 const updateGuideSchema = z
   .object({
@@ -45,7 +49,8 @@ type AsyncRoute = (
   res: Response,
   next: NextFunction
 ) => Promise<void>;
-const asyncRoute = (handler: AsyncRoute) =>
+const asyncRoute =
+  (handler: AsyncRoute) =>
   (req: Request, res: Response, next: NextFunction): void => {
     void handler(req, res, next).catch(next);
   };
@@ -88,7 +93,10 @@ router.post(
       });
       return;
     }
-    const guide = await createGuideMaterial({ ...parsed.data, adminId: req.user!.id });
+    const guide = await createGuideMaterial({
+      ...parsed.data,
+      adminId: req.user!.id,
+    });
     res.status(201).json({ success: true, data: { guide } });
   })
 );
@@ -98,7 +106,9 @@ router.put(
   asyncRoute(async (req, res) => {
     const parsed = reorderSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Urutan materi tidak valid' });
+      res
+        .status(400)
+        .json({ success: false, error: 'Urutan materi tidak valid' });
       return;
     }
     await reorderGuideMaterials(parsed.data.ids);
@@ -171,7 +181,9 @@ router.get(
     if (!guideId || !slotId) return;
     const slot = await getGuideUploadSlot(slotId, req.user!.id);
     if (!slot || slot.guideId !== guideId) {
-      res.status(404).json({ success: false, error: 'Slot upload tidak ditemukan' });
+      res
+        .status(404)
+        .json({ success: false, error: 'Slot upload tidak ditemukan' });
       return;
     }
     res.json({ success: true, data: { slot } });
@@ -186,7 +198,9 @@ router.delete(
     if (!guideId || !slotId) return;
     const slot = await getGuideUploadSlot(slotId, req.user!.id);
     if (!slot || slot.guideId !== guideId) {
-      res.status(404).json({ success: false, error: 'Slot upload tidak ditemukan' });
+      res
+        .status(404)
+        .json({ success: false, error: 'Slot upload tidak ditemukan' });
       return;
     }
     await releaseGuideUploadSlot(slotId, req.user!.id);
@@ -201,30 +215,38 @@ router.get(
     if (!guideId) return;
     const guide = await getGuideAsset(guideId, false);
     if (!guide) {
-      res.status(404).json({ success: false, error: 'File materi tidak ditemukan' });
+      res
+        .status(404)
+        .json({ success: false, error: 'File materi tidak ditemukan' });
       return;
     }
     await streamInlineMedia(req, res, next, {
       path: guide.storagePath,
-      filename: guide.originalFilename || `guide.${guide.assetType === 'pdf' ? 'pdf' : 'mp4'}`,
-      mimeType: guide.mimeType || (guide.assetType === 'pdf' ? 'application/pdf' : 'video/mp4'),
+      filename:
+        guide.originalFilename ||
+        `guide.${guideAssetExtension(guide.assetType)}`,
+      mimeType: guide.mimeType || guideAssetMimeType(guide.assetType),
     });
   })
 );
 
-router.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  if (error instanceof GuideServiceError) {
-    res.status(error.statusCode).json({
-      success: false,
-      error: error.message,
-      code: error.code,
+router.use(
+  (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    if (error instanceof GuideServiceError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: error.message,
+        code: error.code,
+      });
+      return;
+    }
+    logger.error('Admin Guide route failed', {
+      reason: error instanceof Error ? error.message : 'UNKNOWN',
     });
-    return;
+    res
+      .status(500)
+      .json({ success: false, error: 'Layanan Guide sedang bermasalah' });
   }
-  logger.error('Admin Guide route failed', {
-    reason: error instanceof Error ? error.message : 'UNKNOWN',
-  });
-  res.status(500).json({ success: false, error: 'Layanan Guide sedang bermasalah' });
-});
+);
 
 export default router;

@@ -567,10 +567,10 @@
   },
   "guide": {
     "pageTitle": "Guide - igo",
-    "metaDescription": "Guidance for using IGO features through PDF and video materials.",
+    "metaDescription": "Guidance for using IGO features through PDF, PowerPoint, and video materials.",
     "eyebrow": "Guide",
     "title": "How to use IGO",
-    "description": "Select a material from the list to read a PDF guide or watch a video prepared by the administrator.",
+    "description": "Select a material from the list to read a PDF, view a PowerPoint presentation, or watch a video prepared by the administrator.",
     "materials": "Materials",
     "loading": "Loading materials…",
     "chooseMaterial": "Select a material",
@@ -581,21 +581,29 @@
     "viewerError": "The material could not be displayed.",
     "assetType": {
       "pdf": "PDF document",
-      "video": "MP4 video"
+      "video": "MP4 video",
+      "pptx": "PowerPoint presentation"
     },
-    "frameTitle": "Guide material: {{title}}"
+    "frameTitle": "Guide material: {{title}}",
+    "pptxLoading": "Loading PowerPoint preview…",
+    "pptxDownloadMessage": "If the preview is not rendered perfectly, you can still download the PowerPoint file.",
+    "pptxLoadError": "The PowerPoint preview could not be loaded. Download the file to open it.",
+    "previousSlide": "Previous",
+    "nextSlide": "Next",
+    "slideCounter": "Slide {{current}} of {{total}}",
+    "downloadPptx": "Download PPTX"
   },
   "adminGuide": {
     "pageTitle": "Manage Guide - igo",
     "metaDescription": "Manage igo Guide materials.",
     "eyebrow": "Admin",
     "title": "Manage Guide",
-    "description": "Manage materials, publication status, and the display order of PDFs/videos for users.",
+    "description": "Manage materials, publication status, and the display order of PDF/PPTX/video materials for users.",
     "viewGuide": "View Guide",
     "bulkTitle": "Add materials in bulk",
-    "bulkDescription": "Select multiple PDFs or MP4s at once. Material titles will use the filenames without extensions, with a maximum of 100 MB per file. Uploads are resumable and sent in stages, so large files are not sent in one request.",
+    "bulkDescription": "Select multiple PDFs, PPTX files, or MP4s at once. Material titles will use the filenames without extensions, with a maximum of 100 MB per file. Uploads are resumable and sent in stages, so large files are not sent in one request.",
     "fileLabel": "Material files",
-    "fileHint": "Only PDF and MP4 files are accepted. Set the file order in the list before starting the upload.",
+    "fileHint": "Only PDF, PPTX, and MP4 files are accepted. Set the file order in the list before starting the upload.",
     "uploadAll": "Upload all materials",
     "orderTitle": "Material order",
     "orderDescription": "Use the up/down buttons to set the order users will see.",
@@ -625,7 +633,8 @@
     },
     "type": {
       "pdf": "PDF",
-      "video": "MP4"
+      "video": "MP4",
+      "pptx": "PPTX"
     },
     "fileMissing": "File has not been uploaded",
     "defaults": {
@@ -644,10 +653,11 @@
       "emptyFile": "Material files cannot be empty.",
       "mustBePdf": "The material must be a PDF.",
       "mustBeMp4": "The video material must be an MP4.",
+      "mustBePptx": "The PowerPoint material must be a PPTX file.",
       "uploadSuccess": "The material file was uploaded. It remains a draft until published.",
       "uploadFailed": "Material upload failed.",
       "selectFile": "Select material files first.",
-      "invalidSelection": "The files were rejected. Only non-empty PDF/MP4 files up to 100 MB each are allowed: {{names}}",
+      "invalidSelection": "The files were rejected. Only non-empty PDF/PPTX/MP4 files up to 100 MB each are allowed: {{names}}",
       "filesReady": "{{count}} file(s) ready to upload. Check the order, then click “Upload all materials”.",
       "batchSummary": "{{count}} file(s) selected. The order below will be used for uploading and as the initial material order.",
       "batchUploading": "Uploading {{name}}: {{sent}} of {{total}}",

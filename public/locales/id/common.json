@@ -567,10 +567,10 @@
   },
   "guide": {
     "pageTitle": "Panduan - igo",
-    "metaDescription": "Panduan penggunaan fitur IGO dalam materi PDF dan video.",
+    "metaDescription": "Panduan penggunaan fitur IGO dalam materi PDF, PowerPoint, dan video.",
     "eyebrow": "Panduan",
     "title": "Panduan penggunaan IGO",
-    "description": "Pilih materi di daftar untuk membaca panduan PDF atau menonton video yang disiapkan admin.",
+    "description": "Pilih materi di daftar untuk membaca PDF, melihat presentasi PowerPoint, atau menonton video yang disiapkan admin.",
     "materials": "Daftar materi",
     "loading": "Memuat materi…",
     "chooseMaterial": "Pilih materi",
@@ -581,21 +581,29 @@
     "viewerError": "Materi belum dapat ditampilkan.",
     "assetType": {
       "pdf": "Dokumen PDF",
-      "video": "Video MP4"
+      "video": "Video MP4",
+      "pptx": "Presentasi PowerPoint"
     },
-    "frameTitle": "Materi Panduan: {{title}}"
+    "frameTitle": "Materi Panduan: {{title}}",
+    "pptxLoading": "Memuat pratinjau PowerPoint…",
+    "pptxDownloadMessage": "Jika pratinjau tidak tampil sempurna, Anda tetap dapat mengunduh file PowerPoint.",
+    "pptxLoadError": "Pratinjau PowerPoint belum dapat dimuat. Silakan unduh file untuk membukanya.",
+    "previousSlide": "Sebelumnya",
+    "nextSlide": "Berikutnya",
+    "slideCounter": "Slide {{current}} dari {{total}}",
+    "downloadPptx": "Unduh PPTX"
   },
   "adminGuide": {
     "pageTitle": "Kelola Panduan - igo",
     "metaDescription": "Kelola materi Panduan igo.",
     "eyebrow": "Admin",
     "title": "Kelola Panduan",
-    "description": "Atur materi, status publikasi, dan urutan tampil PDF/video untuk pengguna.",
+    "description": "Atur materi, status publikasi, dan urutan tampil PDF/PPTX/video untuk pengguna.",
     "viewGuide": "Lihat Panduan",
     "bulkTitle": "Tambah materi secara batch",
-    "bulkDescription": "Pilih beberapa PDF atau MP4 sekaligus. Nama materi akan mengikuti nama file tanpa ekstensi, maksimal 100 MB per file. Upload dilakukan bertahap dan resumable sehingga file besar tidak dikirim sebagai satu request.",
+    "bulkDescription": "Pilih beberapa PDF, PPTX, atau MP4 sekaligus. Nama materi akan mengikuti nama file tanpa ekstensi, maksimal 100 MB per file. Upload dilakukan bertahap dan resumable sehingga file besar tidak dikirim sebagai satu request.",
     "fileLabel": "File materi",
-    "fileHint": "Format yang diterima hanya PDF dan MP4. Atur urutan file pada daftar sebelum menekan tombol upload.",
+    "fileHint": "Format yang diterima hanya PDF, PPTX, dan MP4. Atur urutan file pada daftar sebelum menekan tombol upload.",
     "uploadAll": "Upload semua materi",
     "orderTitle": "Urutan materi",
     "orderDescription": "Gunakan tombol naik/turun untuk mengatur urutan yang dilihat pengguna.",
@@ -625,7 +633,8 @@
     },
     "type": {
       "pdf": "PDF",
-      "video": "MP4"
+      "video": "MP4",
+      "pptx": "PPTX"
     },
     "fileMissing": "File belum diunggah",
     "defaults": {
@@ -644,10 +653,11 @@
       "emptyFile": "File materi tidak boleh kosong.",
       "mustBePdf": "Materi harus berupa PDF.",
       "mustBeMp4": "Materi video harus berupa MP4.",
+      "mustBePptx": "Materi PowerPoint harus berupa PPTX.",
       "uploadSuccess": "File materi berhasil diunggah. Materi masih draft sampai dipublikasikan.",
       "uploadFailed": "Upload materi gagal.",
       "selectFile": "Pilih file materi terlebih dahulu.",
-      "invalidSelection": "Daftar file ditolak. Pastikan hanya PDF/MP4, tidak kosong, dan maksimal 100 MB per file: {{names}}",
+      "invalidSelection": "Daftar file ditolak. Pastikan hanya PDF/PPTX/MP4, tidak kosong, dan maksimal 100 MB per file: {{names}}",
       "filesReady": "{{count}} file siap diunggah. Periksa urutan lalu tekan “Upload semua materi”.",
       "batchSummary": "{{count}} file dipilih. Urutan di bawah akan menjadi urutan upload dan urutan awal materi.",
       "batchUploading": "Mengunggah {{name}}: {{sent}} dari {{total}}",

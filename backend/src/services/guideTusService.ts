@@ -28,7 +28,8 @@ import { logger } from '../utils/logger.js';
 const uploadIdSchema = z.string().uuid();
 const maxGuideUploadBytes = Math.max(
   config.support.guidePdfMaxBytes,
-  config.support.guideVideoMaxBytes
+  config.support.guideVideoMaxBytes,
+  config.support.guidePptxMaxBytes
 );
 type TusRequest = Parameters<NonNullable<ServerOptions['onUploadCreate']>>[0];
 
@@ -43,11 +44,15 @@ function getAdminRequest(request: TusRequest): ExpressRequest {
     }
   ).runtime?.node?.req;
   if (!nodeRequest?.user) protocolError(401, 'Authentication required');
-  if (nodeRequest.user.role !== 'admin') protocolError(403, 'Admin access required');
+  if (nodeRequest.user.role !== 'admin')
+    protocolError(403, 'Admin access required');
   return nodeRequest;
 }
 
-function metadataValue(metadata: Upload['metadata'], key: string): string | null {
+function metadataValue(
+  metadata: Upload['metadata'],
+  key: string
+): string | null {
   const value = metadata?.[key];
   return typeof value === 'string' ? value : null;
 }
@@ -93,7 +98,10 @@ export const guideTusServer = new Server({
     const parsed = uploadIdSchema.safeParse(uploadId);
     if (!parsed.success) protocolError(400, 'Invalid upload id');
     if (request.method === 'POST') {
-      const slot = await getGuideUploadSlot(parsed.data, expressRequest.user!.id);
+      const slot = await getGuideUploadSlot(
+        parsed.data,
+        expressRequest.user!.id
+      );
       if (!slot) protocolError(404, 'Upload reservation expired');
       if (slot.status !== 'ready') {
         protocolError(
@@ -105,9 +113,15 @@ export const guideTusServer = new Server({
       }
       return;
     }
-    const slot = await authorizeGuideUpload(parsed.data, expressRequest.user!.id);
+    const slot = await authorizeGuideUpload(
+      parsed.data,
+      expressRequest.user!.id
+    );
     if (!slot) {
-      protocolError(404, 'Upload not found or no longer belongs to this session');
+      protocolError(
+        404,
+        'Upload not found or no longer belongs to this session'
+      );
     }
   },
   onUploadCreate: async (request, upload) => {
@@ -127,7 +141,8 @@ export const guideTusServer = new Server({
         expressRequest.user!.id,
         inputBytes
       );
-      if (!slot) protocolError(409, 'This upload reservation is no longer ready');
+      if (!slot)
+        protocolError(409, 'This upload reservation is no longer ready');
       return {
         metadata: { slotId, filetype: 'application/octet-stream' },
       };
@@ -144,7 +159,10 @@ export const guideTusServer = new Server({
       if (!slot || slot.status !== 'uploading') {
         protocolError(409, 'This upload reservation is no longer active');
       }
-      const expected = validateGuideFileName(slot.originalFilename, slot.assetType);
+      const expected = validateGuideFileName(
+        slot.originalFilename,
+        slot.assetType
+      );
       await scanFileForMalware(uploadPath);
       const validatedFile = await assertFileMatchesKind(uploadPath, expected);
       const guide = await finalizeGuideUpload(
@@ -156,10 +174,16 @@ export const guideTusServer = new Server({
       await guideFileStore.configstore
         .delete(upload.id)
         .catch((): undefined => undefined);
-      logger.info('Guide upload completed', { guideId: guide.id, sizeBytes: guide.sizeBytes });
+      logger.info('Guide upload completed', {
+        guideId: guide.id,
+        sizeBytes: guide.sizeBytes,
+      });
       return { headers: { 'Upload-Guide-Id': guide.id } };
     } catch (error) {
-      if (error instanceof FileValidationError || error instanceof MalwareScanError) {
+      if (
+        error instanceof FileValidationError ||
+        error instanceof MalwareScanError
+      ) {
         await removeGuideTusUploadArtifacts(upload.id).catch(
           (): undefined => undefined
         );
@@ -172,7 +196,8 @@ export const guideTusServer = new Server({
       );
       logger.warn('Guide upload finalization failed', {
         uploadId: upload.id,
-        reason: error instanceof Error ? error.message : 'UPLOAD_FINALIZATION_FAILED',
+        reason:
+          error instanceof Error ? error.message : 'UPLOAD_FINALIZATION_FAILED',
       });
       protocolErrorFrom(error);
     }
@@ -195,11 +220,14 @@ guideTusServer.on(EVENTS.POST_TERMINATE, (request, _response, uploadId) => {
   }
 });
 
-const cleanupTimer = setInterval(() => {
-  void guideTusServer.cleanUpExpiredUploads().catch((error: unknown) => {
-    logger.warn('Could not clean expired guide uploads', {
-      reason: error instanceof Error ? error.message : 'UNKNOWN',
+const cleanupTimer = setInterval(
+  () => {
+    void guideTusServer.cleanUpExpiredUploads().catch((error: unknown) => {
+      logger.warn('Could not clean expired guide uploads', {
+        reason: error instanceof Error ? error.message : 'UNKNOWN',
+      });
     });
-  });
-}, 10 * 60 * 1000);
+  },
+  10 * 60 * 1000
+);
 cleanupTimer.unref();

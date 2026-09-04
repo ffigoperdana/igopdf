@@ -7,6 +7,7 @@ import { pool } from '../config/database.js';
 import {
   type GuideAssetType,
   type ValidatedStoredFile,
+  guideAssetMimeType,
   validateGuideFileName,
 } from '../utils/fileValidation.js';
 
@@ -146,7 +147,9 @@ export function ensureGuideStorage(): void {
   }
 }
 
-export async function removeGuideTusUploadArtifacts(uploadId: string): Promise<void> {
+export async function removeGuideTusUploadArtifacts(
+  uploadId: string
+): Promise<void> {
   await Promise.all([
     rm(getGuideUploadPath(uploadId), { force: true }),
     rm(`${getGuideUploadPath(uploadId)}.json`, { force: true }),
@@ -154,20 +157,23 @@ export async function removeGuideTusUploadArtifacts(uploadId: string): Promise<v
 }
 
 function maxBytesForGuideType(assetType: GuideAssetType): number {
-  return assetType === 'pdf'
-    ? config.support.guidePdfMaxBytes
-    : config.support.guideVideoMaxBytes;
+  if (assetType === 'pdf') return config.support.guidePdfMaxBytes;
+  if (assetType === 'video') return config.support.guideVideoMaxBytes;
+  return config.support.guidePptxMaxBytes;
 }
 
 export function guidePublicConfig() {
   return {
     pdfMaxBytes: config.support.guidePdfMaxBytes,
     videoMaxBytes: config.support.guideVideoMaxBytes,
+    pptxMaxBytes: config.support.guidePptxMaxBytes,
     uploadChunkBytes: config.support.uploadChunkBytes,
   };
 }
 
-export async function ensureGuideDiskCapacity(inputBytes: number): Promise<void> {
+export async function ensureGuideDiskCapacity(
+  inputBytes: number
+): Promise<void> {
   ensureGuideStorage();
   const filesystem = await statfs(config.support.storageDir);
   const availableBytes = Number(filesystem.bavail) * Number(filesystem.bsize);
@@ -334,7 +340,11 @@ export async function createGuideUploadSlot(
       [guideId]
     );
     if (!guideResult.rows[0]) {
-      throw new GuideServiceError('GUIDE_NOT_FOUND', 'Materi tidak ditemukan', 404);
+      throw new GuideServiceError(
+        'GUIDE_NOT_FOUND',
+        'Materi tidak ditemukan',
+        404
+      );
     }
     const guide = guideResult.rows[0];
     if (!Number.isSafeInteger(expectedBytes) || expectedBytes <= 0) {
@@ -550,8 +560,7 @@ export async function finalizeGuideUpload(
       !slot ||
       slot.status !== 'uploading' ||
       slot.expectedBytes !== uploadedFile.size ||
-      (slot.assetType === 'pdf' && validatedFile.kind !== 'pdf') ||
-      (slot.assetType === 'video' && validatedFile.kind !== 'mp4') ||
+      validatedFile.mimeType !== guideAssetMimeType(slot.assetType) ||
       slot.originalFilename !== validatedFile.fileName
     ) {
       throw new GuideServiceError(
@@ -710,5 +719,7 @@ export async function cleanupExpiredGuideUploadSlots(): Promise<void> {
      WHERE status IN ('ready', 'uploading') AND expires_at <= NOW()
      RETURNING id`
   );
-  await Promise.all(result.rows.map(({ id }) => removeGuideTusUploadArtifacts(id)));
+  await Promise.all(
+    result.rows.map(({ id }) => removeGuideTusUploadArtifacts(id))
+  );
 }

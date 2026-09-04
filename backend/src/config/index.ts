@@ -198,10 +198,7 @@ export const config = {
       process.env.DOCX_JOB_TIMEOUT_MS,
       45 * 60 * 1000
     ),
-    retentionMs: positiveInteger(
-      process.env.DOCX_RETENTION_MS,
-      15 * 60 * 1000
-    ),
+    retentionMs: positiveInteger(process.env.DOCX_RETENTION_MS, 15 * 60 * 1000),
     workerPollMs: positiveInteger(process.env.DOCX_WORKER_POLL_MS, 2000),
   },
 
@@ -236,6 +233,10 @@ export const config = {
       process.env.GUIDE_VIDEO_MAX_BYTES,
       100 * 1024 * 1024
     ),
+    guidePptxMaxBytes: positiveInteger(
+      process.env.GUIDE_PPTX_MAX_BYTES,
+      100 * 1024 * 1024
+    ),
     diskMinimumFreeBytes: positiveInteger(
       process.env.SUPPORT_DISK_MINIMUM_FREE_BYTES,
       512 * 1024 * 1024
@@ -253,7 +254,10 @@ export const config = {
       process.env.MALWARE_SCAN_REQUIRED === 'true',
     host: process.env.CLAMAV_HOST || 'clamav',
     port: positiveInteger(process.env.CLAMAV_PORT, 3310),
-    timeoutMs: positiveInteger(process.env.MALWARE_SCAN_TIMEOUT_MS, 15 * 60 * 1000),
+    timeoutMs: positiveInteger(
+      process.env.MALWARE_SCAN_TIMEOUT_MS,
+      15 * 60 * 1000
+    ),
     maxBytes: positiveInteger(
       process.env.MALWARE_SCAN_MAX_BYTES,
       1024 * 1024 * 1024
@@ -270,7 +274,8 @@ export const config = {
     smtpPort: positiveInteger(process.env.SMTP_PORT, 25),
     smtpSecure: process.env.SMTP_SECURE === 'true',
     smtpRequireTls: process.env.SMTP_REQUIRE_TLS === 'true',
-    smtpRejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false',
+    smtpRejectUnauthorized:
+      process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false',
     connectionTimeoutMs: positiveInteger(
       process.env.SMTP_CONNECTION_TIMEOUT_MS,
       10_000

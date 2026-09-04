@@ -40,8 +40,8 @@
             class="mt-2 text-on-surface-variant"
             data-i18n="adminGuide.description"
           >
-            Atur materi, status publikasi, dan urutan tampil PDF/video untuk
-            pengguna.
+            Atur materi, status publikasi, dan urutan tampil PDF/PPTX/video
+            untuk pengguna.
           </p>
         </div>
         <a
@@ -72,10 +72,10 @@
           class="mt-1 text-sm text-on-surface-variant"
           data-i18n="adminGuide.bulkDescription"
         >
-          Pilih beberapa PDF atau MP4 sekaligus. Nama materi akan mengikuti nama
-          file tanpa ekstensi, maksimal 100 MB per file. Upload dilakukan
-          bertahap dan resumable sehingga file besar tidak dikirim sebagai satu
-          request.
+          Pilih beberapa PDF, PPTX, atau MP4 sekaligus. Nama materi akan
+          mengikuti nama file tanpa ekstensi, maksimal 100 MB per file. Upload
+          dilakukan bertahap dan resumable sehingga file besar tidak dikirim
+          sebagai satu request.
         </p>
         <form id="guide-create-form" class="mt-5 grid gap-4" novalidate>
           <div>
@@ -90,15 +90,15 @@
               required
               multiple
               type="file"
-              accept=".pdf,.mp4,application/pdf,video/mp4"
+              accept=".pdf,.pptx,.mp4,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,video/mp4"
               class="block w-full rounded-lg border border-outline-variant bg-background px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-vibrant-palm file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-orange-600"
             />
             <p
               class="mt-2 text-xs text-on-surface-variant"
               data-i18n="adminGuide.fileHint"
             >
-              Format yang diterima hanya PDF dan MP4. Atur urutan file pada
-              daftar sebelum menekan tombol upload.
+              Format yang diterima hanya PDF, PPTX, dan MP4. Atur urutan file
+              pada daftar sebelum menekan tombol upload.
             </p>
           </div>
           <div id="guide-upload-queue" class="hidden" aria-live="polite"></div>

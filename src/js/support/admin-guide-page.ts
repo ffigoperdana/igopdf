@@ -3,7 +3,7 @@ import { formatBytes } from '../utils/helpers-light.js';
 import { initAuth, requireAdmin } from '../auth/guard.js';
 import { initI18n, t } from '../i18n/index.js';
 
-type AssetType = 'pdf' | 'video';
+type AssetType = 'pdf' | 'video' | 'pptx';
 type BatchItemStatus = 'queued' | 'uploading' | 'completed' | 'error';
 
 interface GuideMaterial {
@@ -110,7 +110,20 @@ function button(label: string, className: string): HTMLButtonElement {
 function assetTypeFromFilename(filename: string): AssetType | null {
   if (/\.pdf$/i.test(filename)) return 'pdf';
   if (/\.mp4$/i.test(filename)) return 'video';
+  if (/\.pptx$/i.test(filename)) return 'pptx';
   return null;
+}
+
+function assetTypeTranslationKey(assetType: AssetType): string {
+  if (assetType === 'pdf') return 'adminGuide.type.pdf';
+  if (assetType === 'video') return 'adminGuide.type.video';
+  return 'adminGuide.type.pptx';
+}
+
+function acceptForAssetType(assetType: AssetType): string {
+  if (assetType === 'pdf') return '.pdf,application/pdf';
+  if (assetType === 'video') return '.mp4,video/mp4';
+  return '.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation';
 }
 
 function matchesAssetType(assetType: AssetType, filename: string): boolean {
@@ -120,7 +133,7 @@ function matchesAssetType(assetType: AssetType, filename: string): boolean {
 function titleFromFilename(filename: string): string {
   const basename = filename.split(/[\\/]/).pop() || filename;
   const cleaned = basename
-    .replace(/\.(pdf|mp4)$/i, '')
+    .replace(/\.(pdf|mp4|pptx)$/i, '')
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
@@ -153,7 +166,7 @@ function buildGuideCard(guide: GuideMaterial, index: number): HTMLElement {
   title.textContent = `${index + 1}. ${guide.title}`;
   const detail = document.createElement('p');
   detail.className = 'mt-1 text-xs text-on-surface-variant';
-  detail.textContent = `${t(guide.assetType === 'pdf' ? 'adminGuide.type.pdf' : 'adminGuide.type.video')} · ${guide.originalFilename || t('adminGuide.fileMissing')}${guide.sizeBytes ? ` · ${formatBytes(guide.sizeBytes)}` : ''}`;
+  detail.textContent = `${t(assetTypeTranslationKey(guide.assetType))} · ${guide.originalFilename || t('adminGuide.fileMissing')}${guide.sizeBytes ? ` · ${formatBytes(guide.sizeBytes)}` : ''}`;
   heading.append(title, detail);
 
   const status = document.createElement('span');
@@ -242,8 +255,7 @@ function buildGuideCard(guide: GuideMaterial, index: number): HTMLElement {
   const replaceInput = document.createElement('input');
   replaceInput.type = 'file';
   replaceInput.className = 'hidden';
-  replaceInput.accept =
-    guide.assetType === 'pdf' ? '.pdf,application/pdf' : '.mp4,video/mp4';
+  replaceInput.accept = acceptForAssetType(guide.assetType);
   replaceInput.addEventListener('change', () => {
     const file = replaceInput.files?.[0];
     if (file)
@@ -413,7 +425,9 @@ async function uploadGuideFile(
         : null
     : guide.assetType === 'pdf'
       ? t('adminGuide.messages.mustBePdf')
-      : t('adminGuide.messages.mustBeMp4');
+      : guide.assetType === 'video'
+        ? t('adminGuide.messages.mustBeMp4')
+        : t('adminGuide.messages.mustBePptx');
   if (errorMessage) {
     if (options.silent !== true) showStatus(errorMessage, 'error');
     throw new Error(errorMessage);
@@ -544,7 +558,7 @@ function renderBatchQueue(): void {
     name.textContent = `${index + 1}. ${item.file.name}`;
     const detail = document.createElement('p');
     detail.className = 'mt-1 text-xs text-on-surface-variant';
-    detail.textContent = `${t(item.assetType === 'pdf' ? 'adminGuide.type.pdf' : 'adminGuide.type.video')} · ${formatBytes(item.file.size)} · ${t('adminGuide.labels.title')}: ${item.title}`;
+    detail.textContent = `${t(assetTypeTranslationKey(item.assetType))} · ${formatBytes(item.file.size)} · ${t('adminGuide.labels.title')}: ${item.title}`;
     const state = document.createElement('p');
     state.className =
       item.status === 'error'
