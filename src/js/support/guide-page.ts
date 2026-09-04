@@ -20,7 +20,10 @@ const viewerContent = document.getElementById('guide-viewer-content');
 let loadedGuides: GuideMaterial[] = [];
 let activeGuide: GuideMaterial | null = null;
 let pageState: GuidePageState = 'loading';
-type PptxViewerInstance = import('@aiden0z/pptx-renderer').PptxViewer;
+// Use the package's browser entry for the lazy-loaded viewer. The generic ESM
+// entry relies on bundler Node-compatibility shims that are unreliable on
+// mobile Safari before the viewer has even opened the presentation.
+type PptxViewerInstance = import('@aiden0z/pptx-renderer/browser').PptxViewer;
 
 interface PptxNavigationControls {
   previousButton: HTMLButtonElement;
@@ -93,7 +96,7 @@ async function renderPptxViewer(
     }
 
     const { PptxViewer, RECOMMENDED_ZIP_LIMITS } =
-      await import('@aiden0z/pptx-renderer');
+      await import('@aiden0z/pptx-renderer/browser');
     if (
       generation !== pptxRenderGeneration ||
       activeGuide?.id !== guide.id ||
