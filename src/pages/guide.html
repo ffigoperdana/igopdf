@@ -5,8 +5,12 @@
     <script>try{var __m=matchMedia('(prefers-color-scheme: dark)').matches,__s;try{__s=localStorage.getItem('igo-theme')}catch(e){}var __t=__s==='light'||__s==='dark'?__s:__m?'dark':'light';if(__t==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Guide - igo</title>
-    <meta name="description" content="Panduan penggunaan fitur IGO dalam materi PDF dan video." />
+    <title data-i18n="guide.pageTitle">Panduan - igo</title>
+    <meta
+      name="description"
+      content="Panduan penggunaan fitur IGO dalam materi PDF dan video."
+      data-i18n-content="guide.metaDescription"
+    />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/png" href="/images/favicon-192x192.png" />
@@ -17,28 +21,71 @@
 
     <main class="container mx-auto min-h-screen w-full max-w-7xl px-4 py-8">
       <div class="mb-8">
-        <p class="text-sm font-semibold uppercase tracking-wide text-vibrant-palm">Guide</p>
-        <h1 class="mt-1 text-3xl font-bold text-deep-forest dark:text-content">Panduan penggunaan IGO</h1>
-        <p class="mt-2 max-w-3xl text-on-surface-variant">
-          Pilih materi di daftar untuk membaca panduan PDF atau menonton video yang disiapkan admin.
+        <p
+          class="text-sm font-semibold uppercase tracking-wide text-vibrant-palm"
+          data-i18n="guide.eyebrow"
+        >
+          Panduan
+        </p>
+        <h1
+          class="mt-1 text-3xl font-bold text-deep-forest dark:text-content"
+          data-i18n="guide.title"
+        >
+          Panduan penggunaan IGO
+        </h1>
+        <p
+          class="mt-2 max-w-3xl text-on-surface-variant"
+          data-i18n="guide.description"
+        >
+          Pilih materi di daftar untuk membaca panduan PDF atau menonton video
+          yang disiapkan admin.
         </p>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-[minmax(250px,320px)_minmax(0,1fr)]">
-        <aside class="rounded-xl border border-outline-variant bg-paper-white p-4 dark:bg-surface-raised">
-          <h2 class="mb-4 text-lg font-bold text-ink-slate dark:text-content">Daftar materi</h2>
+        <aside
+          class="rounded-xl border border-outline-variant bg-paper-white p-4 dark:bg-surface-raised"
+        >
+          <h2
+            class="mb-4 text-lg font-bold text-ink-slate dark:text-content"
+            data-i18n="guide.materials"
+          >
+            Daftar materi
+          </h2>
           <div id="guide-list" class="space-y-3" aria-live="polite">
-            <p class="text-sm text-on-surface-variant">Memuat materi…</p>
+            <p
+              class="text-sm text-on-surface-variant"
+              data-i18n="guide.loading"
+            >
+              Memuat materi…
+            </p>
           </div>
         </aside>
 
-        <section id="guide-viewer" class="rounded-xl border border-outline-variant bg-paper-white p-5 dark:bg-surface-raised">
+        <section
+          id="guide-viewer"
+          class="rounded-xl border border-outline-variant bg-paper-white p-5 dark:bg-surface-raised"
+        >
           <div class="mb-4 border-b border-outline-variant pb-4">
-            <h2 id="guide-viewer-title" class="text-xl font-bold text-ink-slate dark:text-content">Pilih materi</h2>
-            <p id="guide-viewer-description" class="mt-1 text-sm text-on-surface-variant"></p>
+            <h2
+              id="guide-viewer-title"
+              class="text-xl font-bold text-ink-slate dark:text-content"
+              data-i18n="guide.chooseMaterial"
+            >
+              Pilih materi
+            </h2>
+            <p
+              id="guide-viewer-description"
+              class="mt-1 text-sm text-on-surface-variant"
+            ></p>
           </div>
           <div id="guide-viewer-content">
-            <p class="py-16 text-center text-sm text-on-surface-variant">Pilih materi dari daftar di sebelah kiri.</p>
+            <p
+              class="py-16 text-center text-sm text-on-surface-variant"
+              data-i18n="guide.chooseFromList"
+            >
+              Pilih materi dari daftar di sebelah kiri.
+            </p>
           </div>
         </section>
       </div>

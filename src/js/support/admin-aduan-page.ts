@@ -1,7 +1,8 @@
 import DOMPurify from 'dompurify';
 import { initAuth, requireAdmin } from '../auth/guard.js';
 import { formatBytes } from '../utils/helpers-light.js';
-import { initRichTextEditor } from './richTextEditor.js';
+import { initI18n, t } from '../i18n/index.js';
+import { initRichTextEditor, type RichTextEditor } from './richTextEditor.js';
 
 type Status = 'draft' | 'open' | 'in_progress' | 'resolved';
 interface Ticket {
@@ -34,8 +35,12 @@ interface Detail extends Ticket {
 }
 
 const statusBox = document.getElementById('admin-complaint-status');
-const searchInput = document.getElementById('admin-complaint-search') as HTMLInputElement | null;
-const filterInput = document.getElementById('admin-complaint-filter') as HTMLSelectElement | null;
+const searchInput = document.getElementById(
+  'admin-complaint-search'
+) as HTMLInputElement | null;
+const filterInput = document.getElementById(
+  'admin-complaint-filter'
+) as HTMLSelectElement | null;
 const countLabel = document.getElementById('admin-complaint-count');
 const list = document.getElementById('admin-complaint-list');
 const detail = document.getElementById('admin-complaint-detail');
@@ -43,6 +48,9 @@ const detail = document.getElementById('admin-complaint-detail');
 let tickets: Ticket[] = [];
 let selectedId: string | null = null;
 let searchDebounce: number | null = null;
+let selectedDetail: Detail | null = null;
+let resolutionEditor: RichTextEditor | null = null;
+let resolutionDraftHtml: string | null = null;
 
 const editorCommands = [
   ['bold', 'B'],
@@ -53,7 +61,10 @@ const editorCommands = [
   ['createLink', 'Link'],
 ] as const;
 
-function showStatus(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
+function showStatus(
+  message: string,
+  type: 'success' | 'error' | 'info' = 'info'
+): void {
   if (!statusBox) return;
   statusBox.className =
     type === 'success'
@@ -67,18 +78,23 @@ function showStatus(message: string, type: 'success' | 'error' | 'info' = 'info'
 async function apiError(response: Response): Promise<string> {
   try {
     const payload = (await response.json()) as { error?: string };
-    return payload.error || `Permintaan gagal (${response.status})`;
+    return (
+      payload.error ||
+      t('adminComplaint.messages.requestFailed', { status: response.status })
+    );
   } catch {
-    return `Permintaan gagal (${response.status})`;
+    return t('adminComplaint.messages.requestFailed', {
+      status: response.status,
+    });
   }
 }
 
 function statusLabel(status: Status): string {
   return {
-    open: 'Baru',
-    in_progress: 'Diproses',
-    resolved: 'Selesai',
-    draft: 'Draft',
+    open: t('adminComplaint.status.open'),
+    in_progress: t('adminComplaint.status.inProgress'),
+    resolved: t('adminComplaint.status.resolved'),
+    draft: t('adminComplaint.status.draft'),
   }[status];
 }
 
@@ -92,17 +108,25 @@ function statusClass(status: Status): string {
 
 function dateLabel(value: string | null): string {
   if (!value) return '-';
-  return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+  const locale = document.documentElement.lang === 'en' ? 'en-US' : 'id-ID';
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value));
 }
 
 function renderList(): void {
   if (!list) return;
   list.textContent = '';
-  if (countLabel) countLabel.textContent = `${tickets.length} tiket ditemukan`;
+  if (countLabel)
+    countLabel.textContent = t('adminComplaint.count', {
+      count: tickets.length,
+    });
   if (tickets.length === 0) {
     const empty = document.createElement('p');
-    empty.className = 'rounded-lg border border-dashed border-outline-variant p-5 text-sm text-on-surface-variant';
-    empty.textContent = 'Tidak ada tiket yang cocok.';
+    empty.className =
+      'rounded-lg border border-dashed border-outline-variant p-5 text-sm text-on-surface-variant';
+    empty.textContent = t('adminComplaint.empty');
     list.appendChild(empty);
     return;
   }
@@ -121,11 +145,12 @@ function renderList(): void {
     badge.textContent = statusLabel(ticket.status);
     header.append(number, badge);
     const subject = document.createElement('p');
-    subject.className = 'mt-2 truncate text-sm font-semibold text-ink-slate dark:text-content';
+    subject.className =
+      'mt-2 truncate text-sm font-semibold text-ink-slate dark:text-content';
     subject.textContent = ticket.subject;
     const meta = document.createElement('p');
     meta.className = 'mt-1 truncate text-xs text-on-surface-variant';
-    meta.textContent = `${ticket.reporterUsername} · ${ticket.featureName || 'Di luar fitur'} · ${dateLabel(ticket.submittedAt)}`;
+    meta.textContent = `${ticket.reporterUsername} · ${ticket.featureName || t('adminComplaint.outsideFeature')} · ${dateLabel(ticket.submittedAt)}`;
     button.append(header, subject, meta);
     list.appendChild(button);
   });
@@ -136,21 +161,28 @@ async function loadTickets(): Promise<void> {
   if (searchInput?.value.trim()) params.set('search', searchInput.value.trim());
   if (filterInput?.value) params.set('status', filterInput.value);
   const response = await fetch(`/api/admin/complaints?${params.toString()}`, {
-    credentials: 'include', cache: 'no-store',
+    credentials: 'include',
+    cache: 'no-store',
   });
   if (!response.ok) throw new Error(await apiError(response));
   const payload = (await response.json()) as { data?: Ticket[] };
   tickets = payload.data || [];
-  if (selectedId && !tickets.some((ticket) => ticket.id === selectedId)) selectedId = null;
+  if (selectedId && !tickets.some((ticket) => ticket.id === selectedId))
+    selectedId = null;
   renderList();
   if (!selectedId && tickets[0]) await loadDetail(tickets[0].id);
 }
 
-function addDetailText(container: HTMLElement, label: string, value: string): void {
+function addDetailText(
+  container: HTMLElement,
+  label: string,
+  value: string
+): void {
   const row = document.createElement('div');
   row.className = 'rounded-lg bg-surface-gray px-3 py-2 dark:bg-surface-muted';
   const heading = document.createElement('p');
-  heading.className = 'text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant';
+  heading.className =
+    'text-[11px] font-semibold uppercase tracking-wide text-on-surface-variant';
   heading.textContent = label;
   const content = document.createElement('p');
   content.className = 'mt-1 text-sm text-ink-slate dark:text-content';
@@ -161,7 +193,22 @@ function addDetailText(container: HTMLElement, label: string, value: string): vo
 
 function safeRichText(value: string | null): string {
   return DOMPurify.sanitize(value || '', {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a'],
+    ALLOWED_TAGS: [
+      'p',
+      'br',
+      'strong',
+      'b',
+      'em',
+      'i',
+      'u',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'code',
+      'pre',
+      'a',
+    ],
     ALLOWED_ATTR: ['href'],
     ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):)/i,
   });
@@ -173,9 +220,16 @@ function renderRichText(container: HTMLElement, value: string | null): void {
 
 function renderDetail(ticket: Detail): void {
   if (!detail) return;
+  if (resolutionEditor && selectedDetail?.status !== 'resolved') {
+    resolutionDraftHtml = resolutionEditor.getHtml();
+  }
+  selectedDetail = ticket;
+  resolutionEditor = null;
+  if (ticket.status === 'resolved') resolutionDraftHtml = null;
   detail.textContent = '';
   const heading = document.createElement('div');
-  heading.className = 'flex flex-col gap-3 border-b border-outline-variant pb-5 sm:flex-row sm:items-start sm:justify-between';
+  heading.className =
+    'flex flex-col gap-3 border-b border-outline-variant pb-5 sm:flex-row sm:items-start sm:justify-between';
   const headingText = document.createElement('div');
   const number = document.createElement('p');
   number.className = 'font-mono text-sm font-bold text-vibrant-palm';
@@ -185,7 +239,7 @@ function renderDetail(ticket: Detail): void {
   title.textContent = ticket.subject;
   const subtitle = document.createElement('p');
   subtitle.className = 'mt-1 text-sm text-on-surface-variant';
-  subtitle.textContent = `${ticket.reporterUsername} · dibuat ${dateLabel(ticket.submittedAt)}`;
+  subtitle.textContent = `${ticket.reporterUsername} · ${t('adminComplaint.labels.created')} ${dateLabel(ticket.submittedAt)}`;
   headingText.append(number, title, subtitle);
   const badge = document.createElement('span');
   badge.className = `shrink-0 self-start rounded-full px-3 py-1.5 text-xs font-semibold ${statusClass(ticket.status)}`;
@@ -195,41 +249,63 @@ function renderDetail(ticket: Detail): void {
 
   const metadata = document.createElement('div');
   metadata.className = 'mt-5 grid gap-3 sm:grid-cols-2';
-  addDetailText(metadata, 'Jenis aduan', ticket.category === 'main_feature' ? 'Terkait fitur utama' : ticket.category === 'other_feature' ? 'Terkait fitur lain' : 'Di luar fitur');
-  addDetailText(metadata, 'Fitur', ticket.featureName || '-');
+  addDetailText(
+    metadata,
+    t('adminComplaint.labels.category'),
+    ticket.category === 'main_feature'
+      ? t('complaint.categories.mainFeature')
+      : ticket.category === 'other_feature'
+        ? t('complaint.categories.otherFeature')
+        : t('complaint.categories.nonFeature')
+  );
+  addDetailText(
+    metadata,
+    t('adminComplaint.labels.feature'),
+    ticket.featureName || '-'
+  );
   detail.appendChild(metadata);
 
   const contentHeading = document.createElement('h3');
-  contentHeading.className = 'mt-6 text-sm font-bold text-ink-slate dark:text-content';
-  contentHeading.textContent = 'Isi aduan';
+  contentHeading.className =
+    'mt-6 text-sm font-bold text-ink-slate dark:text-content';
+  contentHeading.textContent = t('adminComplaint.labels.content');
   detail.appendChild(contentHeading);
   const content = document.createElement('div');
-  content.className = 'prose prose-sm mt-2 max-w-none rounded-lg border border-outline-variant p-4 text-ink-slate dark:text-content';
+  content.className =
+    'prose prose-sm mt-2 max-w-none rounded-lg border border-outline-variant p-4 text-ink-slate dark:text-content';
   renderRichText(content, ticket.contentHtml);
   detail.appendChild(content);
 
   const attachmentsHeading = document.createElement('h3');
-  attachmentsHeading.className = 'mt-6 text-sm font-bold text-ink-slate dark:text-content';
-  attachmentsHeading.textContent = `Lampiran (${ticket.attachments.length})`;
+  attachmentsHeading.className =
+    'mt-6 text-sm font-bold text-ink-slate dark:text-content';
+  attachmentsHeading.textContent = t('adminComplaint.labels.attachments', {
+    count: ticket.attachments.length,
+  });
   detail.appendChild(attachmentsHeading);
   const attachments = document.createElement('div');
   attachments.className = 'mt-2 space-y-2';
   if (ticket.attachments.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'text-sm text-on-surface-variant';
-    empty.textContent = 'Tidak ada lampiran.';
+    empty.textContent = t('adminComplaint.noAttachments');
     attachments.appendChild(empty);
   }
   ticket.attachments.forEach((attachment) => {
     const row = document.createElement('div');
-    row.className = 'flex flex-wrap items-center justify-between gap-2 rounded-lg border border-outline-variant px-3 py-2';
+    row.className =
+      'flex flex-wrap items-center justify-between gap-2 rounded-lg border border-outline-variant px-3 py-2';
     const file = document.createElement('span');
-    file.className = 'min-w-0 truncate text-sm text-ink-slate dark:text-content';
+    file.className =
+      'min-w-0 truncate text-sm text-ink-slate dark:text-content';
     file.textContent = `${attachment.originalFilename} (${formatBytes(attachment.sizeBytes)})`;
     const download = document.createElement('a');
-    download.className = 'shrink-0 text-xs font-semibold text-vibrant-palm hover:underline';
+    download.className =
+      'shrink-0 text-xs font-semibold text-vibrant-palm hover:underline';
     download.href = `/api/admin/complaints/${encodeURIComponent(ticket.id)}/attachments/${encodeURIComponent(attachment.id)}/download`;
-    download.textContent = attachment.available ? 'Unduh' : 'Sudah dihapus';
+    download.textContent = attachment.available
+      ? t('adminComplaint.download')
+      : t('adminComplaint.deleted');
     if (!attachment.available) {
       download.removeAttribute('href');
       download.classList.add('cursor-not-allowed', 'text-on-surface-variant');
@@ -240,62 +316,118 @@ function renderDetail(ticket: Detail): void {
   detail.appendChild(attachments);
 
   const actions = document.createElement('div');
-  actions.className = 'mt-6 flex flex-wrap gap-2 border-t border-outline-variant pt-5';
+  actions.className =
+    'mt-6 flex flex-wrap gap-2 border-t border-outline-variant pt-5';
   if (ticket.status !== 'resolved') {
     const inProgress = document.createElement('button');
     inProgress.type = 'button';
-    inProgress.className = 'rounded-lg border border-outline-variant px-3 py-2 text-sm font-semibold hover:border-vibrant-palm';
-    inProgress.textContent = ticket.status === 'in_progress' ? 'Sedang diproses' : 'Tandai diproses';
+    inProgress.className =
+      'rounded-lg border border-outline-variant px-3 py-2 text-sm font-semibold hover:border-vibrant-palm';
+    inProgress.textContent =
+      ticket.status === 'in_progress'
+        ? t('adminComplaint.actions.inProgress')
+        : t('adminComplaint.actions.markInProgress');
     inProgress.disabled = ticket.status === 'in_progress';
-    inProgress.addEventListener('click', () => void changeStatus(ticket.id, 'in_progress'));
+    inProgress.addEventListener(
+      'click',
+      () => void changeStatus(ticket.id, 'in_progress')
+    );
     actions.appendChild(inProgress);
   }
   detail.appendChild(actions);
 
   const resolutionHeading = document.createElement('h3');
-  resolutionHeading.className = 'mt-7 text-sm font-bold text-ink-slate dark:text-content';
-  resolutionHeading.textContent = ticket.status === 'resolved' ? 'Catatan penyelesaian' : 'Selesaikan aduan';
+  resolutionHeading.className =
+    'mt-7 text-sm font-bold text-ink-slate dark:text-content';
+  resolutionHeading.textContent =
+    ticket.status === 'resolved'
+      ? t('adminComplaint.actions.resolutionNote')
+      : t('adminComplaint.actions.resolve');
   detail.appendChild(resolutionHeading);
   if (ticket.status === 'resolved') {
     const resolution = document.createElement('div');
-    resolution.className = 'prose prose-sm mt-2 max-w-none rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-100';
+    resolution.className =
+      'prose prose-sm mt-2 max-w-none rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-100';
     renderRichText(resolution, ticket.resolutionHtml);
     detail.appendChild(resolution);
     return;
   }
 
   const toolbar = document.createElement('div');
-  toolbar.className = 'mt-2 flex flex-wrap gap-1 rounded-t-lg border border-b-0 border-outline-variant bg-surface-gray p-2 dark:bg-surface-muted';
+  toolbar.className =
+    'mt-2 flex flex-wrap gap-1 rounded-t-lg border border-b-0 border-outline-variant bg-surface-gray p-2 dark:bg-surface-muted';
   const editorElement = document.createElement('div');
-  editorElement.className = 'min-h-40 rounded-b-lg border border-outline-variant bg-background p-4 text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20';
+  editorElement.className =
+    'min-h-40 rounded-b-lg border border-outline-variant bg-background p-4 text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/20';
   editorElement.contentEditable = 'true';
   editorElement.setAttribute('role', 'textbox');
   editorElement.setAttribute('aria-multiline', 'true');
   const count = document.createElement('p');
   count.className = 'mt-2 text-xs text-on-surface-variant';
-  const editor = initRichTextEditor({ editor: editorElement, toolbar, count, minimumCharacters: 250 });
+  const editor = initRichTextEditor({
+    editor: editorElement,
+    toolbar,
+    count,
+    minimumCharacters: 250,
+    countLabel: (characterCount, minimumCharacters) =>
+      t('adminComplaint.characterCount', {
+        count: characterCount,
+        minimum: minimumCharacters,
+      }),
+    linkPrompt: () => t('adminComplaint.linkPrompt'),
+  });
+  resolutionEditor = editor;
+  if (resolutionDraftHtml) {
+    editorElement.innerHTML = safeRichText(resolutionDraftHtml);
+    editor.refresh();
+  }
   editorCommands.forEach(([command, label]) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.editorCommand = command;
-    button.className = 'rounded px-2 py-1 text-sm hover:bg-black/10 dark:hover:bg-white/10';
-    button.textContent = label;
+    button.className =
+      'rounded px-2 py-1 text-sm hover:bg-black/10 dark:hover:bg-white/10';
+    button.textContent =
+      command === 'insertUnorderedList'
+        ? t('adminComplaint.toolbar.bulletedButton')
+        : command === 'insertOrderedList'
+          ? t('adminComplaint.toolbar.numberedButton')
+          : command === 'createLink'
+            ? t('adminComplaint.toolbar.linkButton')
+            : label;
     toolbar.appendChild(button);
   });
   detail.append(toolbar, editorElement, count);
   const resolve = document.createElement('button');
   resolve.type = 'button';
-  resolve.className = 'mt-3 rounded-lg bg-vibrant-palm px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60';
-  resolve.textContent = 'Tandai selesai';
-  resolve.addEventListener('click', () => void resolveTicket(ticket.id, editor));
+  resolve.className =
+    'mt-3 rounded-lg bg-vibrant-palm px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60';
+  resolve.textContent = t('adminComplaint.actions.markResolved');
+  resolve.addEventListener(
+    'click',
+    () => void resolveTicket(ticket.id, editor)
+  );
   detail.appendChild(resolve);
 }
 
 async function loadDetail(id: string): Promise<void> {
   selectedId = id;
   renderList();
-  if (detail) detail.innerHTML = '<div class="flex min-h-[420px] items-center justify-center text-sm text-on-surface-variant">Memuat detail…</div>';
-  const response = await fetch(`/api/admin/complaints/${encodeURIComponent(id)}`, { credentials: 'include', cache: 'no-store' });
+  selectedDetail = null;
+  resolutionEditor = null;
+  resolutionDraftHtml = null;
+  if (detail) {
+    detail.textContent = '';
+    const loading = document.createElement('div');
+    loading.className =
+      'flex min-h-[420px] items-center justify-center text-sm text-on-surface-variant';
+    loading.textContent = t('adminComplaint.messages.loadingDetail');
+    detail.appendChild(loading);
+  }
+  const response = await fetch(
+    `/api/admin/complaints/${encodeURIComponent(id)}`,
+    { credentials: 'include', cache: 'no-store' }
+  );
   if (!response.ok) {
     showStatus(await apiError(response), 'error');
     return;
@@ -305,29 +437,45 @@ async function loadDetail(id: string): Promise<void> {
   renderDetail(payload.data.ticket);
 }
 
-async function changeStatus(id: string, status: 'open' | 'in_progress'): Promise<void> {
-  const response = await fetch(`/api/admin/complaints/${encodeURIComponent(id)}/status`, {
-    method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
+async function changeStatus(
+  id: string,
+  status: 'open' | 'in_progress'
+): Promise<void> {
+  const response = await fetch(
+    `/api/admin/complaints/${encodeURIComponent(id)}/status`,
+    {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    }
+  );
   if (!response.ok) {
     showStatus(await apiError(response), 'error');
     return;
   }
-  showStatus('Status tiket berhasil diperbarui.', 'success');
+  showStatus(t('adminComplaint.messages.statusUpdated'), 'success');
   await loadTickets();
   await loadDetail(id);
 }
 
-async function resolveTicket(id: string, editor: { getHtml(): string; getCharacterCount(): number }): Promise<void> {
+async function resolveTicket(
+  id: string,
+  editor: { getHtml(): string; getCharacterCount(): number }
+): Promise<void> {
   if (editor.getCharacterCount() < 250) {
-    showStatus('Catatan penyelesaian minimal 250 karakter.', 'error');
+    showStatus(t('adminComplaint.messages.minResolution'), 'error');
     return;
   }
-  const response = await fetch(`/api/admin/complaints/${encodeURIComponent(id)}/resolve`, {
-    method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contentHtml: editor.getHtml() }),
-  });
+  const response = await fetch(
+    `/api/admin/complaints/${encodeURIComponent(id)}/resolve`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentHtml: editor.getHtml() }),
+    }
+  );
   if (!response.ok) {
     showStatus(await apiError(response), 'error');
     return;
@@ -338,10 +486,10 @@ async function resolveTicket(id: string, editor: { getHtml(): string; getCharact
   const notification = payload.data?.notification;
   showStatus(
     notification?.sent === true
-      ? 'Aduan ditandai selesai dan notifikasi email berhasil dikirim.'
+      ? t('adminComplaint.messages.resolvedEmailSent')
       : notification?.enabled === false
-        ? 'Aduan ditandai selesai. Notifikasi email belum diaktifkan.'
-        : 'Aduan ditandai selesai, tetapi notifikasi email belum berhasil dikirim.',
+        ? t('adminComplaint.messages.resolvedEmailDisabled')
+        : t('adminComplaint.messages.resolvedEmailFailed'),
     notification?.sent === true ? 'success' : 'info'
   );
   await loadTickets();
@@ -349,6 +497,11 @@ async function resolveTicket(id: string, editor: { getHtml(): string; getCharact
 }
 
 async function init(): Promise<void> {
+  await initI18n();
+  document.addEventListener('igo:languagechange', () => {
+    renderList();
+    if (selectedDetail) renderDetail(selectedDetail);
+  });
   await initAuth();
   requireAdmin();
   const refresh = (): void => {
@@ -356,7 +509,9 @@ async function init(): Promise<void> {
     searchDebounce = window.setTimeout((): void => {
       void loadTickets().catch((error: unknown): void => {
         showStatus(
-          error instanceof Error ? error.message : 'Daftar tiket gagal dimuat.',
+          error instanceof Error
+            ? error.message
+            : t('adminComplaint.messages.loadFailed'),
           'error'
         );
       });
@@ -367,7 +522,12 @@ async function init(): Promise<void> {
   try {
     await loadTickets();
   } catch (error) {
-    showStatus(error instanceof Error ? error.message : 'Daftar tiket gagal dimuat.', 'error');
+    showStatus(
+      error instanceof Error
+        ? error.message
+        : t('adminComplaint.messages.loadFailed'),
+      'error'
+    );
   }
 }
 

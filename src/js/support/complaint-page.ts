@@ -2,6 +2,7 @@ import { Upload as TusUpload } from 'tus-js-client';
 import { categories } from '../config/tools.js';
 import { formatBytes } from '../utils/helpers-light.js';
 import { initRichTextEditor } from './richTextEditor.js';
+import { initI18n, t } from '../i18n/index.js';
 
 type ComplaintCategory = 'main_feature' | 'other_feature' | 'non_feature';
 
@@ -72,27 +73,47 @@ const fallbackConfig: ComplaintConfig = {
   uploadChunkBytes: 25 * MIB,
 };
 
-const form = document.getElementById('complaint-form') as HTMLFormElement | null;
-const categorySelect = document.getElementById('complaint-category') as HTMLSelectElement | null;
+const form = document.getElementById(
+  'complaint-form'
+) as HTMLFormElement | null;
+const categorySelect = document.getElementById(
+  'complaint-category'
+) as HTMLSelectElement | null;
 const mainFeatureGroup = document.getElementById('main-feature-group');
-const mainFeatureSelect = document.getElementById('main-feature') as HTMLSelectElement | null;
+const mainFeatureSelect = document.getElementById(
+  'main-feature'
+) as HTMLSelectElement | null;
 const otherFeatureGroup = document.getElementById('other-feature-group');
-const otherFeatureSearch = document.getElementById('other-feature-search') as HTMLInputElement | null;
+const otherFeatureSearch = document.getElementById(
+  'other-feature-search'
+) as HTMLInputElement | null;
 const otherFeatureResults = document.getElementById('other-feature-results');
 const selectedOtherFeature = document.getElementById('selected-other-feature');
-const attachmentInput = document.getElementById('complaint-attachments') as HTMLInputElement | null;
+const attachmentInput = document.getElementById(
+  'complaint-attachments'
+) as HTMLInputElement | null;
 const attachmentGroup = document.getElementById('complaint-attachment-group');
 const attachmentInfo = document.getElementById('complaint-attachment-info');
 const attachmentList = document.getElementById('complaint-attachment-list');
 const formStatus = document.getElementById('complaint-form-status');
-const submitButton = document.getElementById('submit-complaint') as HTMLButtonElement | null;
-const uploadProgress = document.getElementById('complaint-upload-progress') as HTMLProgressElement | null;
-const uploadProgressLabel = document.getElementById('complaint-upload-progress-label');
+const submitButton = document.getElementById(
+  'submit-complaint'
+) as HTMLButtonElement | null;
+const uploadProgress = document.getElementById(
+  'complaint-upload-progress'
+) as HTMLProgressElement | null;
+const uploadProgressLabel = document.getElementById(
+  'complaint-upload-progress-label'
+);
 const successModal = document.getElementById('complaint-success-modal');
 const ticketNumber = document.getElementById('complaint-ticket-number');
 const emailStatus = document.getElementById('complaint-email-status');
-const homeButton = document.getElementById('complaint-home-button') as HTMLButtonElement | null;
-const subjectInput = document.getElementById('complaint-subject') as HTMLInputElement | null;
+const homeButton = document.getElementById(
+  'complaint-home-button'
+) as HTMLButtonElement | null;
+const subjectInput = document.getElementById(
+  'complaint-subject'
+) as HTMLInputElement | null;
 const editor = document.getElementById('complaint-editor');
 const editorToolbar = document.getElementById('complaint-editor-toolbar');
 const editorCount = document.getElementById('complaint-editor-count');
@@ -120,6 +141,9 @@ const richEditor =
         toolbar: editorToolbar,
         count: editorCount,
         minimumCharacters: 250,
+        countLabel: (count, minimumCharacters) =>
+          t('complaint.characterCount', { count, minimum: minimumCharacters }),
+        linkPrompt: () => t('complaint.linkPrompt'),
       })
     : null;
 
@@ -151,7 +175,10 @@ function fileKey(file: File): string {
   return `${file.name}|${file.size}|${file.lastModified}`;
 }
 
-function setStatus(message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+function setStatus(
+  message: string,
+  type: 'info' | 'error' | 'success' = 'info'
+): void {
   if (!formStatus) return;
   formStatus.textContent = message;
   formStatus.className =
@@ -179,14 +206,16 @@ function renderAttachmentList(): void {
   attachmentList.textContent = '';
   selectedFiles.forEach((file) => {
     const row = document.createElement('li');
-    row.className = 'flex items-center justify-between gap-3 rounded border border-outline-variant bg-surface-gray px-3 py-2 text-sm';
+    row.className =
+      'flex items-center justify-between gap-3 rounded border border-outline-variant bg-surface-gray px-3 py-2 text-sm';
     const label = document.createElement('span');
     label.className = 'min-w-0 truncate text-ink-slate dark:text-content';
     label.textContent = `${file.name} (${formatBytes(file.size)})`;
     const remove = document.createElement('button');
     remove.type = 'button';
-    remove.className = 'shrink-0 text-red-700 hover:underline dark:text-red-300';
-    remove.textContent = 'Hapus';
+    remove.className =
+      'shrink-0 text-red-700 hover:underline dark:text-red-300';
+    remove.textContent = t('complaint.actions.remove');
     remove.addEventListener('click', () => {
       selectedFiles = selectedFiles.filter((candidate) => candidate !== file);
       resetDraft();
@@ -201,8 +230,10 @@ function updateAttachmentControls(): void {
   const category = activeCategory();
   const policy = currentPolicy();
   const isFeatureRelated = category !== 'non_feature';
-  if (mainFeatureGroup) mainFeatureGroup.classList.toggle('hidden', category !== 'main_feature');
-  if (otherFeatureGroup) otherFeatureGroup.classList.toggle('hidden', category !== 'other_feature');
+  if (mainFeatureGroup)
+    mainFeatureGroup.classList.toggle('hidden', category !== 'main_feature');
+  if (otherFeatureGroup)
+    otherFeatureGroup.classList.toggle('hidden', category !== 'other_feature');
   if (attachmentGroup) attachmentGroup.classList.remove('hidden');
   if (attachmentInput) {
     attachmentInput.accept = isFeatureRelated
@@ -211,9 +242,14 @@ function updateAttachmentControls(): void {
   }
   if (attachmentInfo) {
     const types = isFeatureRelated
-      ? 'Hanya PDF; server memeriksa ekstensi dan signature isi file.'
-      : 'PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, WebP, atau MP4; server memeriksa signature isi file.';
-    attachmentInfo.textContent = `${types} Maksimal ${policy.maxFiles} file, ${formatBytes(policy.maxBytesPerFile)} per file. Lampiran dihapus otomatis paling lambat ${config.attachmentRetentionHours} jam.`;
+      ? t('complaint.attachmentTypes.feature')
+      : t('complaint.attachmentTypes.nonFeature');
+    attachmentInfo.textContent = t('complaint.attachmentInfo', {
+      types,
+      maxFiles: policy.maxFiles,
+      maxBytes: formatBytes(policy.maxBytesPerFile),
+      retentionHours: config.attachmentRetentionHours,
+    });
   }
   const previousFiles = selectedFiles;
   selectedFiles = selectedFiles.filter(
@@ -222,7 +258,7 @@ function updateAttachmentControls(): void {
       file.size <= policy.maxBytesPerFile
   );
   if (previousFiles.length !== selectedFiles.length) {
-    setStatus('Lampiran yang tidak sesuai aturan kategori telah dihapus dari daftar.', 'info');
+    setStatus(t('complaint.messages.filteredAttachments'), 'info');
     resetDraft();
   }
   renderAttachmentList();
@@ -230,38 +266,55 @@ function updateAttachmentControls(): void {
 
 function populateMainFeatures(): void {
   if (!mainFeatureSelect) return;
+  const selectedId = mainFeatureSelect.value;
   mainFeatureSelect.textContent = '';
   config.mainFeatures.forEach((feature) => {
     const option = document.createElement('option');
     option.value = feature.id;
-    option.textContent = `${feature.name} — maksimal ${formatBytes(feature.maxBytesPerFile)}/file`;
+    option.textContent = t('complaint.mainFeatureOption', {
+      name: feature.name,
+      maxBytes: formatBytes(feature.maxBytesPerFile),
+    });
     mainFeatureSelect.appendChild(option);
   });
+  if (
+    selectedId &&
+    config.mainFeatures.some((feature) => feature.id === selectedId)
+  ) {
+    mainFeatureSelect.value = selectedId;
+  }
 }
 
 function renderOtherFeatureResults(query: string): void {
   if (!otherFeatureResults) return;
   const normalized = query.trim().toLocaleLowerCase('id');
   const matches = toolOptions
-    .filter((tool) => !normalized || tool.name.toLocaleLowerCase('id').includes(normalized))
+    .filter(
+      (tool) =>
+        !normalized || tool.name.toLocaleLowerCase('id').includes(normalized)
+    )
     .slice(0, 14);
   otherFeatureResults.textContent = '';
   if (matches.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'px-3 py-2 text-sm text-on-surface-variant';
-    empty.textContent = 'Fitur tidak ditemukan.';
+    empty.textContent = t('complaint.messages.featureNotFound');
     otherFeatureResults.appendChild(empty);
     return;
   }
   matches.forEach((tool) => {
     const option = document.createElement('button');
     option.type = 'button';
-    option.className = 'block w-full px-3 py-2 text-left text-sm hover:bg-orange-50 dark:hover:bg-white/5';
+    option.className =
+      'block w-full px-3 py-2 text-left text-sm hover:bg-orange-50 dark:hover:bg-white/5';
     option.textContent = tool.name;
     option.addEventListener('click', () => {
       selectedOtherTool = tool;
       if (otherFeatureSearch) otherFeatureSearch.value = tool.name;
-      if (selectedOtherFeature) selectedOtherFeature.textContent = `Dipilih: ${tool.name}`;
+      if (selectedOtherFeature)
+        selectedOtherFeature.textContent = t('complaint.selectedFeature', {
+          name: tool.name,
+        });
       otherFeatureResults.classList.add('hidden');
       resetDraft();
     });
@@ -276,16 +329,23 @@ function addFiles(files: FileList | null): void {
   const errors: string[] = [];
   for (const file of Array.from(files)) {
     if (!policy.acceptedExtensions.includes(extensionOf(file.name))) {
-      errors.push(`${file.name}: format tidak diizinkan`);
+      errors.push(t('complaint.messages.invalidFormat', { name: file.name }));
       continue;
     }
     if (file.size > policy.maxBytesPerFile) {
-      errors.push(`${file.name}: melebihi ${formatBytes(policy.maxBytesPerFile)}`);
+      errors.push(
+        t('complaint.messages.fileTooLarge', {
+          name: file.name,
+          maxBytes: formatBytes(policy.maxBytesPerFile),
+        })
+      );
       continue;
     }
     if (selectedFiles.some((item) => fileKey(item) === fileKey(file))) continue;
     if (selectedFiles.length >= policy.maxFiles) {
-      errors.push(`Maksimal ${policy.maxFiles} lampiran`);
+      errors.push(
+        t('complaint.messages.maxFiles', { maxFiles: policy.maxFiles })
+      );
       break;
     }
     selectedFiles.push(file);
@@ -300,24 +360,35 @@ function addFiles(files: FileList | null): void {
 async function readApiError(response: Response): Promise<string> {
   try {
     const payload = (await response.json()) as { error?: string };
-    return payload.error || `Permintaan gagal (${response.status})`;
+    return (
+      payload.error ||
+      t('complaint.messages.requestFailed', { status: response.status })
+    );
   } catch {
-    return `Permintaan gagal (${response.status})`;
+    return t('complaint.messages.requestFailed', { status: response.status });
   }
 }
 
-async function fetchUploadSlot(ticketId: string, slotId: string): Promise<UploadSlot> {
+async function fetchUploadSlot(
+  ticketId: string,
+  slotId: string
+): Promise<UploadSlot> {
   const response = await fetch(
     `/api/complaints/${encodeURIComponent(ticketId)}/upload-slots/${encodeURIComponent(slotId)}`,
     { credentials: 'include', cache: 'no-store' }
   );
   if (!response.ok) throw new Error(await readApiError(response));
   const payload = (await response.json()) as { data?: { slot?: UploadSlot } };
-  if (!payload.data?.slot) throw new Error('Slot upload tidak tersedia');
+  if (!payload.data?.slot)
+    throw new Error(t('complaint.messages.slotUnavailable'));
   return payload.data.slot;
 }
 
-async function uploadAttachment(file: File, ticket: Ticket, index: number): Promise<void> {
+async function uploadAttachment(
+  file: File,
+  ticket: Ticket,
+  index: number
+): Promise<void> {
   const slotResponse = await fetch(
     `/api/complaints/${encodeURIComponent(ticket.id)}/upload-slots`,
     {
@@ -328,9 +399,11 @@ async function uploadAttachment(file: File, ticket: Ticket, index: number): Prom
     }
   );
   if (!slotResponse.ok) throw new Error(await readApiError(slotResponse));
-  const slotPayload = (await slotResponse.json()) as { data?: { slot?: UploadSlot } };
+  const slotPayload = (await slotResponse.json()) as {
+    data?: { slot?: UploadSlot };
+  };
   let slot = slotPayload.data?.slot;
-  if (!slot) throw new Error('Slot upload tidak tersedia');
+  if (!slot) throw new Error(t('complaint.messages.slotUnavailable'));
 
   const uploadOnce = (current: UploadSlot): Promise<void> =>
     new Promise((resolve, reject) => {
@@ -347,9 +420,19 @@ async function uploadAttachment(file: File, ticket: Ticket, index: number): Prom
         removeFingerprintOnSuccess: true,
         metadata: { slotId: current.id, filename: file.name },
         onProgress: (sent, total) => {
-          if (uploadProgress && total > 0) uploadProgress.value = (sent / total) * 100;
+          if (uploadProgress && total > 0)
+            uploadProgress.value = (sent / total) * 100;
           if (uploadProgressLabel) {
-            uploadProgressLabel.textContent = `Mengunggah ${index + 1}/${selectedFiles.length}: ${file.name} (${formatBytes(sent)} dari ${formatBytes(total)})`;
+            uploadProgressLabel.textContent = t(
+              'complaint.messages.uploading',
+              {
+                current: index + 1,
+                totalFiles: selectedFiles.length,
+                name: file.name,
+                sent: formatBytes(sent),
+                total: formatBytes(total),
+              }
+            );
           }
         },
         onSuccess: () => resolve(),
@@ -373,11 +456,16 @@ async function uploadAttachment(file: File, ticket: Ticket, index: number): Prom
 function selectedFeature(): { id: string | null; name: string | null } {
   const category = activeCategory();
   if (category === 'main_feature') {
-    const feature = config.mainFeatures.find((item) => item.id === mainFeatureSelect?.value);
+    const feature = config.mainFeatures.find(
+      (item) => item.id === mainFeatureSelect?.value
+    );
     return { id: feature?.id || null, name: feature?.name || null };
   }
   if (category === 'other_feature') {
-    return { id: selectedOtherTool?.id || null, name: selectedOtherTool?.name || null };
+    return {
+      id: selectedOtherTool?.id || null,
+      name: selectedOtherTool?.name || null,
+    };
   }
   return { id: null, name: null };
 }
@@ -387,10 +475,10 @@ function showSuccess(ticket: Ticket, notification?: NotificationResult): void {
   if (emailStatus) {
     emailStatus.textContent =
       notification?.sent === true
-        ? 'Konfirmasi nomor tiket juga dikirim ke email akun AD Anda.'
+        ? t('complaint.messages.emailSent')
         : notification?.enabled === false
-          ? 'Notifikasi email belum diaktifkan; nomor tiket tetap tersimpan.'
-          : 'Nomor tiket tetap tersimpan, tetapi konfirmasi email belum berhasil dikirim.';
+          ? t('complaint.messages.emailDisabled')
+          : t('complaint.messages.emailFailed');
   }
   successModal?.classList.remove('hidden');
   redirectTimer = window.setTimeout(() => {
@@ -403,24 +491,27 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
   clearStatus();
   if (!richEditor || !subjectInput || !submitButton) return;
   if (richEditor.getCharacterCount() < 250) {
-    setStatus('Isi aduan minimal 250 karakter.', 'error');
+    setStatus(t('complaint.messages.minCharacters'), 'error');
     richEditor.focus();
     return;
   }
   const feature = selectedFeature();
   if (activeCategory() !== 'non_feature' && !feature.id) {
-    setStatus('Pilih fitur yang terkait dengan aduan ini.', 'error');
+    setStatus(t('complaint.messages.selectFeature'), 'error');
     return;
   }
   const policy = currentPolicy();
   if (selectedFiles.length > policy.maxFiles) {
-    setStatus(`Maksimal ${policy.maxFiles} lampiran untuk kategori ini.`, 'error');
+    setStatus(
+      t('complaint.messages.maxFilesCategory', { maxFiles: policy.maxFiles }),
+      'error'
+    );
     return;
   }
 
   submitting = true;
   submitButton.disabled = true;
-  submitButton.textContent = 'Mengirim aduan…';
+  submitButton.textContent = t('complaint.messages.submitting');
   try {
     if (!draft) {
       const createResponse = await fetch('/api/complaints', {
@@ -435,9 +526,13 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
           contentHtml: richEditor.getHtml(),
         }),
       });
-      if (!createResponse.ok) throw new Error(await readApiError(createResponse));
-      const payload = (await createResponse.json()) as { data?: { ticket?: Ticket } };
-      if (!payload.data?.ticket) throw new Error('Tiket aduan tidak dapat dibuat');
+      if (!createResponse.ok)
+        throw new Error(await readApiError(createResponse));
+      const payload = (await createResponse.json()) as {
+        data?: { ticket?: Ticket };
+      };
+      if (!payload.data?.ticket)
+        throw new Error(t('complaint.messages.ticketCreateFailed'));
       draft = payload.data.ticket;
     }
 
@@ -458,18 +553,21 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
     const payload = (await submitResponse.json()) as {
       data?: { ticket?: Ticket; notification?: NotificationResult };
     };
-    if (!payload.data?.ticket) throw new Error('Aduan tidak dapat dikirim');
+    if (!payload.data?.ticket)
+      throw new Error(t('complaint.messages.submitFailed'));
     showSuccess(payload.data.ticket, payload.data.notification);
   } catch (error) {
     if (uploadProgress) uploadProgress.classList.add('hidden');
     setStatus(
-      error instanceof Error ? error.message : 'Aduan belum dapat dikirim. Coba lagi.',
+      error instanceof Error
+        ? error.message
+        : t('complaint.messages.sendFailed'),
       'error'
     );
   } finally {
     submitting = false;
     submitButton.disabled = false;
-    submitButton.textContent = 'Kirim Aduan';
+    submitButton.textContent = t('complaint.submit');
   }
 }
 
@@ -480,7 +578,9 @@ async function loadConfig(): Promise<void> {
       cache: 'no-store',
     });
     if (!response.ok) return;
-    const payload = (await response.json()) as { data?: Partial<ComplaintConfig> };
+    const payload = (await response.json()) as {
+      data?: Partial<ComplaintConfig>;
+    };
     config = { ...fallbackConfig, ...payload.data };
   } catch {
     // The fallback precisely mirrors the server defaults and keeps client-side
@@ -489,12 +589,29 @@ async function loadConfig(): Promise<void> {
 }
 
 async function init(): Promise<void> {
-  if (!form || !categorySelect || !attachmentInput || !mainFeatureSelect) return;
+  if (!form || !categorySelect || !attachmentInput || !mainFeatureSelect)
+    return;
+  await initI18n();
   await loadConfig();
   populateMainFeatures();
   updateAttachmentControls();
   renderOtherFeatureResults('');
   otherFeatureResults?.classList.add('hidden');
+
+  document.addEventListener('igo:languagechange', () => {
+    const resultsWereHidden =
+      otherFeatureResults?.classList.contains('hidden') ?? true;
+    populateMainFeatures();
+    updateAttachmentControls();
+    renderOtherFeatureResults(otherFeatureSearch?.value || '');
+    if (resultsWereHidden) otherFeatureResults?.classList.add('hidden');
+    if (selectedOtherTool && selectedOtherFeature) {
+      selectedOtherFeature.textContent = t('complaint.selectedFeature', {
+        name: selectedOtherTool.name,
+      });
+    }
+    richEditor?.refresh();
+  });
 
   categorySelect.addEventListener('change', () => {
     selectedOtherTool = null;
@@ -516,7 +633,9 @@ async function init(): Promise<void> {
     resetDraft();
     renderOtherFeatureResults(otherFeatureSearch.value);
   });
-  attachmentInput.addEventListener('change', () => addFiles(attachmentInput.files));
+  attachmentInput.addEventListener('change', () =>
+    addFiles(attachmentInput.files)
+  );
   subjectInput?.addEventListener('input', resetDraft);
   editor?.addEventListener('input', resetDraft);
   form.addEventListener('submit', (event) => void submitComplaint(event));

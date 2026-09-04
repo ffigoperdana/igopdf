@@ -12,6 +12,16 @@ docker compose --env-file .env.prod -f "$COMPOSE_FILE" pull
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" up -d postgres
 docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm migrate
 
+# Named volumes outlive one-shot containers. Use the existing backend service
+# as a temporary root-owned initializer so this deploy script also remains
+# compatible with older production Compose files that predate storage-init.
+# The application itself still runs as the fixed non-root UID 10001.
+docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm --no-deps \
+  --user 0:0 --entrypoint sh backend \
+  -ec 'install -d -o 10001 -g 10001 -m 0700 /var/lib/igo-jobs /var/lib/igo-support
+       chown -R 10001:10001 /var/lib/igo-jobs /var/lib/igo-support
+       chmod 0700 /var/lib/igo-jobs /var/lib/igo-support'
+
 if [ "${1:-}" = "--seed-admin" ]; then
   docker compose --env-file .env.prod -f "$COMPOSE_FILE" run --rm backend node dist/scripts/seed.js
 fi

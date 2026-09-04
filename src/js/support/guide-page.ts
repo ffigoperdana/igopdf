@@ -1,3 +1,5 @@
+import { initI18n, t } from '../i18n/index.js';
+
 interface GuideMaterial {
   id: string;
   title: string;
@@ -7,27 +9,54 @@ interface GuideMaterial {
   position: number;
 }
 
+type GuidePageState = 'loading' | 'ready' | 'empty' | 'error';
+
 const list = document.getElementById('guide-list');
 const viewer = document.getElementById('guide-viewer');
 const viewerTitle = document.getElementById('guide-viewer-title');
 const viewerDescription = document.getElementById('guide-viewer-description');
 const viewerContent = document.getElementById('guide-viewer-content');
 
-function showViewerMessage(message: string): void {
+let loadedGuides: GuideMaterial[] = [];
+let activeGuide: GuideMaterial | null = null;
+let pageState: GuidePageState = 'loading';
+
+function showViewerMessage(messageKey: string): void {
   if (!viewerContent) return;
   viewerContent.textContent = '';
   const paragraph = document.createElement('p');
   paragraph.className = 'py-16 text-center text-sm text-on-surface-variant';
-  paragraph.textContent = message;
+  paragraph.textContent = t(messageKey);
   viewerContent.appendChild(paragraph);
 }
 
+function renderListMessage(messageKey: string, className: string): void {
+  if (!list) return;
+  list.textContent = '';
+  const message = document.createElement('p');
+  message.className = className;
+  message.textContent = t(messageKey);
+  list.appendChild(message);
+}
+
 function setActiveGuide(guide: GuideMaterial): void {
-  document.querySelectorAll<HTMLButtonElement>('[data-guide-id]').forEach((button) => {
-    button.classList.toggle('border-vibrant-palm', button.dataset.guideId === guide.id);
-    button.classList.toggle('bg-orange-50', button.dataset.guideId === guide.id);
-    button.classList.toggle('dark:bg-orange-950/20', button.dataset.guideId === guide.id);
-  });
+  activeGuide = guide;
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-guide-id]')
+    .forEach((button) => {
+      button.classList.toggle(
+        'border-vibrant-palm',
+        button.dataset.guideId === guide.id
+      );
+      button.classList.toggle(
+        'bg-orange-50',
+        button.dataset.guideId === guide.id
+      );
+      button.classList.toggle(
+        'dark:bg-orange-950/20',
+        button.dataset.guideId === guide.id
+      );
+    });
   if (viewer) viewer.classList.remove('hidden');
   if (viewerTitle) viewerTitle.textContent = guide.title;
   if (viewerDescription) viewerDescription.textContent = guide.description;
@@ -44,15 +73,20 @@ function setActiveGuide(guide: GuideMaterial): void {
     viewerContent.appendChild(video);
   } else {
     const frame = document.createElement('iframe');
-    frame.className = 'h-[68vh] w-full rounded border border-outline-variant bg-white';
-    frame.title = `Materi Guide: ${guide.title}`;
+    frame.className =
+      'h-[68vh] w-full rounded border border-outline-variant bg-white';
+    frame.title = t('guide.frameTitle', { title: guide.title });
     frame.src = `${source}#view=FitH`;
     viewerContent.appendChild(frame);
   }
 
   const params = new URLSearchParams(window.location.search);
   params.set('materi', guide.id);
-  window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+  window.history.replaceState(
+    null,
+    '',
+    `${window.location.pathname}?${params.toString()}`
+  );
 }
 
 function renderGuideList(guides: GuideMaterial[]): void {
@@ -77,7 +111,11 @@ function renderGuideList(guides: GuideMaterial[]): void {
     title.textContent = guide.title;
     const type = document.createElement('p');
     type.className = 'mt-1 text-xs text-on-surface-variant';
-    type.textContent = guide.assetType === 'pdf' ? 'Dokumen PDF' : 'Video MP4';
+    type.textContent = t(
+      guide.assetType === 'pdf'
+        ? 'guide.assetType.pdf'
+        : 'guide.assetType.video'
+    );
     label.append(title, type);
     top.append(order, label);
     button.appendChild(top);
@@ -86,7 +124,33 @@ function renderGuideList(guides: GuideMaterial[]): void {
   });
 }
 
+function refreshTranslatedContent(): void {
+  if (pageState === 'empty') {
+    renderListMessage(
+      'guide.empty',
+      'rounded-lg border border-dashed border-outline-variant p-5 text-sm text-on-surface-variant'
+    );
+    showViewerMessage('guide.emptyViewer');
+    return;
+  }
+  if (pageState === 'error') {
+    renderListMessage(
+      'guide.loadError',
+      'rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-700'
+    );
+    showViewerMessage('guide.viewerError');
+    return;
+  }
+  if (pageState === 'ready') {
+    renderGuideList(loadedGuides);
+    if (activeGuide) setActiveGuide(activeGuide);
+  }
+}
+
 async function init(): Promise<void> {
+  await initI18n();
+  document.addEventListener('igo:languagechange', refreshTranslatedContent);
+
   try {
     const response = await fetch('/api/guides', {
       credentials: 'include',
@@ -96,30 +160,23 @@ async function init(): Promise<void> {
     const payload = (await response.json()) as {
       data?: { guides?: GuideMaterial[] };
     };
-    const guides = payload.data?.guides || [];
-    if (guides.length === 0) {
-      if (list) {
-        list.textContent = '';
-        const message = document.createElement('p');
-        message.className = 'rounded-lg border border-dashed border-outline-variant p-5 text-sm text-on-surface-variant';
-        message.textContent = 'Belum ada materi Guide yang dipublikasikan.';
-        list.appendChild(message);
-      }
-      showViewerMessage('Pilih materi ketika Guide sudah tersedia.');
+    loadedGuides = payload.data?.guides || [];
+    if (loadedGuides.length === 0) {
+      pageState = 'empty';
+      refreshTranslatedContent();
       return;
     }
-    renderGuideList(guides);
-    const selectedId = new URLSearchParams(window.location.search).get('materi');
-    setActiveGuide(guides.find((guide) => guide.id === selectedId) || guides[0]);
+    pageState = 'ready';
+    renderGuideList(loadedGuides);
+    const selectedId = new URLSearchParams(window.location.search).get(
+      'materi'
+    );
+    setActiveGuide(
+      loadedGuides.find((guide) => guide.id === selectedId) || loadedGuides[0]
+    );
   } catch {
-    if (list) {
-      list.textContent = '';
-      const message = document.createElement('p');
-      message.className = 'rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-700';
-      message.textContent = 'Guide belum dapat dimuat. Silakan muat ulang halaman.';
-      list.appendChild(message);
-    }
-    showViewerMessage('Materi belum dapat ditampilkan.');
+    pageState = 'error';
+    refreshTranslatedContent();
   }
 }
 

@@ -46,11 +46,11 @@ function updateUI(): void {
     const adminLinkDesktop = isAdmin(currentUser)
       ? `<a href="/report.html" class="${linkCls}">Report</a>
          <a href="/admin.html" class="${linkCls}">Admin</a>
-         <a href="/admin-guide.html" class="${linkCls}">Kelola Guide</a>
-         <a href="/admin-aduan.html" class="${linkCls}">Kelola Aduan</a>`
+         <a href="/admin-guide.html" class="${linkCls}" data-i18n="nav.manageGuide">Kelola Panduan</a>
+         <a href="/admin-aduan.html" class="${linkCls}" data-i18n="nav.manageComplaints">Kelola Aduan</a>`
       : '';
     const adminLinkMobile = isAdmin(currentUser)
-      ? '<a href="/report.html" class="block px-3 py-2 hover:text-vibrant-palm">Report</a><a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a><a href="/admin-guide.html" class="block px-3 py-2 hover:text-vibrant-palm">Kelola Guide</a><a href="/admin-aduan.html" class="block px-3 py-2 hover:text-vibrant-palm">Kelola Aduan</a>'
+      ? '<a href="/report.html" class="block px-3 py-2 hover:text-vibrant-palm">Report</a><a href="/admin.html" class="block px-3 py-2 hover:text-vibrant-palm">Admin</a><a href="/admin-guide.html" class="block px-3 py-2 hover:text-vibrant-palm" data-i18n="nav.manageGuide">Kelola Panduan</a><a href="/admin-aduan.html" class="block px-3 py-2 hover:text-vibrant-palm" data-i18n="nav.manageComplaints">Kelola Aduan</a>'
       : '';
 
     const safeName = escapeHtml(currentUser.username);

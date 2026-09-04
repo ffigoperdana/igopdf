@@ -13,10 +13,14 @@
 
       <div class="hidden items-center gap-1 md:flex">
         <a href="/index.html" class="nav-item" data-i18n="nav.home">Beranda</a>
-        <a href="/user-manual" class="nav-item">Guide</a>
-        <a href="/aduan" class="nav-item">Aduan</a>
+        <a href="/user-manual" class="nav-item" data-i18n="nav.guide"
+          >Panduan</a
+        >
+        <a href="/aduan" class="nav-item" data-i18n="nav.complaints">Aduan</a>
         <a href="/about.html" class="nav-item" data-i18n="nav.about">Tentang</a>
-        <a href="/licensing.html" class="nav-item" data-i18n="nav.licensing">Lisensi</a>
+        <a href="/licensing.html" class="nav-item" data-i18n="nav.licensing"
+          >Lisensi</a
+        >
       </div>
 
       <div class="hidden items-center gap-2.5 md:flex">
@@ -39,7 +43,11 @@
             stroke-width="2"
             aria-hidden="true"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5"
+            />
           </svg>
         </button>
         <div id="auth-area" class="flex items-center gap-3"></div>
@@ -55,25 +63,64 @@
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
-          <span class="sr-only" data-i18n="nav.openMainMenu">Buka menu utama</span>
-          <svg id="menu-icon" class="block h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+          <span class="sr-only" data-i18n="nav.openMainMenu"
+            >Buka menu utama</span
+          >
+          <svg
+            id="menu-icon"
+            class="block h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 7h16M4 12h16M4 17h16"
+            />
           </svg>
-          <svg id="close-icon" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+          <svg
+            id="close-icon"
+            class="hidden h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18 18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden border-t border-white/10 bg-deep-forest dark:bg-surface-raised dark:border-white/10 md:hidden">
+  <div
+    id="mobile-menu"
+    class="hidden border-t border-white/10 bg-deep-forest dark:bg-surface-raised dark:border-white/10 md:hidden"
+  >
     <div class="space-y-1 px-4 py-3">
-      <a href="/index.html" class="nav-item block" data-i18n="nav.home">Beranda</a>
-      <a href="/user-manual" class="nav-item block">Guide</a>
-      <a href="/aduan" class="nav-item block">Aduan</a>
-      <a href="/about.html" class="nav-item block" data-i18n="nav.about">Tentang</a>
-      <a href="/licensing.html" class="nav-item block" data-i18n="nav.licensing">Lisensi</a>
+      <a href="/index.html" class="nav-item block" data-i18n="nav.home"
+        >Beranda</a
+      >
+      <a href="/user-manual" class="nav-item block" data-i18n="nav.guide"
+        >Panduan</a
+      >
+      <a href="/aduan" class="nav-item block" data-i18n="nav.complaints"
+        >Aduan</a
+      >
+      <a href="/about.html" class="nav-item block" data-i18n="nav.about"
+        >Tentang</a
+      >
+      <a href="/licensing.html" class="nav-item block" data-i18n="nav.licensing"
+        >Lisensi</a
+      >
       <div class="px-3 py-2" id="mobile-language-switcher-container"></div>
       <button
         id="check-updates-btn-mobile"
@@ -88,7 +135,11 @@
           stroke-width="2"
           aria-hidden="true"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M20 11a8.1 8.1 0 0 0-14.7-4.7L3 8m0 0V3m0 5h5M4 13a8.1 8.1 0 0 0 14.7 4.7L21 16m0 0v5m0-5h-5"
+          />
         </svg>
         <span data-i18n="nav.checkForUpdates">Periksa pembaruan</span>
       </button>

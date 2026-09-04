@@ -48,40 +48,51 @@ export const getLanguageFromUrl = (): SupportedLanguage => {
 };
 
 let initialized = false;
+let initializationPromise: Promise<typeof i18next> | null = null;
 
-export const initI18n = async (): Promise<typeof i18next> => {
-  if (initialized) return i18next;
+export const initI18n = (): Promise<typeof i18next> => {
+  if (initialized) return Promise.resolve(i18next);
+  if (initializationPromise) return initializationPromise;
 
-  const currentLang = getLanguageFromUrl();
+  initializationPromise = (async () => {
+    const currentLang = getLanguageFromUrl();
 
-  localStorage.setItem('i18nextLng', currentLang);
+    localStorage.setItem('i18nextLng', currentLang);
 
-  await i18next.use(HttpBackend).init({
-    lng: currentLang,
-    fallbackLng: 'id',
-    supportedLngs: supportedLanguages as unknown as string[],
-    ns: ['common', 'tools'],
-    defaultNS: 'common',
-    preload: [currentLang],
-    backend: {
-      loadPath: `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}locales/{{lng}}/{{ns}}.json`,
-    },
-    interpolation: {
-      escapeValue: false,
-    },
+    await i18next.use(HttpBackend).init({
+      lng: currentLang,
+      fallbackLng: 'id',
+      supportedLngs: supportedLanguages as unknown as string[],
+      ns: ['common', 'tools'],
+      defaultNS: 'common',
+      preload: [currentLang],
+      backend: {
+        loadPath: `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}locales/{{lng}}/{{ns}}.json`,
+      },
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+
+    await i18next.loadNamespaces('tools');
+
+    initialized = true;
+    return i18next;
+  })().catch((error: unknown) => {
+    initializationPromise = null;
+    throw error;
   });
 
-  await i18next.loadNamespaces('tools');
-
-  initialized = true;
-  return i18next;
+  return initializationPromise;
 };
 
 export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18next.t(key, options);
 };
 
-export const changeLanguage = async (lang: SupportedLanguage): Promise<void> => {
+export const changeLanguage = async (
+  lang: SupportedLanguage
+): Promise<void> => {
   if (!supportedLanguages.includes(lang) || lang === i18next.language) return;
   localStorage.setItem('i18nextLng', lang);
   // In-place switch (no reload → no white flash). i18next loads the target
@@ -89,7 +100,9 @@ export const changeLanguage = async (lang: SupportedLanguage): Promise<void> => 
   // [data-i18n] node and notify listeners (e.g. to refresh the ID|EN pill).
   await i18next.changeLanguage(lang);
   applyTranslations();
-  document.dispatchEvent(new CustomEvent('igo:languagechange', { detail: lang }));
+  document.dispatchEvent(
+    new CustomEvent('igo:languagechange', { detail: lang })
+  );
 };
 
 export const applyTranslations = (): void => {
@@ -105,10 +118,20 @@ export const applyTranslations = (): void => {
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
     const key = element.getAttribute('data-i18n-placeholder');
-    if (key && element instanceof HTMLInputElement) {
+    if (key) {
       const translation = t(key);
       if (translation && translation !== key) {
-        element.placeholder = translation;
+        if (
+          element instanceof HTMLInputElement ||
+          element instanceof HTMLTextAreaElement
+        ) {
+          element.placeholder = translation;
+        } else if (
+          element instanceof HTMLElement &&
+          element.hasAttribute('data-placeholder')
+        ) {
+          element.setAttribute('data-placeholder', translation);
+        }
       }
     }
   });
@@ -133,15 +156,29 @@ export const applyTranslations = (): void => {
     }
   });
 
-  document.querySelectorAll<HTMLImageElement>('[data-i18n-alt]').forEach((element) => {
-    const key = element.getAttribute('data-i18n-alt');
-    if (key) {
-      const translation = t(key);
-      if (translation && translation !== key) {
-        element.alt = translation;
+  document
+    .querySelectorAll<HTMLImageElement>('[data-i18n-alt]')
+    .forEach((element) => {
+      const key = element.getAttribute('data-i18n-alt');
+      if (key) {
+        const translation = t(key);
+        if (translation && translation !== key) {
+          element.alt = translation;
+        }
       }
-    }
-  });
+    });
+
+  document
+    .querySelectorAll<HTMLMetaElement>('[data-i18n-content]')
+    .forEach((element) => {
+      const key = element.getAttribute('data-i18n-content');
+      if (key) {
+        const translation = t(key);
+        if (translation && translation !== key) {
+          element.content = translation;
+        }
+      }
+    });
 
   document.documentElement.lang = i18next.language;
   document.documentElement.dir = 'ltr';

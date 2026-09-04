@@ -1,6 +1,7 @@
 export interface RichTextEditor {
   getHtml(): string;
   getCharacterCount(): number;
+  refresh(): void;
   clear(): void;
   focus(): void;
 }
@@ -24,12 +25,22 @@ export function initRichTextEditor(input: {
   toolbar: HTMLElement;
   count: HTMLElement;
   minimumCharacters: number;
+  countLabel?: (count: number, minimumCharacters: number) => string;
+  linkPrompt?: () => string;
 }): RichTextEditor {
   const updateCount = () => {
     const count = Array.from(plainText(input.editor)).length;
-    input.count.textContent = `${count} / minimal ${input.minimumCharacters} karakter`;
-    input.count.classList.toggle('text-red-600', count > 0 && count < input.minimumCharacters);
-    input.count.classList.toggle('text-emerald-700', count >= input.minimumCharacters);
+    input.count.textContent = input.countLabel
+      ? input.countLabel(count, input.minimumCharacters)
+      : `${count} / minimal ${input.minimumCharacters} karakter`;
+    input.count.classList.toggle(
+      'text-red-600',
+      count > 0 && count < input.minimumCharacters
+    );
+    input.count.classList.toggle(
+      'text-emerald-700',
+      count >= input.minimumCharacters
+    );
     input.count.classList.toggle(
       'text-on-surface-variant',
       count === 0 || count < input.minimumCharacters
@@ -49,7 +60,9 @@ export function initRichTextEditor(input: {
     const command = target.dataset.editorCommand;
     if (!command) return;
     if (command === 'createLink') {
-      const href = window.prompt('Masukkan tautan https:// atau mailto:');
+      const href = window.prompt(
+        input.linkPrompt?.() || 'Masukkan tautan https:// atau mailto:'
+      );
       if (!href) return;
       try {
         const parsed = new URL(href, window.location.origin);
@@ -76,6 +89,7 @@ export function initRichTextEditor(input: {
   return {
     getHtml: () => input.editor.innerHTML,
     getCharacterCount: () => Array.from(plainText(input.editor)).length,
+    refresh: updateCount,
     clear: () => {
       input.editor.textContent = '';
       updateCount();
