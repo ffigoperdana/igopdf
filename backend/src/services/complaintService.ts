@@ -139,6 +139,18 @@ const ATTACHMENT_FIELDS = `
   uploaded_at AS "uploadedAt", expires_at AS "expiresAt", purged_at AS "purgedAt"
 `;
 
+// The download queries join complaint_tickets, which also has an `id` column.
+// Keep a qualified variant for those queries so PostgreSQL does not reject the
+// SELECT list as ambiguous.
+const ATTACHMENT_FIELDS_FROM_ATTACHMENTS = `
+  attachments.id, attachments.ticket_id AS "ticketId",
+  attachments.original_filename AS "originalFilename",
+  attachments.file_kind AS "fileKind", attachments.mime_type AS "mimeType",
+  attachments.size_bytes::text AS "sizeBytes",
+  attachments.uploaded_at AS "uploadedAt", attachments.expires_at AS "expiresAt",
+  attachments.purged_at AS "purgedAt"
+`;
+
 const SLOT_FIELDS = `
   slots.id, slots.ticket_id AS "ticketId", slots.user_id AS "userId",
   slots.original_filename AS "originalFilename", slots.file_kind AS "fileKind",
@@ -860,7 +872,8 @@ export async function getComplaintAttachmentForOwner(
   userId: string
 ): Promise<(ComplaintAttachment & { storagePath: string }) | null> {
   const result = await pool.query<Record<string, unknown>>(
-    `SELECT ${ATTACHMENT_FIELDS}, attachments.storage_key AS "storageKey"
+    `SELECT ${ATTACHMENT_FIELDS_FROM_ATTACHMENTS},
+            attachments.storage_key AS "storageKey"
      FROM complaint_attachments attachments
      INNER JOIN complaint_tickets tickets ON tickets.id = attachments.ticket_id
      WHERE attachments.id = $1 AND attachments.ticket_id = $2
@@ -946,7 +959,8 @@ export async function getComplaintAttachmentForAdmin(
   attachmentId: string
 ): Promise<(ComplaintAttachment & { storagePath: string }) | null> {
   const result = await pool.query<Record<string, unknown>>(
-    `SELECT ${ATTACHMENT_FIELDS}, attachments.storage_key AS "storageKey"
+    `SELECT ${ATTACHMENT_FIELDS_FROM_ATTACHMENTS},
+            attachments.storage_key AS "storageKey"
      FROM complaint_attachments attachments
      INNER JOIN complaint_tickets tickets ON tickets.id = attachments.ticket_id
      WHERE attachments.id = $1 AND attachments.ticket_id = $2
