@@ -59,6 +59,12 @@ let activePptxViewer: PptxViewerInstance | null = null;
 let pptxAbortController: AbortController | null = null;
 let pptxRenderGeneration = 0;
 let activePptxFullscreen: PptxFullscreenState | null = null;
+const DESKTOP_FULLSCREEN_SIZE_CLASSES = [
+  'lg:h-full',
+  'lg:w-auto',
+  'lg:max-h-full',
+  'lg:max-w-full',
+] as const;
 
 function updatePptxNavigation(
   controls: PptxNavigationControls,
@@ -236,6 +242,7 @@ function closePptxFullscreen(requestRender = true): void {
 
   activePptxFullscreen = null;
   fullscreen.zoom.destroy();
+  fullscreen.container.classList.remove(...DESKTOP_FULLSCREEN_SIZE_CLASSES);
   fullscreen.inlinePreview.append(fullscreen.container, fullscreen.navigation);
   fullscreen.overlay.remove();
   document.body.style.overflow = fullscreen.previousBodyOverflow;
@@ -304,7 +311,13 @@ function openPptxFullscreen(
   stage.className =
     'relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg bg-black/30';
   const zoomTarget = document.createElement('div');
-  zoomTarget.className = 'w-full';
+  // On desktop, fit the presentation by both available width and height.
+  // A `w-full` slide can be taller than the remaining viewport and gets
+  // cropped vertically. These breakpoint-only classes leave the mobile
+  // fullscreen experience unchanged.
+  zoomTarget.className =
+    'w-full lg:flex lg:h-full lg:items-center lg:justify-center';
+  container.classList.add(...DESKTOP_FULLSCREEN_SIZE_CLASSES);
   zoomTarget.appendChild(container);
   stage.appendChild(zoomTarget);
   navigation.classList.add('shrink-0');
