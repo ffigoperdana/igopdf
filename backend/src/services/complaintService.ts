@@ -88,6 +88,18 @@ export class ComplaintServiceError extends Error {
 const MIB = 1024 * 1024;
 const GIB = 1024 * MIB;
 
+const DOCUMENT_AND_IMAGE_EXTENSIONS = [
+  '.pdf',
+  '.docx',
+  '.xlsx',
+  '.pptx',
+  '.txt',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+] as const;
+
 export const MAIN_COMPLAINT_FEATURES: ReadonlyArray<{
   id: MainComplaintFeatureId;
   name: string;
@@ -234,6 +246,58 @@ export function getComplaintAttachmentPath(storageKey: string): string {
   return path.join(getComplaintAttachmentDirectory(), storageKey);
 }
 
+function isMissingStorageError(error: unknown): boolean {
+  if (!error || typeof error !== 'object' || !('code' in error)) return false;
+  const code = (error as { code?: unknown }).code;
+  return code === 'ENOENT' || code === 'ENOTDIR';
+}
+
+async function getVerifiedComplaintAttachmentPath(
+  storageKey: string
+): Promise<string> {
+  const storagePath = getComplaintAttachmentPath(storageKey);
+  try {
+    const storedFile = await stat(storagePath);
+    if (!storedFile.isFile()) {
+      throw new ComplaintServiceError(
+        'ATTACHMENT_STORAGE_MISSING',
+        'Lampiran tidak tersedia di penyimpanan privat',
+        410
+      );
+    }
+    return storagePath;
+  } catch (error) {
+    if (error instanceof ComplaintServiceError) throw error;
+    if (isMissingStorageError(error)) {
+      throw new ComplaintServiceError(
+        'ATTACHMENT_STORAGE_MISSING',
+        'Lampiran tidak tersedia di penyimpanan privat',
+        410
+      );
+    }
+    throw error;
+  }
+}
+
+async function mapAttachmentWithStorageStatus(
+  row: Record<string, unknown>
+): Promise<ComplaintAttachment> {
+  const attachment = mapAttachment(row);
+  if (!attachment.available) return attachment;
+  try {
+    await getVerifiedComplaintAttachmentPath(String(row.storageKey));
+    return attachment;
+  } catch (error) {
+    if (
+      error instanceof ComplaintServiceError &&
+      error.code === 'ATTACHMENT_STORAGE_MISSING'
+    ) {
+      return { ...attachment, available: false };
+    }
+    throw error;
+  }
+}
+
 export function ensureComplaintStorage(): void {
   for (const directory of [
     config.support.storageDir,
@@ -304,25 +368,14 @@ export function getComplaintAttachmentPolicy(
     return {
       maxFiles: 10,
       maxBytesPerFile: 10 * MIB,
-      acceptedExtensions: ['.pdf'],
+      acceptedExtensions: [...DOCUMENT_AND_IMAGE_EXTENSIONS],
     };
   }
 
   return {
     maxFiles: 10,
     maxBytesPerFile: 10 * MIB,
-    acceptedExtensions: [
-      '.pdf',
-      '.docx',
-      '.xlsx',
-      '.pptx',
-      '.txt',
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.webp',
-      '.mp4',
-    ],
+    acceptedExtensions: [...DOCUMENT_AND_IMAGE_EXTENSIONS],
   };
 }
 
@@ -443,7 +496,10 @@ export async function createComplaintUploadSlot(
     }
 
     expiredSlotIds = await removeExpiredSlotsForTicket(client, ticket.id);
-    const policy = getComplaintAttachmentPolicy(ticket.category, ticket.featureId);
+    const policy = getComplaintAttachmentPolicy(
+      ticket.category,
+      ticket.featureId
+    );
     if (!Number.isSafeInteger(expectedBytes) || expectedBytes <= 0) {
       throw new ComplaintServiceError(
         'INVALID_FILE_SIZE',
@@ -613,7 +669,11 @@ export async function authorizeComplaintUpload(
       [slotId, userId, slotExpiry()]
     );
     if (!updated.rows[0]) {
-      const completed = await getComplaintUploadSlotById(client, slotId, userId);
+      const completed = await getComplaintUploadSlotById(
+        client,
+        slotId,
+        userId
+      );
       await client.query('COMMIT');
       return completed?.status === 'completed' ? completed : null;
     }
@@ -702,6 +762,14 @@ export async function finalizeComplaintUpload(
     finalPath = getComplaintAttachmentPath(slot.id);
     await rename(uploadPath, finalPath);
     moved = true;
+    const storedFile = await stat(finalPath);
+    if (!storedFile.isFile() || storedFile.size !== uploadedFile.size) {
+      throw new ComplaintServiceError(
+        'ATTACHMENT_STORAGE_INVALID',
+        'Lampiran tidak dapat disimpan dengan aman',
+        500
+      );
+    }
 
     const inserted = await client.query<Record<string, unknown>>(
       `INSERT INTO complaint_attachments (
@@ -804,7 +872,9 @@ export async function getComplaintAttachmentForOwner(
   const attachment = mapAttachment(result.rows[0]);
   return {
     ...attachment,
-    storagePath: getComplaintAttachmentPath(String(result.rows[0].storageKey)),
+    storagePath: await getVerifiedComplaintAttachmentPath(
+      String(result.rows[0].storageKey)
+    ),
   };
 }
 
@@ -846,9 +916,7 @@ export async function listAdminComplaints(input: {
   };
 }
 
-export async function getAdminComplaint(
-  ticketId: string
-): Promise<
+export async function getAdminComplaint(ticketId: string): Promise<
   | (ComplaintTicket & {
       attachments: ComplaintAttachment[];
     })
@@ -861,13 +929,15 @@ export async function getAdminComplaint(
   );
   if (!ticketResult.rows[0]) return null;
   const attachments = await pool.query<Record<string, unknown>>(
-    `SELECT ${ATTACHMENT_FIELDS} FROM complaint_attachments
+    `SELECT ${ATTACHMENT_FIELDS}, storage_key AS "storageKey" FROM complaint_attachments
      WHERE ticket_id = $1 ORDER BY uploaded_at ASC`,
     [ticketId]
   );
   return {
     ...mapTicket(ticketResult.rows[0]),
-    attachments: attachments.rows.map(mapAttachment),
+    attachments: await Promise.all(
+      attachments.rows.map(mapAttachmentWithStorageStatus)
+    ),
   };
 }
 
@@ -888,7 +958,9 @@ export async function getComplaintAttachmentForAdmin(
   const attachment = mapAttachment(result.rows[0]);
   return {
     ...attachment,
-    storagePath: getComplaintAttachmentPath(String(result.rows[0].storageKey)),
+    storagePath: await getVerifiedComplaintAttachmentPath(
+      String(result.rows[0].storageKey)
+    ),
   };
 }
 

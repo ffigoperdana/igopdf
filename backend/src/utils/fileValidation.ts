@@ -45,7 +45,13 @@ const MIME_TYPES: Record<StoredFileKind, string> = {
   mp4: 'video/mp4',
 };
 
-const NON_FEATURE_EXTENSION_MAP: Record<string, StoredFileKind> = {
+// Complaints can include safe document or image evidence. Video is deliberately
+// excluded: it is not needed for an aduan and would expand the upload attack
+// surface as well as the storage footprint substantially.
+const COMPLAINT_DOCUMENT_AND_IMAGE_EXTENSION_MAP: Record<
+  string,
+  StoredFileKind
+> = {
   '.pdf': 'pdf',
   '.docx': 'docx',
   '.xlsx': 'xlsx',
@@ -55,7 +61,6 @@ const NON_FEATURE_EXTENSION_MAP: Record<string, StoredFileKind> = {
   '.jpeg': 'jpeg',
   '.png': 'png',
   '.webp': 'webp',
-  '.mp4': 'mp4',
 };
 
 const PDF_SIGNATURE = Buffer.from('%PDF-', 'ascii');
@@ -100,7 +105,10 @@ function fileKindFromName(
   const safeName = cleanFileName(fileName);
   const extension = path.extname(safeName).toLowerCase();
 
-  if (category === 'main_feature' || category === 'other_feature') {
+  // A sample for the main PDF tools must remain a PDF so it can be used as a
+  // reproducible baseline. Other-feature and non-feature complaints may add
+  // document/image evidence, but never video.
+  if (category === 'main_feature') {
     if (extension !== '.pdf') {
       throw new FileValidationError(
         'Aduan terkait fitur hanya menerima lampiran PDF'
@@ -109,10 +117,10 @@ function fileKindFromName(
     return { fileName: safeName, kind: 'pdf', mimeType: MIME_TYPES.pdf };
   }
 
-  const kind = NON_FEATURE_EXTENSION_MAP[extension];
+  const kind = COMPLAINT_DOCUMENT_AND_IMAGE_EXTENSION_MAP[extension];
   if (!kind) {
     throw new FileValidationError(
-      'Jenis file tidak diizinkan. Gunakan PDF, Office, TXT, gambar, atau MP4.'
+      'Jenis file tidak diizinkan. Gunakan PDF, DOCX, XLSX, PPTX, TXT, atau gambar.'
     );
   }
   return { fileName: safeName, kind, mimeType: MIME_TYPES[kind] };

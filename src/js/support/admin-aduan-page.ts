@@ -60,6 +60,7 @@ const editorCommands = [
   ['insertOrderedList', '1. List'],
   ['createLink', 'Link'],
 ] as const;
+const MIN_RESOLUTION_CHARACTERS = 50;
 
 function showStatus(
   message: string,
@@ -273,7 +274,12 @@ function renderDetail(ticket: Detail): void {
   const content = document.createElement('div');
   content.className =
     'prose prose-sm mt-2 max-w-none rounded-lg border border-outline-variant p-4 text-ink-slate dark:text-content';
-  renderRichText(content, ticket.contentHtml);
+  if (ticket.contentText.trim()) {
+    renderRichText(content, ticket.contentHtml);
+  } else {
+    content.classList.add('text-on-surface-variant');
+    content.textContent = t('adminComplaint.noDetails');
+  }
   detail.appendChild(content);
 
   const attachmentsHeading = document.createElement('h3');
@@ -368,7 +374,7 @@ function renderDetail(ticket: Detail): void {
     editor: editorElement,
     toolbar,
     count,
-    minimumCharacters: 250,
+    minimumCharacters: MIN_RESOLUTION_CHARACTERS,
     countLabel: (characterCount, minimumCharacters) =>
       t('adminComplaint.characterCount', {
         count: characterCount,
@@ -463,7 +469,7 @@ async function resolveTicket(
   id: string,
   editor: { getHtml(): string; getCharacterCount(): number }
 ): Promise<void> {
-  if (editor.getCharacterCount() < 250) {
+  if (editor.getCharacterCount() < MIN_RESOLUTION_CHARACTERS) {
     showStatus(t('adminComplaint.messages.minResolution'), 'error');
     return;
   }

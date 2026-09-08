@@ -126,7 +126,7 @@
               data-i18n="complaint.otherFeatureHint"
             >
               Daftar ini mengikuti seluruh fitur yang tersedia di codebase.
-              Lampiran untuk aduan terkait fitur hanya PDF, maksimal 10 MB per
+              Lampiran dapat berupa dokumen atau gambar, maksimal 10 MB per
               file.
             </p>
           </div>
@@ -151,7 +151,34 @@
             />
           </div>
 
-          <div>
+          <div
+            id="complaint-detail-toggle-group"
+            class="rounded-lg border border-outline-variant bg-surface-gray p-3 dark:bg-surface-muted"
+          >
+            <label class="flex cursor-pointer items-start gap-3">
+              <input
+                id="complaint-include-details"
+                type="checkbox"
+                checked
+                class="mt-0.5 h-4 w-4 rounded border-outline-variant text-vibrant-palm focus:ring-vibrant-palm"
+              />
+              <span>
+                <span
+                  class="block text-sm font-semibold text-ink-slate dark:text-content"
+                  data-i18n="complaint.detailToggleLabel"
+                  >Tambahkan detail aduan</span
+                >
+                <span
+                  class="mt-1 block text-xs text-on-surface-variant"
+                  data-i18n="complaint.detailToggleHint"
+                  >Nonaktifkan bila lampiran dan subjek sudah cukup menjelaskan
+                  kendala.</span
+                >
+              </span>
+            </label>
+          </div>
+
+          <div id="complaint-detail-group">
             <div class="mb-2 flex items-center justify-between gap-3">
               <label
                 for="complaint-editor"
@@ -162,7 +189,7 @@
               <span
                 id="complaint-editor-count"
                 class="text-xs text-on-surface-variant"
-                >0 / minimal 250 karakter</span
+                >0 / minimal 50 karakter</span
               >
             </div>
             <div
@@ -239,10 +266,11 @@
               data-i18n-placeholder="complaint.editorPlaceholder"
             ></div>
             <p
+              id="complaint-editor-hint"
               class="mt-2 text-xs text-on-surface-variant"
               data-i18n="complaint.editorHint"
             >
-              Minimal 250 karakter. Jangan masukkan password atau data rahasia.
+              Minimal 50 karakter. Jangan masukkan password atau data rahasia.
             </p>
           </div>
 

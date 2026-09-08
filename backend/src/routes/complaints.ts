@@ -20,6 +20,7 @@ import { sendComplaintSubmittedEmail } from '../services/emailService.js';
 
 const router = Router();
 const idSchema = z.string().uuid();
+const MIN_COMPLAINT_DETAIL_CHARACTERS = 50;
 const complaintSchema = z
   .object({
     category: z.enum(['main_feature', 'other_feature', 'non_feature']),
@@ -33,10 +34,14 @@ const complaintSchema = z
       .optional(),
     featureName: z.string().trim().min(2).max(180).nullable().optional(),
     subject: z.string().trim().min(5).max(180),
-    contentHtml: z.string().min(1).max(50_000),
+    contentHtml: z.string().max(50_000).optional().default(''),
+    includeDetails: z.boolean().optional().default(true),
   })
   .superRefine((data, context) => {
-    if (data.category === 'main_feature' && !getMainComplaintFeature(data.featureId)) {
+    if (
+      data.category === 'main_feature' &&
+      !getMainComplaintFeature(data.featureId)
+    ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['featureId'],
@@ -48,6 +53,13 @@ const complaintSchema = z
         code: z.ZodIssueCode.custom,
         path: ['featureId'],
         message: 'Pilih fitur IGO yang terkait',
+      });
+    }
+    if (data.category === 'non_feature' && !data.includeDetails) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['includeDetails'],
+        message: 'Detail aduan wajib diisi untuk aduan di luar fitur',
       });
     }
   });
@@ -62,7 +74,8 @@ type AsyncRoute = (
   res: Response,
   next: NextFunction
 ) => Promise<void>;
-const asyncRoute = (handler: AsyncRoute) =>
+const asyncRoute =
+  (handler: AsyncRoute) =>
   (req: Request, res: Response, next: NextFunction): void => {
     void handler(req, res, next).catch(next);
   };
@@ -76,6 +89,11 @@ function validId(
   if (parsed.success) return parsed.data;
   res.status(400).json({ success: false, error: `${label} tidak valid` });
   return null;
+}
+
+function downloadErrorCode(error: Error): string {
+  const code = (error as Error & { code?: unknown }).code;
+  return typeof code === 'string' ? code : 'UNKNOWN';
 }
 
 router.use(authMiddleware);
@@ -100,11 +118,18 @@ router.post(
       });
       return;
     }
-    const content = sanitizeRichText(parsed.data.contentHtml);
-    if (content.characterCount < 250) {
+    const includeDetails =
+      parsed.data.category === 'non_feature' || parsed.data.includeDetails;
+    const content = includeDetails
+      ? sanitizeRichText(parsed.data.contentHtml)
+      : { html: '', text: '', characterCount: 0 };
+    if (
+      includeDetails &&
+      content.characterCount < MIN_COMPLAINT_DETAIL_CHARACTERS
+    ) {
       res.status(400).json({
         success: false,
-        error: 'Isi aduan minimal 250 karakter',
+        error: 'Isi aduan minimal 50 karakter',
         code: 'COMPLAINT_CONTENT_TOO_SHORT',
       });
       return;
@@ -160,7 +185,9 @@ router.get(
     if (!ticketId || !slotId) return;
     const slot = await getComplaintUploadSlot(slotId, req.user!.id);
     if (!slot || slot.ticketId !== ticketId) {
-      res.status(404).json({ success: false, error: 'Slot upload tidak ditemukan' });
+      res
+        .status(404)
+        .json({ success: false, error: 'Slot upload tidak ditemukan' });
       return;
     }
     res.json({ success: true, data: { slot } });
@@ -175,7 +202,9 @@ router.delete(
     if (!ticketId || !slotId) return;
     const slot = await getComplaintUploadSlot(slotId, req.user!.id);
     if (!slot || slot.ticketId !== ticketId) {
-      res.status(404).json({ success: false, error: 'Slot upload tidak ditemukan' });
+      res
+        .status(404)
+        .json({ success: false, error: 'Slot upload tidak ditemukan' });
       return;
     }
     await releaseComplaintUploadSlot(slotId, req.user!.id);
@@ -217,25 +246,54 @@ router.get(
       'X-Content-Type-Options': 'nosniff',
       'Cache-Control': 'private, no-store',
     });
-    res.download(attachment.storagePath, attachment.originalFilename, (error) => {
-      if (error) next(error);
-    });
+    res.download(
+      attachment.storagePath,
+      attachment.originalFilename,
+      (error) => {
+        if (!error) return;
+        logger.error('Complaint attachment download failed', {
+          ticketId,
+          attachmentId,
+          code: downloadErrorCode(error),
+          reason: error.message,
+        });
+        // A client cancellation can occur after a file response has started.
+        // Do not try to send a second JSON response in that case.
+        if (!res.headersSent) next(error);
+      }
+    );
   })
 );
 
-router.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  if (error instanceof ComplaintServiceError || error instanceof FileValidationError) {
-    res.status(error instanceof ComplaintServiceError ? error.statusCode : 415).json({
-      success: false,
-      error: error.message,
-      code: error instanceof ComplaintServiceError ? error.code : 'INVALID_FILE',
+router.use(
+  (error: unknown, _req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) {
+      next(error);
+      return;
+    }
+    if (
+      error instanceof ComplaintServiceError ||
+      error instanceof FileValidationError
+    ) {
+      res
+        .status(error instanceof ComplaintServiceError ? error.statusCode : 415)
+        .json({
+          success: false,
+          error: error.message,
+          code:
+            error instanceof ComplaintServiceError
+              ? error.code
+              : 'INVALID_FILE',
+        });
+      return;
+    }
+    logger.error('Complaint route failed', {
+      reason: error instanceof Error ? error.message : 'UNKNOWN',
     });
-    return;
+    res
+      .status(500)
+      .json({ success: false, error: 'Layanan aduan sedang bermasalah' });
   }
-  logger.error('Complaint route failed', {
-    reason: error instanceof Error ? error.message : 'UNKNOWN',
-  });
-  res.status(500).json({ success: false, error: 'Layanan aduan sedang bermasalah' });
-});
+);
 
 export default router;

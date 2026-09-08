@@ -42,6 +42,18 @@ interface UploadSlot {
 }
 
 const MIB = 1024 * 1024;
+const MIN_COMPLAINT_DETAIL_CHARACTERS = 50;
+const DOCUMENT_AND_IMAGE_EXTENSIONS = [
+  '.pdf',
+  '.docx',
+  '.xlsx',
+  '.pptx',
+  '.txt',
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+];
 const fallbackConfig: ComplaintConfig = {
   mainFeatures: [
     { id: 'compress-pdf', name: 'Compress PDF', maxBytesPerFile: 1024 * MIB },
@@ -52,23 +64,12 @@ const fallbackConfig: ComplaintConfig = {
   otherFeature: {
     maxFiles: 10,
     maxBytesPerFile: 10 * MIB,
-    acceptedExtensions: ['.pdf'],
+    acceptedExtensions: [...DOCUMENT_AND_IMAGE_EXTENSIONS],
   },
   nonFeature: {
     maxFiles: 10,
     maxBytesPerFile: 10 * MIB,
-    acceptedExtensions: [
-      '.pdf',
-      '.docx',
-      '.xlsx',
-      '.pptx',
-      '.txt',
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.webp',
-      '.mp4',
-    ],
+    acceptedExtensions: [...DOCUMENT_AND_IMAGE_EXTENSIONS],
   },
   uploadChunkBytes: 25 * MIB,
 };
@@ -117,6 +118,13 @@ const subjectInput = document.getElementById(
 const editor = document.getElementById('complaint-editor');
 const editorToolbar = document.getElementById('complaint-editor-toolbar');
 const editorCount = document.getElementById('complaint-editor-count');
+const detailToggleGroup = document.getElementById(
+  'complaint-detail-toggle-group'
+);
+const detailToggle = document.getElementById(
+  'complaint-include-details'
+) as HTMLInputElement | null;
+const detailGroup = document.getElementById('complaint-detail-group');
 
 let config = fallbackConfig;
 let selectedOtherTool: { id: string; name: string } | null = null;
@@ -140,7 +148,7 @@ const richEditor =
         editor,
         toolbar: editorToolbar,
         count: editorCount,
-        minimumCharacters: 250,
+        minimumCharacters: MIN_COMPLAINT_DETAIL_CHARACTERS,
         countLabel: (count, minimumCharacters) =>
           t('complaint.characterCount', { count, minimum: minimumCharacters }),
         linkPrompt: () => t('complaint.linkPrompt'),
@@ -149,6 +157,37 @@ const richEditor =
 
 function activeCategory(): ComplaintCategory {
   return (categorySelect?.value || 'main_feature') as ComplaintCategory;
+}
+
+function detailsAreEnabled(): boolean {
+  return activeCategory() === 'non_feature' || detailToggle?.checked !== false;
+}
+
+function updateDetailControls(): void {
+  const canDisableDetails = activeCategory() !== 'non_feature';
+  if (detailToggleGroup)
+    detailToggleGroup.classList.toggle('hidden', !canDisableDetails);
+  if (detailToggle) {
+    detailToggle.disabled = !canDisableDetails;
+    if (!canDisableDetails) detailToggle.checked = true;
+  }
+
+  const enabled = detailsAreEnabled();
+  if (editor) {
+    editor.contentEditable = String(enabled);
+    editor.setAttribute('aria-disabled', String(!enabled));
+    editor.classList.toggle('cursor-not-allowed', !enabled);
+    editor.classList.toggle('opacity-60', !enabled);
+  }
+  if (editorToolbar) {
+    editorToolbar.setAttribute('aria-disabled', String(!enabled));
+    editorToolbar
+      .querySelectorAll<HTMLButtonElement>('button')
+      .forEach((button) => {
+        button.disabled = !enabled;
+      });
+  }
+  detailGroup?.classList.toggle('opacity-60', !enabled);
 }
 
 function currentPolicy(): AttachmentPolicy {
@@ -229,21 +268,21 @@ function renderAttachmentList(): void {
 function updateAttachmentControls(): void {
   const category = activeCategory();
   const policy = currentPolicy();
-  const isFeatureRelated = category !== 'non_feature';
   if (mainFeatureGroup)
     mainFeatureGroup.classList.toggle('hidden', category !== 'main_feature');
   if (otherFeatureGroup)
     otherFeatureGroup.classList.toggle('hidden', category !== 'other_feature');
   if (attachmentGroup) attachmentGroup.classList.remove('hidden');
   if (attachmentInput) {
-    attachmentInput.accept = isFeatureRelated
-      ? '.pdf,application/pdf'
-      : '.pdf,.docx,.xlsx,.pptx,.txt,.jpg,.jpeg,.png,.webp,.mp4,application/pdf,image/jpeg,image/png,image/webp,video/mp4,text/plain';
+    attachmentInput.accept = policy.acceptedExtensions.join(',');
   }
   if (attachmentInfo) {
-    const types = isFeatureRelated
-      ? t('complaint.attachmentTypes.feature')
-      : t('complaint.attachmentTypes.nonFeature');
+    const types =
+      category === 'main_feature'
+        ? t('complaint.attachmentTypes.mainFeature')
+        : category === 'other_feature'
+          ? t('complaint.attachmentTypes.otherFeature')
+          : t('complaint.attachmentTypes.nonFeature');
     attachmentInfo.textContent = t('complaint.attachmentInfo', {
       types,
       maxFiles: policy.maxFiles,
@@ -262,6 +301,7 @@ function updateAttachmentControls(): void {
     resetDraft();
   }
   renderAttachmentList();
+  updateDetailControls();
 }
 
 function populateMainFeatures(): void {
@@ -490,7 +530,11 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
   event.preventDefault();
   clearStatus();
   if (!richEditor || !subjectInput || !submitButton) return;
-  if (richEditor.getCharacterCount() < 250) {
+  const includeDetails = detailsAreEnabled();
+  if (
+    includeDetails &&
+    richEditor.getCharacterCount() < MIN_COMPLAINT_DETAIL_CHARACTERS
+  ) {
     setStatus(t('complaint.messages.minCharacters'), 'error');
     richEditor.focus();
     return;
@@ -523,7 +567,8 @@ async function submitComplaint(event: SubmitEvent): Promise<void> {
           featureId: feature.id,
           featureName: feature.name,
           subject: subjectInput.value.trim(),
-          contentHtml: richEditor.getHtml(),
+          includeDetails,
+          contentHtml: includeDetails ? richEditor.getHtml() : '',
         }),
       });
       if (!createResponse.ok)
@@ -636,6 +681,10 @@ async function init(): Promise<void> {
   attachmentInput.addEventListener('change', () =>
     addFiles(attachmentInput.files)
   );
+  detailToggle?.addEventListener('change', () => {
+    resetDraft();
+    updateDetailControls();
+  });
   subjectInput?.addEventListener('input', resetDraft);
   editor?.addEventListener('input', resetDraft);
   form.addEventListener('submit', (event) => void submitComplaint(event));

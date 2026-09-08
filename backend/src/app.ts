@@ -126,8 +126,15 @@ app.use(
     err: Error,
     _req: express.Request,
     res: express.Response,
-    _next: express.NextFunction
+    next: express.NextFunction
   ) => {
+    // A streaming download can fail after its headers have already reached the
+    // client (for example when the browser cancels it). Passing it onward lets
+    // Express close the response safely instead of trying to send JSON twice.
+    if (res.headersSent) {
+      next(err);
+      return;
+    }
     logger.error('Unhandled error', err);
     res.status(500).json({
       success: false,

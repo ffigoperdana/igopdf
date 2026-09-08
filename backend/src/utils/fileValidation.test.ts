@@ -64,6 +64,21 @@ describe('support upload file validation', () => {
     ).resolves.toMatchObject({ kind: 'pdf', mimeType: 'application/pdf' });
   });
 
+  it('allows document or image evidence for other/non-feature complaints but rejects video', () => {
+    expect(
+      validateComplaintFileName('evidence.docx', 'other_feature')
+    ).toMatchObject({ kind: 'docx' });
+    expect(
+      validateComplaintFileName('screenshot.webp', 'non_feature')
+    ).toMatchObject({ kind: 'webp' });
+    expect(() =>
+      validateComplaintFileName('recording.mp4', 'other_feature')
+    ).toThrow(FileValidationError);
+    expect(() =>
+      validateComplaintFileName('evidence.docx', 'main_feature')
+    ).toThrow(FileValidationError);
+  });
+
   it('checks the OOXML content type instead of trusting a ZIP extension', async () => {
     const fakeOffice = await temporaryFile(
       'sample.docx',

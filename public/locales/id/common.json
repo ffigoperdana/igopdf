@@ -702,10 +702,12 @@
     "mainFeatureHint": "Compress PDF menerima PDF sampai 1 GB per file. PDF to DOCX dan Text Editor menerima sampai 500 MB per file.",
     "otherFeatureSearchLabel": "Cari fitur IGO",
     "otherFeaturePlaceholder": "Ketik nama fitur, misalnya Merge PDF",
-    "otherFeatureHint": "Daftar ini mengikuti seluruh fitur yang tersedia di codebase. Lampiran untuk aduan terkait fitur hanya PDF, maksimal 10 MB per file.",
+    "otherFeatureHint": "Daftar ini mengikuti seluruh fitur yang tersedia di codebase. Lampiran dapat berupa dokumen atau gambar, maksimal 10 MB per file.",
     "subjectLabel": "Subjek",
     "subjectPlaceholder": "Ringkasan singkat kendala",
     "detailLabel": "Detail aduan",
+    "detailToggleLabel": "Tambahkan detail aduan",
+    "detailToggleHint": "Nonaktifkan bila lampiran dan subjek sudah cukup menjelaskan kendala.",
     "characterCount": "{{count}} / minimal {{minimum}} karakter",
     "linkPrompt": "Masukkan tautan https:// atau mailto:",
     "editorPlaceholder": "Tuliskan kronologi, langkah yang dilakukan, dan hasil yang diharapkan…",
@@ -720,11 +722,12 @@
       "numberedButton": "1. Daftar",
       "linkButton": "Tautan"
     },
-    "editorHint": "Minimal 250 karakter. Jangan masukkan password atau data rahasia.",
+    "editorHint": "Minimal 50 karakter. Jangan masukkan password atau data rahasia.",
     "attachmentLabel": "Lampiran (opsional)",
     "attachmentTypes": {
-      "feature": "Hanya PDF; server memeriksa ekstensi dan signature isi file.",
-      "nonFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, WebP, atau MP4; server memeriksa signature isi file."
+      "mainFeature": "Hanya PDF untuk kebutuhan baseline; server memeriksa ekstensi dan signature isi file.",
+      "otherFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, atau WebP; video tidak diizinkan dan server memeriksa signature isi file.",
+      "nonFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, atau WebP; video tidak diizinkan dan server memeriksa signature isi file."
     },
     "attachmentInfo": "{{types}} Maksimal {{maxFiles}} file, {{maxBytes}} per file. Lampiran dihapus otomatis paling lambat {{retentionHours}} jam.",
     "submit": "Kirim Aduan",
@@ -749,7 +752,7 @@
       "emailSent": "Konfirmasi nomor tiket juga dikirim ke email akun AD Anda.",
       "emailDisabled": "Notifikasi email belum diaktifkan; nomor tiket tetap tersimpan.",
       "emailFailed": "Nomor tiket tetap tersimpan, tetapi konfirmasi email belum berhasil dikirim.",
-      "minCharacters": "Isi aduan minimal 250 karakter.",
+      "minCharacters": "Isi aduan minimal 50 karakter.",
       "selectFeature": "Pilih fitur yang terkait dengan aduan ini.",
       "maxFilesCategory": "Maksimal {{maxFiles}} lampiran untuk kategori ini.",
       "submitting": "Mengirim aduan…",
@@ -787,6 +790,7 @@
       "created": "dibuat"
     },
     "outsideFeature": "Di luar fitur",
+    "noDetails": "Tidak ada detail tambahan.",
     "noAttachments": "Tidak ada lampiran.",
     "download": "Unduh",
     "deleted": "Sudah dihapus",
@@ -807,7 +811,7 @@
     "messages": {
       "requestFailed": "Permintaan gagal ({{status}})",
       "statusUpdated": "Status tiket berhasil diperbarui.",
-      "minResolution": "Catatan penyelesaian minimal 250 karakter.",
+      "minResolution": "Catatan penyelesaian minimal 50 karakter.",
       "resolvedEmailSent": "Aduan ditandai selesai dan notifikasi email berhasil dikirim.",
       "resolvedEmailDisabled": "Aduan ditandai selesai. Notifikasi email belum diaktifkan.",
       "resolvedEmailFailed": "Aduan ditandai selesai, tetapi notifikasi email belum berhasil dikirim.",

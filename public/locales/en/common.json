@@ -702,10 +702,12 @@
     "mainFeatureHint": "Compress PDF accepts PDFs up to 1 GB per file. PDF to DOCX and Text Editor accept up to 500 MB per file.",
     "otherFeatureSearchLabel": "Search IGO features",
     "otherFeaturePlaceholder": "Type a feature name, for example Merge PDF",
-    "otherFeatureHint": "This list follows all features available in the codebase. Attachments for feature-related complaints must be PDF, up to 10 MB per file.",
+    "otherFeatureHint": "This list follows all features available in the codebase. Attachments can be documents or images, up to 10 MB per file.",
     "subjectLabel": "Subject",
     "subjectPlaceholder": "Short summary of the issue",
     "detailLabel": "Complaint details",
+    "detailToggleLabel": "Add complaint details",
+    "detailToggleHint": "Disable this when the attachment and subject already explain the issue sufficiently.",
     "characterCount": "{{count}} / minimum {{minimum}} characters",
     "linkPrompt": "Enter an https:// or mailto: link:",
     "editorPlaceholder": "Describe the timeline, steps taken, and expected result…",
@@ -720,11 +722,12 @@
       "numberedButton": "1. List",
       "linkButton": "Link"
     },
-    "editorHint": "Minimum 250 characters. Do not enter passwords or confidential data.",
+    "editorHint": "Minimum 50 characters. Do not enter passwords or confidential data.",
     "attachmentLabel": "Attachments (optional)",
     "attachmentTypes": {
-      "feature": "PDF only; the server checks the extension and file signature.",
-      "nonFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, WebP, or MP4; the server checks the file signature."
+      "mainFeature": "PDF only for a reproducible baseline; the server checks the extension and file signature.",
+      "otherFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, or WebP; video is not allowed and the server checks the file signature.",
+      "nonFeature": "PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, or WebP; video is not allowed and the server checks the file signature."
     },
     "attachmentInfo": "{{types}} Maximum {{maxFiles}} file(s), {{maxBytes}} per file. Attachments are automatically deleted within {{retentionHours}} hours at the latest.",
     "submit": "Submit complaint",
@@ -749,7 +752,7 @@
       "emailSent": "The ticket confirmation was also sent to your AD account email.",
       "emailDisabled": "Email notifications are not enabled; the ticket number was still saved.",
       "emailFailed": "The ticket number was saved, but the email confirmation could not be sent.",
-      "minCharacters": "Complaint details must contain at least 250 characters.",
+      "minCharacters": "Complaint details must contain at least 50 characters.",
       "selectFeature": "Select the feature related to this complaint.",
       "maxFilesCategory": "Maximum {{maxFiles}} attachments for this category.",
       "submitting": "Submitting complaint…",
@@ -787,6 +790,7 @@
       "created": "created"
     },
     "outsideFeature": "Not feature-related",
+    "noDetails": "No additional details were provided.",
     "noAttachments": "No attachments.",
     "download": "Download",
     "deleted": "Deleted",
@@ -807,7 +811,7 @@
     "messages": {
       "requestFailed": "Request failed ({{status}})",
       "statusUpdated": "Ticket status updated.",
-      "minResolution": "The resolution note must contain at least 250 characters.",
+      "minResolution": "The resolution note must contain at least 50 characters.",
       "resolvedEmailSent": "The complaint was marked resolved and the email notification was sent.",
       "resolvedEmailDisabled": "The complaint was marked resolved. Email notifications are not enabled.",
       "resolvedEmailFailed": "The complaint was marked resolved, but the email notification could not be sent.",
