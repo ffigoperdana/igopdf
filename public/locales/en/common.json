@@ -595,7 +595,16 @@
     "previousSlide": "Previous",
     "nextSlide": "Next",
     "slideCounter": "Slide {{current}} of {{total}}",
-    "downloadPptx": "Download PPTX"
+    "downloadPptx": "Download PPTX",
+    "openFullscreen": "Open fullscreen",
+    "openFullscreenLabel": "Open fullscreen preview for {{title}}",
+    "openFullscreenHint": "Tap or click the preview to open it fullscreen.",
+    "fullscreenTitle": "PowerPoint preview: {{title}}",
+    "fullscreenZoomHint": "Pinch to zoom. Drag while zoomed in.",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "resetZoom": "Reset zoom",
+    "closeFullscreen": "Close preview"
   },
   "adminGuide": {
     "pageTitle": "Manage Guide - igo",

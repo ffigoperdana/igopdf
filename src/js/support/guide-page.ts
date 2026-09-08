@@ -38,9 +38,27 @@ interface PptxLoadingIndicator {
   progress: HTMLProgressElement;
 }
 
+interface PptxZoomController {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  reset: () => void;
+  destroy: () => void;
+}
+
+interface PptxFullscreenState {
+  overlay: HTMLDivElement;
+  inlinePreview: HTMLDivElement;
+  container: HTMLDivElement;
+  navigation: HTMLDivElement;
+  zoom: PptxZoomController;
+  previousBodyOverflow: string;
+  keydownHandler: (event: KeyboardEvent) => void;
+}
+
 let activePptxViewer: PptxViewerInstance | null = null;
 let pptxAbortController: AbortController | null = null;
 let pptxRenderGeneration = 0;
+let activePptxFullscreen: PptxFullscreenState | null = null;
 
 function updatePptxNavigation(
   controls: PptxNavigationControls,
@@ -59,11 +77,267 @@ function updatePptxNavigation(
 }
 
 function clearPptxViewer(): void {
+  closePptxFullscreen(false);
   pptxRenderGeneration += 1;
   pptxAbortController?.abort();
   pptxAbortController = null;
   activePptxViewer?.destroy();
   activePptxViewer = null;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function createPinchZoomController(
+  stage: HTMLElement,
+  target: HTMLElement
+): PptxZoomController {
+  const pointers = new Map<number, { x: number; y: number }>();
+  const minScale = 1;
+  const maxScale = 3;
+  let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
+  let panStartX = 0;
+  let panStartY = 0;
+  let panOriginX = 0;
+  let panOriginY = 0;
+  let pinchStartDistance = 0;
+  let pinchStartScale = 1;
+
+  const constrainTranslation = () => {
+    const maxX = (stage.clientWidth * (scale - 1)) / 2;
+    const maxY = (stage.clientHeight * (scale - 1)) / 2;
+    translateX = clamp(translateX, -maxX, maxX);
+    translateY = clamp(translateY, -maxY, maxY);
+  };
+
+  const renderTransform = () => {
+    constrainTranslation();
+    target.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+  };
+
+  const pointerDistance = () => {
+    const pair = [...pointers.values()];
+    if (pair.length < 2) return 0;
+    return Math.hypot(pair[0].x - pair[1].x, pair[0].y - pair[1].y);
+  };
+
+  const updatePointer = (event: PointerEvent) => {
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  };
+
+  const reset = () => {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    renderTransform();
+  };
+
+  const zoomBy = (amount: number) => {
+    scale = clamp(scale + amount, minScale, maxScale);
+    if (scale === minScale) {
+      translateX = 0;
+      translateY = 0;
+    }
+    renderTransform();
+  };
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    updatePointer(event);
+    stage.setPointerCapture?.(event.pointerId);
+
+    if (pointers.size >= 2) {
+      pinchStartDistance = pointerDistance();
+      pinchStartScale = scale;
+    } else {
+      panStartX = event.clientX;
+      panStartY = event.clientY;
+      panOriginX = translateX;
+      panOriginY = translateY;
+    }
+    event.preventDefault();
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!pointers.has(event.pointerId)) return;
+    updatePointer(event);
+
+    if (pointers.size >= 2) {
+      const distance = pointerDistance();
+      if (pinchStartDistance > 0 && distance > 0) {
+        scale = clamp(
+          pinchStartScale * (distance / pinchStartDistance),
+          minScale,
+          maxScale
+        );
+        renderTransform();
+      }
+    } else if (scale > minScale) {
+      translateX = panOriginX + event.clientX - panStartX;
+      translateY = panOriginY + event.clientY - panStartY;
+      renderTransform();
+    }
+    event.preventDefault();
+  };
+
+  const onPointerEnd = (event: PointerEvent) => {
+    pointers.delete(event.pointerId);
+    if (pointers.size === 1) {
+      const [remainingPointer] = pointers.values();
+      panStartX = remainingPointer.x;
+      panStartY = remainingPointer.y;
+      panOriginX = translateX;
+      panOriginY = translateY;
+    }
+  };
+
+  stage.style.touchAction = 'none';
+  target.style.transformOrigin = 'center center';
+  stage.addEventListener('pointerdown', onPointerDown);
+  stage.addEventListener('pointermove', onPointerMove);
+  stage.addEventListener('pointerup', onPointerEnd);
+  stage.addEventListener('pointercancel', onPointerEnd);
+  stage.addEventListener('lostpointercapture', onPointerEnd);
+
+  return {
+    zoomIn: () => zoomBy(0.25),
+    zoomOut: () => zoomBy(-0.25),
+    reset,
+    destroy: () => {
+      stage.removeEventListener('pointerdown', onPointerDown);
+      stage.removeEventListener('pointermove', onPointerMove);
+      stage.removeEventListener('pointerup', onPointerEnd);
+      stage.removeEventListener('pointercancel', onPointerEnd);
+      stage.removeEventListener('lostpointercapture', onPointerEnd);
+      target.style.removeProperty('transform');
+      target.style.removeProperty('transform-origin');
+      stage.style.removeProperty('touch-action');
+    },
+  };
+}
+
+function requestActivePptxRender(): void {
+  const currentViewer = activePptxViewer;
+  if (!currentViewer) return;
+
+  const currentSlide = currentViewer.currentSlideIndex;
+  requestAnimationFrame(() => {
+    if (activePptxViewer !== currentViewer) return;
+    void currentViewer.renderSlide(currentSlide).catch(() => {});
+  });
+}
+
+function closePptxFullscreen(requestRender = true): void {
+  const fullscreen = activePptxFullscreen;
+  if (!fullscreen) return;
+
+  activePptxFullscreen = null;
+  fullscreen.zoom.destroy();
+  fullscreen.inlinePreview.append(fullscreen.container, fullscreen.navigation);
+  fullscreen.overlay.remove();
+  document.body.style.overflow = fullscreen.previousBodyOverflow;
+  document.removeEventListener('keydown', fullscreen.keydownHandler);
+  if (requestRender) requestActivePptxRender();
+}
+
+function openPptxFullscreen(
+  guide: GuideMaterial,
+  inlinePreview: HTMLDivElement,
+  container: HTMLDivElement,
+  navigation: HTMLDivElement
+): void {
+  if (activePptxFullscreen || !activePptxViewer) return;
+
+  const overlay = document.createElement('div');
+  overlay.className =
+    'fixed inset-0 z-[100] flex h-dvh w-screen flex-col gap-3 bg-deep-forest p-3 text-content shadow-2xl';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute(
+    'aria-label',
+    t('guide.fullscreenTitle', { title: guide.title })
+  );
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'flex shrink-0 items-center justify-between gap-3';
+  const title = document.createElement('p');
+  title.className = 'min-w-0 truncate text-sm font-semibold';
+  title.textContent = guide.title;
+  const tools = document.createElement('div');
+  tools.className = 'flex shrink-0 items-center gap-2';
+  const toolButtonClass =
+    'inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-outline-variant px-3 text-sm font-bold transition hover:border-vibrant-palm focus:outline-none focus:ring-2 focus:ring-vibrant-palm/30';
+  const zoomOut = document.createElement('button');
+  zoomOut.type = 'button';
+  zoomOut.className = toolButtonClass;
+  zoomOut.textContent = '−';
+  zoomOut.title = t('guide.zoomOut');
+  zoomOut.setAttribute('aria-label', t('guide.zoomOut'));
+  const resetZoom = document.createElement('button');
+  resetZoom.type = 'button';
+  resetZoom.className = toolButtonClass;
+  resetZoom.textContent = '1×';
+  resetZoom.title = t('guide.resetZoom');
+  resetZoom.setAttribute('aria-label', t('guide.resetZoom'));
+  const zoomIn = document.createElement('button');
+  zoomIn.type = 'button';
+  zoomIn.className = toolButtonClass;
+  zoomIn.textContent = '+';
+  zoomIn.title = t('guide.zoomIn');
+  zoomIn.setAttribute('aria-label', t('guide.zoomIn'));
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = toolButtonClass;
+  closeButton.textContent = '×';
+  closeButton.title = t('guide.closeFullscreen');
+  closeButton.setAttribute('aria-label', t('guide.closeFullscreen'));
+  tools.append(zoomOut, resetZoom, zoomIn, closeButton);
+  toolbar.append(title, tools);
+
+  const zoomHint = document.createElement('p');
+  zoomHint.className = 'shrink-0 text-center text-xs text-on-surface-variant';
+  zoomHint.textContent = t('guide.fullscreenZoomHint');
+  const stage = document.createElement('div');
+  stage.className =
+    'relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-lg bg-black/30';
+  const zoomTarget = document.createElement('div');
+  zoomTarget.className = 'w-full';
+  zoomTarget.appendChild(container);
+  stage.appendChild(zoomTarget);
+  navigation.classList.add('shrink-0');
+  overlay.append(toolbar, zoomHint, stage, navigation);
+  document.body.appendChild(overlay);
+
+  const zoom = createPinchZoomController(stage, zoomTarget);
+  const keydownHandler = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    closePptxFullscreen();
+  };
+  const previousBodyOverflow = document.body.style.overflow;
+  activePptxFullscreen = {
+    overlay,
+    inlinePreview,
+    container,
+    navigation,
+    zoom,
+    previousBodyOverflow,
+    keydownHandler,
+  };
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', keydownHandler);
+  zoomOut.addEventListener('click', zoom.zoomOut);
+  resetZoom.addEventListener('click', zoom.reset);
+  zoomIn.addEventListener('click', zoom.zoomIn);
+  closeButton.addEventListener('click', () => closePptxFullscreen());
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) closePptxFullscreen();
+  });
+  closeButton.focus();
+  requestActivePptxRender();
 }
 
 function showViewerMessage(messageKey: string): void {
@@ -168,7 +442,8 @@ async function fetchPptxBuffer(
 }
 
 function normalizePresentationSvgBlips(
-  presentation: import('@aiden0z/pptx-renderer/browser').PresentationData
+  presentation: import('@aiden0z/pptx-renderer/browser').PresentationData,
+  materializeSlideNodes: typeof import('@aiden0z/pptx-renderer/browser').materializeSlideNodes
 ): number {
   let patchedCount = 0;
 
@@ -179,6 +454,10 @@ function normalizePresentationSvgBlips(
     if (normalized.patchedCount === 0) continue;
 
     slide.sourceXml = normalized.source;
+    // Materialize affected slides immediately. This guarantees the viewer sees
+    // a real image relationship for Office Graphics instead of the renderer's
+    // generic "No image data" placeholder. Other slides remain lazy.
+    materializeSlideNodes(presentation, slide);
     patchedCount += normalized.patchedCount;
   }
 
@@ -243,10 +522,9 @@ async function renderPptxViewer(
     const presentation = renderer.buildPresentation(files, {
       lazySlides: true,
     });
-    normalizePresentationSvgBlips(presentation);
-    // The viewer will materialize only the requested slide. Its source XML is
-    // already normalized here, so Office SVG graphics work on every slide
-    // without eagerly parsing the complete deck.
+    normalizePresentationSvgBlips(presentation, renderer.materializeSlideNodes);
+    // Only slides containing nested Office Graphic media are materialized
+    // early. All remaining slides and media continue to load on demand.
     if (presentation.width > 0 && presentation.height > 0) {
       container.style.aspectRatio = `${presentation.width} / ${presentation.height}`;
     }
@@ -377,11 +655,11 @@ function setActiveGuide(guide: GuideMaterial): void {
     };
     const pptxContainer = document.createElement('div');
     pptxContainer.className =
-      'w-full overflow-hidden rounded-lg border border-outline-variant bg-background';
+      'w-full cursor-zoom-in overflow-hidden rounded-lg border border-outline-variant bg-background';
     pptxContainer.style.aspectRatio = '16 / 9';
     pptxContainer.setAttribute(
       'aria-label',
-      t('guide.frameTitle', { title: guide.title })
+      t('guide.openFullscreenLabel', { title: guide.title })
     );
     const navigation = document.createElement('div');
     navigation.className = 'flex items-center justify-between gap-3';
@@ -427,6 +705,23 @@ function setActiveGuide(guide: GuideMaterial): void {
         .catch(() => {});
     });
     navigation.append(previousButton, counter, nextButton);
+    const inlinePreview = document.createElement('div');
+    inlinePreview.className = 'space-y-3';
+    inlinePreview.append(pptxContainer, navigation);
+    const openFullscreen = () => {
+      if (!activePptxViewer || activeGuide?.id !== guide.id) return;
+      openPptxFullscreen(guide, inlinePreview, pptxContainer, navigation);
+    };
+    pptxContainer.addEventListener('click', openFullscreen);
+    const fullscreenHint = document.createElement('p');
+    fullscreenHint.className = 'text-xs text-on-surface-variant';
+    fullscreenHint.textContent = t('guide.openFullscreenHint');
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.type = 'button';
+    fullscreenButton.className =
+      'inline-flex items-center rounded-lg border border-outline-variant px-3 py-2 text-sm font-semibold text-on-surface transition hover:border-vibrant-palm';
+    fullscreenButton.textContent = t('guide.openFullscreen');
+    fullscreenButton.addEventListener('click', openFullscreen);
     const fallbackMessage = document.createElement('p');
     fallbackMessage.className = 'text-sm text-on-surface-variant';
     fallbackMessage.textContent = t('guide.pptxDownloadMessage');
@@ -438,8 +733,9 @@ function setActiveGuide(guide: GuideMaterial): void {
     download.textContent = t('guide.downloadPptx');
     presentation.append(
       loadingElement,
-      pptxContainer,
-      navigation,
+      inlinePreview,
+      fullscreenHint,
+      fullscreenButton,
       fallbackMessage,
       download
     );

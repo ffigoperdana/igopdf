@@ -595,7 +595,16 @@
     "previousSlide": "Sebelumnya",
     "nextSlide": "Berikutnya",
     "slideCounter": "Slide {{current}} dari {{total}}",
-    "downloadPptx": "Unduh PPTX"
+    "downloadPptx": "Unduh PPTX",
+    "openFullscreen": "Buka layar penuh",
+    "openFullscreenLabel": "Buka pratinjau layar penuh untuk {{title}}",
+    "openFullscreenHint": "Ketuk atau klik pratinjau untuk membukanya di layar penuh.",
+    "fullscreenTitle": "Pratinjau PowerPoint: {{title}}",
+    "fullscreenZoomHint": "Cubit untuk memperbesar atau memperkecil. Geser saat diperbesar.",
+    "zoomOut": "Perkecil",
+    "zoomIn": "Perbesar",
+    "resetZoom": "Atur ulang zoom",
+    "closeFullscreen": "Tutup pratinjau"
   },
   "adminGuide": {
     "pageTitle": "Kelola Panduan - igo",

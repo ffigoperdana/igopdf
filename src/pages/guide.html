@@ -42,9 +42,11 @@
         </p>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-[minmax(250px,320px)_minmax(0,1fr)]">
+      <div
+        class="grid items-start gap-6 lg:grid-cols-[minmax(250px,320px)_minmax(0,1fr)]"
+      >
         <aside
-          class="rounded-xl border border-outline-variant bg-paper-white p-4 dark:bg-surface-raised"
+          class="flex max-h-[48vh] flex-col overflow-hidden rounded-xl border border-outline-variant bg-paper-white p-4 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] dark:bg-surface-raised"
         >
           <h2
             class="mb-4 text-lg font-bold text-ink-slate dark:text-content"
@@ -52,7 +54,11 @@
           >
             Daftar materi
           </h2>
-          <div id="guide-list" class="space-y-3" aria-live="polite">
+          <div
+            id="guide-list"
+            class="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1"
+            aria-live="polite"
+          >
             <p
               class="text-sm text-on-surface-variant"
               data-i18n="guide.loading"
@@ -64,7 +70,7 @@
 
         <section
           id="guide-viewer"
-          class="rounded-xl border border-outline-variant bg-paper-white p-5 dark:bg-surface-raised"
+          class="min-w-0 self-start rounded-xl border border-outline-variant bg-paper-white p-5 dark:bg-surface-raised"
         >
           <div class="mb-4 border-b border-outline-variant pb-4">
             <h2

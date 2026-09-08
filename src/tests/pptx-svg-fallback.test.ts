@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import JSZip from 'jszip';
 import {
   buildPresentation,
-  materializeAllSlideNodes,
+  materializeSlideNodes,
   parseZipLazyMedia,
   RECOMMENDED_ZIP_LIMITS,
 } from '@aiden0z/pptx-renderer/browser';
@@ -42,13 +42,37 @@ describe('normalizeOfficeSvgBlips', () => {
     expect(result.source).toBe(source);
   });
 
-  it('leaves non-SVG graphics untouched', () => {
+  it('does not let a preceding self-closing image hide an Office Graphic', () => {
+    const source = `
+      <p:blipFill><a:blip r:embed="rId2"/></p:blipFill>
+      <p:blipFill>
+        <a:blip><a:extLst><a:ext><asvg:svgBlip r:embed="rId3"/></a:ext></a:extLst></a:blip>
+      </p:blipFill>`;
+
+    const result = normalizeOfficeSvgBlips(source);
+
+    expect(result.patchedCount).toBe(1);
+    expect(result.source).toContain('<a:blip r:embed="rId2"/>');
+    expect(result.source).toContain('<a:blip r:embed="rId3">');
+  });
+
+  it('leaves blips without a nested image reference untouched', () => {
     const source = '<a:blip><a:extLst><a:ext/></a:extLst></a:blip>';
 
     const result = normalizeOfficeSvgBlips(source);
 
     expect(result.patchedCount).toBe(0);
     expect(result.source).toBe(source);
+  });
+
+  it('recognizes nested image references from other Office Graphic extensions', () => {
+    const source =
+      '<a:blip><a:extLst><a:ext><a16:imgLayer r:embed="rId8"/></a:ext></a:extLst></a:blip>';
+
+    const result = normalizeOfficeSvgBlips(source);
+
+    expect(result.patchedCount).toBe(1);
+    expect(result.source).toContain('<a:blip r:embed="rId8">');
   });
 
   it('feeds the SVG relationship into the renderer model before slides render', async () => {
@@ -85,7 +109,7 @@ describe('normalizeOfficeSvgBlips', () => {
           <p:grpSpPr/>
           <p:pic>
             <p:nvPicPr><p:cNvPr id="2" name="Graphic 5"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr>
-            <p:blipFill><a:blip><a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}"><asvg:svgBlip r:embed="rId3"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></p:blipFill>
+            <p:blipFill><a:blip><a:extLst><a:ext uri="{96DAC541-7B7A-43D3-8B79-37D633B846F1}"><asvg:svgBlip xmlns:asvg="http://schemas.microsoft.com/office/drawing/2016/SVG/main" r:embed="rId3"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></p:blipFill>
             <p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="914400" cy="914400"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>
           </p:pic>
         </p:spTree></p:cSld>
@@ -110,7 +134,7 @@ describe('normalizeOfficeSvgBlips', () => {
     const slide = presentation.slides[0];
     const normalized = normalizeOfficeSvgBlips(slide.sourceXml || '');
     slide.sourceXml = normalized.source;
-    materializeAllSlideNodes(presentation);
+    materializeSlideNodes(presentation, slide);
 
     expect(normalized.patchedCount).toBe(1);
     expect(slide.nodes[0]).toMatchObject({
