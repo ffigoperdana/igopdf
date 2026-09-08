@@ -1,4 +1,5 @@
 import { initI18n, t } from '../i18n/index.js';
+import { normalizeOfficeSvgBlips } from './pptx-svg-fallback.js';
 
 interface GuideMaterial {
   id: string;
@@ -29,6 +30,12 @@ interface PptxNavigationControls {
   previousButton: HTMLButtonElement;
   nextButton: HTMLButtonElement;
   counter: HTMLSpanElement;
+}
+
+interface PptxLoadingIndicator {
+  element: HTMLDivElement;
+  message: HTMLParagraphElement;
+  progress: HTMLProgressElement;
 }
 
 let activePptxViewer: PptxViewerInstance | null = null;
@@ -69,50 +76,191 @@ function showViewerMessage(messageKey: string): void {
   viewerContent.appendChild(paragraph);
 }
 
+function formatFileSize(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const unitIndex = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(1024)),
+    units.length - 1
+  );
+  const value = bytes / 1024 ** unitIndex;
+
+  return `${value.toLocaleString(undefined, {
+    maximumFractionDigits: unitIndex === 0 || value >= 10 ? 0 : 1,
+  })} ${units[unitIndex]}`;
+}
+
+function setPptxDownloadProgress(
+  indicator: PptxLoadingIndicator,
+  received: number,
+  total?: number
+): void {
+  if (total && total > 0) {
+    const completed = Math.min(received, total);
+    const percent = Math.min(100, Math.round((completed / total) * 100));
+    indicator.message.textContent = t('guide.pptxDownloading', {
+      received: formatFileSize(completed),
+      total: formatFileSize(total),
+      percent,
+    });
+    indicator.progress.max = total;
+    indicator.progress.value = completed;
+    indicator.progress.setAttribute('aria-valuetext', `${percent}%`);
+    return;
+  }
+
+  indicator.message.textContent = t('guide.pptxDownloadingUnknown', {
+    received: formatFileSize(received),
+  });
+  indicator.progress.removeAttribute('value');
+  indicator.progress.removeAttribute('aria-valuetext');
+}
+
+async function fetchPptxBuffer(
+  source: string,
+  signal: AbortSignal,
+  onProgress: (received: number, total?: number) => void
+): Promise<ArrayBuffer> {
+  const response = await fetch(source, {
+    credentials: 'include',
+    cache: 'no-store',
+    signal,
+  });
+  if (!response.ok) throw new Error('PPTX_LOAD_FAILED');
+
+  const contentLength = Number(response.headers.get('content-length'));
+  const total =
+    Number.isSafeInteger(contentLength) && contentLength > 0
+      ? contentLength
+      : undefined;
+  onProgress(0, total);
+
+  if (!response.body) {
+    const buffer = await response.arrayBuffer();
+    onProgress(buffer.byteLength, total);
+    return buffer;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+
+    chunks.push(value);
+    received += value.byteLength;
+    onProgress(received, total);
+  }
+
+  const bytes = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  onProgress(received, total);
+  return bytes.buffer;
+}
+
+function normalizePresentationSvgBlips(
+  presentation: import('@aiden0z/pptx-renderer/browser').PresentationData
+): number {
+  let patchedCount = 0;
+
+  for (const slide of presentation.slides) {
+    if (!slide.sourceXml) continue;
+
+    const normalized = normalizeOfficeSvgBlips(slide.sourceXml);
+    if (normalized.patchedCount === 0) continue;
+
+    slide.sourceXml = normalized.source;
+    patchedCount += normalized.patchedCount;
+  }
+
+  return patchedCount;
+}
+
 async function renderPptxViewer(
   guide: GuideMaterial,
   source: string,
   container: HTMLDivElement,
-  loadingMessage: HTMLParagraphElement,
+  loadingIndicator: PptxLoadingIndicator,
   controls: PptxNavigationControls,
   generation: number,
   abortController: AbortController
 ): Promise<void> {
   try {
-    const response = await fetch(source, {
-      credentials: 'include',
-      cache: 'no-store',
-      signal: abortController.signal,
+    let lastProgressUpdate = -1;
+    const updateDownloadProgress = (received: number, total?: number) => {
+      const isComplete = total ? received >= total : received > 0;
+      if (
+        received !== 0 &&
+        !isComplete &&
+        received - lastProgressUpdate < 256 * 1024
+      ) {
+        return;
+      }
+      lastProgressUpdate = received;
+      setPptxDownloadProgress(loadingIndicator, received, total);
+    };
+
+    // Start downloading the viewer bundle and the presentation at the same
+    // time. This removes one full network round-trip from the first preview.
+    const [renderer, buffer] = await Promise.all([
+      import('@aiden0z/pptx-renderer/browser'),
+      fetchPptxBuffer(source, abortController.signal, updateDownloadProgress),
+    ]);
+    if (
+      generation !== pptxRenderGeneration ||
+      activeGuide?.id !== guide.id ||
+      !container.isConnected
+    ) {
+      return;
+    }
+
+    loadingIndicator.message.textContent = t('guide.pptxPreparing');
+    loadingIndicator.progress.max = 3;
+    loadingIndicator.progress.value = 2;
+    loadingIndicator.progress.setAttribute('aria-valuetext', '2/3');
+
+    const files = await renderer.parseZipLazyMedia(
+      buffer,
+      renderer.RECOMMENDED_ZIP_LIMITS
+    );
+    if (
+      generation !== pptxRenderGeneration ||
+      activeGuide?.id !== guide.id ||
+      !container.isConnected
+    ) {
+      return;
+    }
+
+    const presentation = renderer.buildPresentation(files, {
+      lazySlides: true,
     });
-    if (!response.ok) throw new Error('PPTX_LOAD_FAILED');
-
-    const buffer = await response.arrayBuffer();
-    if (
-      generation !== pptxRenderGeneration ||
-      activeGuide?.id !== guide.id ||
-      !container.isConnected
-    ) {
-      return;
+    normalizePresentationSvgBlips(presentation);
+    // The viewer will materialize only the requested slide. Its source XML is
+    // already normalized here, so Office SVG graphics work on every slide
+    // without eagerly parsing the complete deck.
+    if (presentation.width > 0 && presentation.height > 0) {
+      container.style.aspectRatio = `${presentation.width} / ${presentation.height}`;
     }
 
-    const { PptxViewer, RECOMMENDED_ZIP_LIMITS } =
-      await import('@aiden0z/pptx-renderer/browser');
-    if (
-      generation !== pptxRenderGeneration ||
-      activeGuide?.id !== guide.id ||
-      !container.isConnected
-    ) {
-      return;
-    }
+    loadingIndicator.message.textContent = t('guide.pptxRendering');
+    loadingIndicator.progress.max = 3;
+    loadingIndicator.progress.value = 3;
+    loadingIndicator.progress.setAttribute('aria-valuetext', '3/3');
 
     let openedViewer: PptxViewerInstance | null = null;
-    const pptxViewer = await PptxViewer.open(buffer, container, {
-      zipLimits: RECOMMENDED_ZIP_LIMITS,
+    const pptxViewer = new renderer.PptxViewer(container, {
       lazySlides: true,
       lazyMedia: true,
       pdfjs: false,
-      signal: abortController.signal,
-      renderMode: 'slide',
       onSlideChange: (index) => {
         if (
           !openedViewer ||
@@ -124,6 +272,9 @@ async function renderPptxViewer(
         updatePptxNavigation(controls, index, openedViewer.slideCount);
       },
     });
+    openedViewer = pptxViewer;
+    pptxViewer.load(presentation);
+    await pptxViewer.renderSlide(0);
 
     if (
       generation !== pptxRenderGeneration ||
@@ -135,13 +286,12 @@ async function renderPptxViewer(
     }
 
     activePptxViewer = pptxViewer;
-    openedViewer = pptxViewer;
     updatePptxNavigation(
       controls,
       pptxViewer.currentSlideIndex,
       pptxViewer.slideCount
     );
-    loadingMessage.remove();
+    loadingIndicator.element.remove();
   } catch (error) {
     if (
       abortController.signal.aborted ||
@@ -151,9 +301,10 @@ async function renderPptxViewer(
       return;
     }
 
-    loadingMessage.className =
+    loadingIndicator.element.className =
       'rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200';
-    loadingMessage.textContent = t('guide.pptxLoadError');
+    loadingIndicator.message.textContent = t('guide.pptxLoadError');
+    loadingIndicator.progress.remove();
     controls.counter.textContent = t('guide.pptxLoadError');
     controls.previousButton.disabled = true;
     controls.nextButton.disabled = true;
@@ -206,14 +357,28 @@ function setActiveGuide(guide: GuideMaterial): void {
   } else if (guide.assetType === 'pptx') {
     const presentation = document.createElement('div');
     presentation.className = 'space-y-3';
-    const loadingMessage = document.createElement('p');
-    loadingMessage.className =
+    const loadingElement = document.createElement('div');
+    loadingElement.className =
       'rounded-lg border border-outline-variant bg-background p-4 text-center text-sm text-on-surface-variant';
+    const loadingMessage = document.createElement('p');
     loadingMessage.setAttribute('aria-live', 'polite');
+    loadingMessage.setAttribute('aria-atomic', 'true');
     loadingMessage.textContent = t('guide.pptxLoading');
+    const loadingProgress = document.createElement('progress');
+    loadingProgress.className = 'mt-3 h-2 w-full accent-vibrant-palm';
+    loadingProgress.max = 1;
+    loadingProgress.removeAttribute('value');
+    loadingProgress.setAttribute('aria-label', t('guide.pptxLoading'));
+    loadingElement.append(loadingMessage, loadingProgress);
+    const loadingIndicator: PptxLoadingIndicator = {
+      element: loadingElement,
+      message: loadingMessage,
+      progress: loadingProgress,
+    };
     const pptxContainer = document.createElement('div');
     pptxContainer.className =
-      'h-[68vh] min-h-[28rem] w-full overflow-hidden rounded-lg border border-outline-variant bg-background';
+      'w-full overflow-hidden rounded-lg border border-outline-variant bg-background';
+    pptxContainer.style.aspectRatio = '16 / 9';
     pptxContainer.setAttribute(
       'aria-label',
       t('guide.frameTitle', { title: guide.title })
@@ -272,7 +437,7 @@ function setActiveGuide(guide: GuideMaterial): void {
     download.download = guide.originalFilename || `${guide.title}.pptx`;
     download.textContent = t('guide.downloadPptx');
     presentation.append(
-      loadingMessage,
+      loadingElement,
       pptxContainer,
       navigation,
       fallbackMessage,
@@ -286,7 +451,7 @@ function setActiveGuide(guide: GuideMaterial): void {
       guide,
       source,
       pptxContainer,
-      loadingMessage,
+      loadingIndicator,
       controls,
       generation,
       abortController
