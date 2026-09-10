@@ -6,8 +6,13 @@ import {
   PDFArray,
   PDFNumber,
   PDFRef,
+  PDFRawStream,
+  StandardFonts,
+  decodePDFRawStream,
 } from 'pdf-lib';
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { flattenAnnotations } from '../js/utils/flatten-annotations';
+import { createCompatiblePdfEditorExport } from '../js/utils/pdf-editor-compatible-export';
 
 function createAppearanceStream(
   doc: PDFDocument,
@@ -19,6 +24,32 @@ function createAppearanceStream(
     BBox: bbox,
   });
   return doc.context.register(stream);
+}
+
+async function createTextAppearanceStream(
+  doc: PDFDocument,
+  text: string
+): Promise<{ appearance: PDFRef; encodedText: string }> {
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const encodedText = font.encodeText(text).toString();
+  const stream = doc.context.stream(
+    `q BT /F1 12 Tf 0 g 2 6 Td ${encodedText} Tj ET Q`,
+    {
+      Type: 'XObject',
+      Subtype: 'Form',
+      BBox: [0, 0, 200, 24],
+      Resources: {
+        Font: {
+          F1: font.ref,
+        },
+      },
+    }
+  );
+
+  return {
+    appearance: doc.context.register(stream),
+    encodedText,
+  };
 }
 
 function addAnnotation(
@@ -108,6 +139,76 @@ describe('flattenAnnotations', () => {
     const reloaded = await roundTrip(doc);
     expect(reloaded.getPageCount()).toBe(1);
     expect(getAnnotCount(reloaded.getPage(0))).toBe(0);
+  });
+
+  it('moves FreeText appearance text into page content instead of retaining a comment', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const { appearance, encodedText } = await createTextAppearanceStream(
+      doc,
+      'Ditandatangani secara elektronik'
+    );
+
+    addAnnotation(doc, page, {
+      subtype: 'FreeText',
+      rect: [72, 700, 272, 724],
+      appearance,
+    });
+
+    flattenAnnotations(doc);
+    const reloaded = await roundTrip(doc);
+    const reloadedPage = reloaded.getPage(0);
+
+    expect(getAnnotCount(reloadedPage)).toBe(0);
+
+    const resources = reloadedPage.node.Resources();
+    const xObjects = resources.lookup(PDFName.of('XObject'), PDFDict);
+    const flattenedAppearance = reloaded.context.lookup(
+      xObjects.get(xObjects.keys()[0])!
+    );
+    expect(flattenedAppearance).toBeInstanceOf(PDFRawStream);
+
+    const appearanceContent = new TextDecoder().decode(
+      decodePDFRawStream(flattenedAppearance as PDFRawStream).decode()
+    );
+    expect(appearanceContent).toContain('BT');
+    expect(appearanceContent).toContain(encodedText);
+  });
+
+  it('creates a compatible editor export without FreeText comments', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const { appearance } = await createTextAppearanceStream(
+      doc,
+      'Teks untuk lampiran eksternal'
+    );
+
+    addAnnotation(doc, page, {
+      subtype: 'FreeText',
+      rect: [72, 700, 272, 724],
+      appearance,
+    });
+
+    const source = await doc.save();
+    const compatible = await createCompatiblePdfEditorExport(
+      source.buffer.slice(
+        source.byteOffset,
+        source.byteOffset + source.byteLength
+      ) as ArrayBuffer
+    );
+    const reloaded = await PDFDocument.load(compatible);
+
+    expect(getAnnotCount(reloaded.getPage(0))).toBe(0);
+
+    const loadingTask = getDocument({ data: new Uint8Array(compatible) });
+    const parsedDocument = await loadingTask.promise;
+    const textContent = await (await parsedDocument.getPage(1)).getTextContent();
+    const text = textContent.items
+      .map((item) => ('str' in item ? item.str : ''))
+      .join('');
+
+    expect(text).toContain('Teks untuk lampiran eksternal');
+    await parsedDocument.destroy();
   });
 
   it('should flatten multiple annotation types', async () => {

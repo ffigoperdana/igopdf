@@ -1,7 +1,7 @@
 // Logic for PDF Editor Page
 import { createIcons, icons } from 'lucide';
 import { showAlert, showLoader, hideLoader } from '../ui.js';
-import { formatBytes } from '../utils/helpers.js';
+import { downloadFile, formatBytes } from '../utils/helpers.js';
 import { makeUniqueFileKey } from '../utils/deduplicate-filename.js';
 import { batchDecryptIfNeeded } from '../utils/password-prompt.js';
 import { getEditorDisabledCategories } from '../utils/disabled-tools.js';
@@ -122,6 +122,38 @@ function waitForAnimationFrames(count = 2): Promise<void> {
     };
     wait(count);
   });
+}
+
+function getEditorExportFileName(documentId: string): string {
+  const sourceName = fileEntryMap
+    .get(documentId)
+    ?.dataset.sourceName?.trim();
+  const name = sourceName || 'edited.pdf';
+  return /\.pdf$/i.test(name) ? name : `${name}.pdf`;
+}
+
+async function downloadCompatibleEditorPdf(
+  registry: PluginRegistry,
+  documentId: string
+): Promise<void> {
+  const document = docManagerPlugin?.getDocument(documentId);
+  if (!document) throw new Error('PDF document is no longer open');
+
+  const exportedBuffer = await registry
+    .getEngine()
+    .saveAsCopy(document)
+    .toPromise();
+  const { createCompatiblePdfEditorExport } = await import(
+    '../utils/pdf-editor-compatible-export.js'
+  );
+  const compatibleBytes = await createCompatiblePdfEditorExport(exportedBuffer);
+
+  downloadFile(
+    new Blob([new Uint8Array(compatibleBytes)], {
+      type: 'application/pdf',
+    }),
+    getEditorExportFileName(documentId)
+  );
 }
 
 async function waitForAnnotationChangesToCommit(
@@ -1625,8 +1657,8 @@ async function handleFiles(files: FileList) {
           const documentId = docManagerPlugin?.getActiveDocumentId();
           if (!documentId) throw new Error('No active PDF document');
 
-          // Match the viewer's built-in Export flow so annotation lifecycle
-          // and download behavior remain owned by the viewer.
+          // Ensure all annotation changes and FreeText appearances are stored
+          // before creating an interoperable, flattened export copy.
           blurDeepActiveElement();
           const annotationScope = annotationPlugin?.forDocument(documentId);
           annotationScope?.deselectAnnotation();
@@ -1640,11 +1672,8 @@ async function handleFiles(files: FileList) {
           );
           await waitForAnimationFrames();
           await waitForAnnotationChangesToCommit(documentId);
-          const commands = registry.getPlugin('commands')?.provides() as
-            | CommandsCapability
-            | undefined;
-          if (!commands) throw new Error('PDF export command is unavailable');
-          commands.execute('document:export', documentId, 'ui');
+          downloadBtn.textContent = 'Preparing compatible PDF...';
+          await downloadCompatibleEditorPdf(registry, documentId);
           for (
             let index = pendingTextReplacements.length - 1;
             index >= 0;
@@ -1705,6 +1734,7 @@ function addFileEntries(fileDisplayArea: HTMLElement, files: File[]) {
     fileDiv.className =
       'flex items-center justify-between bg-surface-muted p-3 rounded-lg';
     fileDiv.setAttribute('data-pending-name', makeUniqueFileKey(i, file.name));
+    fileDiv.dataset.sourceName = file.name;
 
     const infoContainer = document.createElement('div');
     infoContainer.className = 'flex flex-col flex-1 min-w-0';
