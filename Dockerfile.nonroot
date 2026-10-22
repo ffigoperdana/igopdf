@@ -5,7 +5,7 @@
 ARG BASE_URL=
 
 # Build stage (identical to main Dockerfile)
-FROM public.ecr.aws/docker/library/node:22.23.4-alpine AS builder
+FROM docker.io/library/node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS builder
 WORKDIR /app
 COPY package*.json ./
 COPY vendor ./vendor
@@ -56,7 +56,7 @@ ENV VITE_BRAND_LOGO=$VITE_BRAND_LOGO
 ENV VITE_FOOTER_TEXT=$VITE_FOOTER_TEXT
 
 # Public-facing canonical site URL. See Dockerfile for details.
-ARG SITE_URL=https://www.bentopdf.com
+ARG SITE_URL=https://igo.bpdp.or.id
 ENV SITE_URL=$SITE_URL
 
 ENV NODE_OPTIONS="--max-old-space-size=3072"

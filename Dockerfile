@@ -2,7 +2,7 @@
 # Build to serve under Subdirectory BASE_URL if provided, eg: "ARG BASE_URL=/pdf/", otherwise leave blank: "ARG BASE_URL="
 ARG BASE_URL=
 
-FROM public.ecr.aws/docker/library/node:22.23.4-alpine AS builder
+FROM docker.io/library/node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS builder
 WORKDIR /app
 COPY package*.json ./
 COPY vendor ./vendor
@@ -64,7 +64,7 @@ ENV VITE_FOOTER_TEXT=$VITE_FOOTER_TEXT
 ARG DISABLE_TOOLS
 ENV DISABLE_TOOLS=$DISABLE_TOOLS
 
-ARG SITE_URL=https://igo.local
+ARG SITE_URL=https://igo.bpdp.or.id
 ENV SITE_URL=$SITE_URL
 
 ENV NODE_OPTIONS="--max-old-space-size=3072"

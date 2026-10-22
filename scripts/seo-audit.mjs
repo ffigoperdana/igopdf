@@ -5,15 +5,22 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DIST_DIR = path.resolve(__dirname, '../dist');
+// An optional output directory lets policy regression tests use disposable fixtures.
+const DIST_DIR = path.resolve(process.argv[2] || path.resolve(__dirname, '../dist'));
 const LOCALES_DIR = path.resolve(__dirname, '../public/locales');
-const SITE_URL = (process.env.SITE_URL || 'https://www.bentopdf.com').replace(
+const SITE_URL = (process.env.SITE_URL || 'https://igo.bpdp.or.id').replace(
   /\/+$/,
   ''
 );
 const HOST = new URL(SITE_URL).hostname;
 
-const NOINDEX_ALLOWLIST = new Set(['404.html', 'wasm-settings.html']);
+// IGO deliberately excludes these internal pages from indexing. Require their
+// noindex directives rather than treating them as public marketing pages.
+const NOINDEX_ALLOWLIST = new Set([
+  '404.html', 'wasm-settings.html', 'index.html', 'about.html', 'privacy.html',
+  'licensing.html', 'login.html', 'profile.html', 'admin.html', 'report.html',
+  'guide.html', 'aduan.html', 'admin-guide.html', 'admin-aduan.html',
+]);
 const SKIP_DIRS = new Set([
   'assets',
   'docs',
@@ -89,14 +96,14 @@ function auditHtml(file) {
     html,
     /<link[^>]+rel=["']canonical["'][^>]*href=["']([^"']+)["']/g
   );
-  if (canonicals.length === 0) {
+  if (canonicals.length === 0 && !NOINDEX_ALLOWLIST.has(file.rel)) {
     fail('canonical', `${file.rel}: missing <link rel="canonical">`);
   } else if (canonicals.length > 1) {
     fail(
       'canonical',
       `${file.rel}: ${canonicals.length} canonical tags (expected 1)`
     );
-  } else {
+  } else if (canonicals.length === 1) {
     const actual = canonicals[0];
     if (file.rel !== '404.html' && actual.endsWith('.html')) {
       fail(
@@ -136,13 +143,16 @@ function auditHtml(file) {
   if (
     robots &&
     /noindex/i.test(robots) &&
-    !NOINDEX_ALLOWLIST.has(file.rel) &&
-    !NOINDEX_ALLOWLIST.has(path.basename(file.rel))
+    !NOINDEX_ALLOWLIST.has(file.rel)
   ) {
     fail(
       'robots',
-      `${file.rel}: noindex on indexable page (robots="${robots}")`
+      `${file.rel}: unexpected noindex directive (robots="${robots}")`
     );
+  }
+
+  if (NOINDEX_ALLOWLIST.has(file.rel) && (!robots || !/\bnoindex\b/i.test(robots))) {
+    fail('robots', `${file.rel}: required internal-page noindex directive missing`);
   }
 
   const emptyI18n = html.match(/<span[^>]*data-i18n="[^"]+"[^>]*>\s*<\/span>/g);
@@ -180,10 +190,44 @@ function auditHtml(file) {
   }
 }
 
+function auditRobots() {
+  const robotsPath = path.join(DIST_DIR, 'robots.txt');
+  if (!fs.existsSync(robotsPath)) {
+    fail('robots', 'dist/robots.txt missing; IGO must disallow crawling');
+    return;
+  }
+  const groups = [];
+  let group = { agents: [], rules: [] };
+  for (const raw of fs.readFileSync(robotsPath, 'utf-8').split(/\r?\n/)) {
+    const line = raw.split('#')[0].trim();
+    const match = line.match(/^([^:]+):\s*(.*)$/);
+    if (!match) continue;
+    const directive = match[1].trim().toLowerCase();
+    const value = match[2].trim();
+    if (directive === 'user-agent') {
+      if (group.rules.length) {
+        groups.push(group);
+        group = { agents: [], rules: [] };
+      }
+      group.agents.push(value);
+    } else if (directive === 'allow' || directive === 'disallow') {
+      group.rules.push({ directive, value });
+    }
+  }
+  if (group.agents.length) groups.push(group);
+  if (!groups.some(({ agents }) => agents.includes('*')) || groups.some(({ rules }) =>
+    !rules.some(({ directive, value }) => directive === 'disallow' && value === '/') ||
+    rules.some(({ directive, value }) => directive === 'allow' && value !== '')
+  )) {
+    fail('robots', 'IGO must retain Disallow: / for all crawlers without Allow exceptions');
+  }
+}
+
 function auditSitemap() {
   const sitemapPath = path.join(DIST_DIR, 'sitemap.xml');
   if (!fs.existsSync(sitemapPath)) {
-    fail('sitemap', 'dist/sitemap.xml not found');
+    // IGO blocks all crawlers and does not generate public language routes.
+    // A sitemap is optional; any supplied sitemap is still validated below.
     return;
   }
   const xml = fs.readFileSync(sitemapPath, 'utf-8');
@@ -212,6 +256,10 @@ function auditSitemap() {
 
     try {
       const url = new URL(loc);
+      const page = path.posix.basename(url.pathname.replace(/\/+$/, '')) || 'index';
+      if (NOINDEX_ALLOWLIST.has(`${page.replace(/\.html$/, '')}.html`)) {
+        fail('sitemap', `sitemap exposes an excluded internal page: ${loc}`);
+      }
       if (url.hostname !== HOST) {
         fail(
           'sitemap',
@@ -247,11 +295,12 @@ function main() {
   }
 
   for (const file of files) auditHtml(file);
+  auditRobots();
   auditSitemap();
 
   const total = failures.length + warnings.length;
   if (total === 0) {
-    console.log(`SEO audit: ${files.length} HTML files passed, sitemap clean.`);
+    console.log(`SEO audit: ${files.length} HTML files passed; IGO metadata and crawl-blocking policy verified.`);
     return;
   }
 
