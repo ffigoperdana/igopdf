@@ -5,7 +5,7 @@
 ARG BASE_URL=
 
 # Build stage (identical to main Dockerfile)
-FROM public.ecr.aws/docker/library/node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:22.23.4-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 COPY vendor ./vendor
@@ -60,6 +60,9 @@ ARG SITE_URL=https://www.bentopdf.com
 ENV SITE_URL=$SITE_URL
 
 ENV NODE_OPTIONS="--max-old-space-size=3072"
+
+# Generate the CSP include required by the runtime image, as in Dockerfile.
+RUN node scripts/generate-security-headers.mjs
 
 RUN --mount=type=secret,id=VITE_CORS_PROXY_URL,required=false \
     --mount=type=secret,id=VITE_CORS_PROXY_SECRET,required=false \

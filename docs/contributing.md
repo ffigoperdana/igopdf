@@ -6,7 +6,7 @@ Thank you for your interest in contributing to BentoPDF! This guide will help yo
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.23.4 LTS (use `nvm use`; supported range: `>=22.23.4 <23`)
 - npm 9+
 - Git
 

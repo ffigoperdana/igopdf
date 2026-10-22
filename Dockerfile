@@ -2,7 +2,7 @@
 # Build to serve under Subdirectory BASE_URL if provided, eg: "ARG BASE_URL=/pdf/", otherwise leave blank: "ARG BASE_URL="
 ARG BASE_URL=
 
-FROM public.ecr.aws/docker/library/node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:22.23.4-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 COPY vendor ./vendor

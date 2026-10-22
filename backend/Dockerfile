@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20.19-bookworm-slim AS builder
+FROM node:22.23.4-bookworm-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20.19-bookworm-slim
+FROM node:22.23.4-bookworm-slim
 WORKDIR /app
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
