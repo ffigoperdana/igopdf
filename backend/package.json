@@ -4,7 +4,7 @@
   "description": "IGO PDF Tools - Backend API",
   "type": "module",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.23.4 <23"
   },
   "scripts": {
     "dev": "tsx watch src/app.ts",

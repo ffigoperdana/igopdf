@@ -127,6 +127,26 @@ function deploymentVersionPlugin(buildId: string): Plugin {
   };
 }
 
+// Source metadata uses a local placeholder; resolve it at build time without
+// changing routing, indexing directives, or generating language-specific pages.
+function canonicalSiteUrlPlugin(): Plugin {
+  const siteUrl = (process.env.SITE_URL || 'https://igo.bpdp.or.id').replace(/\/+$/, '');
+  return {
+    name: 'igo-canonical-site-url',
+    transformIndexHtml(html) {
+      return html.replace(/<(?:link|meta)\b[^>]*>/gi, (tag) => {
+        if (!/\brel=["']canonical["']|\b(?:property|name)=["'](?:og:url|twitter:url)["']/i.test(tag)) {
+          return tag;
+        }
+        return tag.replace(
+          /\b(href|content)=(["'])https:\/\/igo\.local([^"']*)\2/gi,
+          (_match, attribute, quote, pathname) => `${attribute}=${quote}${siteUrl}${pathname}${quote}`
+        );
+      });
+    },
+  };
+}
+
 function getBasePath(): string {
   return (process.env.BASE_URL || '/').replace(/\/$/, '');
 }
@@ -646,6 +666,7 @@ export default defineConfig(() => {
           appVersion: process.env.npm_package_version || 'Unknown',
         },
       }),
+      canonicalSiteUrlPlugin(),
       languageRouterPlugin(),
       flattenPagesPlugin(),
       rewriteHtmlPathsPlugin(),

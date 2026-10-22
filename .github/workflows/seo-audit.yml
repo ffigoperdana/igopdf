@@ -8,6 +8,9 @@ on:
       - 'scripts/generate-i18n-pages.mjs'
       - 'scripts/generate-sitemap.mjs'
       - 'scripts/seo-audit.mjs'
+      - 'scripts/seo-audit.test.mjs'
+      - 'public/robots.txt'
+      - '.github/workflows/seo-audit.yml'
       - 'src/partials/**'
       - 'package.json'
       - 'package-lock.json'
@@ -18,18 +21,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
-      SITE_URL: https://igo.example.go.id
+      SITE_URL: https://igo.bpdp.or.id
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22.23.4'
           cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Test SEO audit policy
+        run: node --test scripts/seo-audit.test.mjs
       - name: SEO audit
         run: npm run seo-audit
